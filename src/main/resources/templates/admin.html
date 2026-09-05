@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="ru">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
+
+    <title>Админ-панель</title>
+
+    <link rel="stylesheet" href="/css/style.css">
+
+</head>
+
+<body>
+
+<div class="container">
+
+    <h1>Управление занятиями</h1>
+
+    <p class="subtitle">
+        Добавляй и удаляй занятия для пользователей
+    </p>
+
+
+    <!-- ФОРМА ДОБАВЛЕНИЯ -->
+
+    <div class="activity-card">
+
+        <h2>Добавить новое занятие</h2>
+
+        <form action="/admin/add"
+              method="post">
+
+            <p>
+                <label>
+                    Название:
+                </label>
+            </p>
+
+            <input type="text"
+                   name="title"
+                   required>
+
+
+            <p>
+                <label>
+                    Описание:
+                </label>
+            </p>
+
+            <textarea name="description"
+                      rows="5"
+                      required></textarea>
+
+
+            <p>
+                <label>
+                    Категория:
+                </label>
+            </p>
+
+            <select name="category"
+                    required>
+
+                <option value="active">
+                    🏃 Активность
+                </option>
+
+                <option value="creative">
+                    🎨 Творчество
+                </option>
+
+                <option value="learning">
+                    📚 Обучение
+                </option>
+
+                <option value="entertainment">
+                    🎮 Развлечения
+                </option>
+
+            </select>
+
+
+            <p>
+                <label>
+                    Длительность в минутах:
+                </label>
+            </p>
+
+            <input type="number"
+                   name="duration"
+                   min="1"
+                   required>
+
+
+            <br>
+
+            <button class="button"
+                    type="submit">
+
+                ➕ Добавить занятие
+
+            </button>
+
+        </form>
+
+    </div>
+
+
+    <!-- СПИСОК ЗАНЯТИЙ -->
+
+    <div class="activity-card">
+
+        <h2>
+            Все занятия
+        </h2>
+
+        <div th:each="activity : ${activities}">
+
+            <hr>
+
+            <h3 th:text="${activity.title}">
+                Название
+            </h3>
+
+            <p th:text="${activity.description}">
+                Описание
+            </p>
+
+            <p>
+
+                Категория:
+                <strong th:text="${activity.category}">
+                    creative
+                </strong>
+
+                <br>
+
+                Время:
+                <strong th:text="${activity.duration}">
+                    30
+                </strong>
+                минут
+
+            </p>
+
+
+            <form th:action="@{'/admin/delete/' + ${activity.id}}"
+                  method="post">
+
+                <button type="submit">
+                    🗑 Удалить
+                </button>
+
+            </form>
+
+        </div>
+
+    </div>
+
+
+    <a class="back-button"
+       href="/">
+
+        ← Вернуться на сайт
+
+    </a>
+
+</div>
+
+</body>
+
+</html>

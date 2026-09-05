@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="ru">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
+
+    <title>Твоё занятие</title>
+
+    <link rel="stylesheet" href="/css/style.css">
+
+</head>
+
+<body>
+
+<div class="container">
+
+    <h1>Твоё занятие на сегодня</h1>
+
+    <div class="activity-card"
+         th:if="${activity != null}">
+
+        <h2 th:text="${activity.title}">
+            Название занятия
+        </h2>
+
+        <p class="activity-description"
+           th:text="${activity.description}">
+            Описание занятия
+        </p>
+
+        <div class="duration">
+
+            ⏱
+            <span th:text="${activity.duration}">
+                30
+            </span>
+            минут
+
+        </div>
+
+        <p>
+
+            📍
+
+            <span th:switch="${activity.location}">
+
+        <span th:case="'home'">
+            Дома
+        </span>
+
+        <span th:case="'outside'">
+            На улице
+        </span>
+
+        <span th:case="'friends'">
+            С друзьями
+        </span>
+
+        <span th:case="'anywhere'">
+            Где угодно
+        </span>
+
+    </span>
+
+        </p>
+
+    </div>
+
+    <div>
+
+        <a class="button"
+           th:href="@{'/activity?category=' + ${selectedCategory}
+        + '&duration=' + ${selectedDuration}
+        + '&location=' + ${selectedLocation}}">
+
+            🎲 Другое занятие
+
+        </a>
+
+    </div>
+
+    <div class="activity-card"
+         th:if="${activity == null}">
+
+        <h2>
+            😔 Пока нет подходящих занятий
+        </h2>
+
+        <p>
+            Попробуй выбрать другую категорию
+        </p>
+
+    </div>
+        <a class="button"
+           href="/">
+
+            ← Вернуться назад
+
+        </a>
+
+    </div>
+
+</body>
+
+</html>

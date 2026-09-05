@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="ru">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
+
+    <title>Чем заняться сегодня?</title>
+
+    <link rel="stylesheet"
+          href="/css/style.css">
+
+</head>
+
+<body>
+
+<div class="container">
+
+    <h1>Чем заняться сегодня?</h1>
+
+    <p class="subtitle">
+        Выбери категорию и количество свободного времени
+    </p>
+
+
+    <form action="/activity"
+          method="get">
+
+        <h2 style="color: white;">
+            1. Что тебе хочется?
+        </h2>
+
+
+        <div class="categories">
+
+            <label class="category-card">
+
+                <input type="radio"
+                       name="category"
+                       value="active"
+                       required>
+
+                <span class="category-content">
+            <span class="category-icon">🏃</span>
+            <span class="category-title">Активность</span>
+            <span class="category-description">
+                Двигаться и быть активнее
+            </span>
+        </span>
+
+            </label>
+
+
+            <label class="category-card">
+
+                <input type="radio"
+                       name="category"
+                       value="creative">
+
+                <span class="category-content">
+            <span class="category-icon">🎨</span>
+            <span class="category-title">Творчество</span>
+            <span class="category-description">
+                Создать что-то новое
+            </span>
+        </span>
+
+            </label>
+
+
+            <label class="category-card">
+
+                <input type="radio"
+                       name="category"
+                       value="learning">
+
+                <span class="category-content">
+            <span class="category-icon">📚</span>
+            <span class="category-title">Обучение</span>
+            <span class="category-description">
+                Узнать что-нибудь новое
+            </span>
+        </span>
+
+            </label>
+
+
+            <label class="category-card">
+
+                <input type="radio"
+                       name="category"
+                       value="entertainment">
+
+                <span class="category-content">
+            <span class="category-icon">🎮</span>
+            <span class="category-title">Развлечения</span>
+            <span class="category-description">
+                Отдохнуть и получить удовольствие
+            </span>
+        </span>
+
+            </label>
+
+        </div>
+
+
+        <h2 style="color: white; margin-top: 50px;">
+            2. Сколько у тебя времени?
+        </h2>
+
+
+        <div class="time-options">
+
+            <label class="time-card">
+
+                <input type="radio"
+                       name="duration"
+                       value="15"
+                       required>
+
+                ⚡ 15 минут
+
+            </label>
+
+
+            <label class="time-card">
+
+                <input type="radio"
+                       name="duration"
+                       value="30">
+
+                🕐 30 минут
+
+            </label>
+
+
+            <label class="time-card">
+
+                <input type="radio"
+                       name="duration"
+                       value="60">
+
+                🕑 1 час
+
+            </label>
+
+
+            <label class="time-card">
+
+                <input type="radio"
+                       name="duration"
+                       value="120">
+
+                🌙 2 часа
+
+            </label>
+
+        </div>
+
+        <h2 style="color: white; margin-top: 50px;">
+            3. Где ты находишься?
+        </h2>
+
+        <div class="time-options">
+
+            <label class="time-card">
+
+                <input type="radio"
+                       name="location"
+                       value="home"
+                       required>
+
+                🏠 Дома
+
+            </label>
+
+            <label class="time-card">
+
+                <input type="radio"
+                       name="location"
+                       value="outside">
+
+                🌳 На улице
+
+            </label>
+
+            <label class="time-card">
+
+                <input type="radio"
+                       name="location"
+                       value="friends">
+
+                👥 С друзьями
+
+            </label>
+
+            <label class="time-card">
+
+                <input type="radio"
+                       name="location"
+                       value="anywhere">
+
+                🌎 Где угодно
+
+            </label>
+
+        </div>
+
+        <button class="button"
+                type="submit">
+
+            🎲 Подобрать занятие
+
+        </button>
+
+    </form>
+
+</div>
+
+</body>
+
+</html>
