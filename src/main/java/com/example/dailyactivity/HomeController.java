@@ -7,6 +7,13 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
+import jakarta.servlet.http.HttpSession;
+
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
+
 @Controller
 public class HomeController {
 
@@ -26,14 +33,41 @@ public class HomeController {
             @RequestParam String category,
             @RequestParam int duration,
             @RequestParam String location,
-            Model model) {
+            Model model,
+            HttpSession session) {
+
+        String historyKey = category + "|" + duration + "|" + location;
+
+        Map<String, Set<Long>> history =
+                (Map<String, Set<Long>>) session.getAttribute("activityHistory");
+
+        if (history == null) {
+            history = new HashMap<>();
+            session.setAttribute("activityHistory", history);
+        }
+
+        Set<Long> usedIds = history.computeIfAbsent(
+                historyKey,
+                key -> new HashSet<>()
+        );
 
         Activity activity =
                 activityService.getRandomActivity(
                         category,
                         duration,
-                        location
+                        location,
+                        usedIds
                 );
+        if (activity != null) {
+            usedIds.add(activity.getId());
+        }
+
+        if (activity == null) {
+            model.addAttribute(
+                    "message",
+                    "Пока нет подходящих занятий, попробуй изменить категорию, время или место"
+            );
+        }
 
         model.addAttribute(
                 "activity",

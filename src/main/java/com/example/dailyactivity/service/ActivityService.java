@@ -6,6 +6,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Random;
+import java.util.Set;
 
 @Service
 public class ActivityService {
@@ -20,7 +21,8 @@ public class ActivityService {
     public Activity getRandomActivity(
             String category,
             int maxDuration,
-            String location) {
+            String location,
+            Set<Long> usedIds) {
 
         List<Activity> activities;
 
@@ -36,7 +38,11 @@ public class ActivityService {
                     );
 
             if (!activities.isEmpty()) {
-                return getRandomActivityFromList(activities);
+                Activity result = getRandomUnusedActivity(activities, usedIds);
+
+                if (result != null) {
+                    return result;
+                }
             }
 
             // 2. Категория + любое место + подходящее время
@@ -48,7 +54,11 @@ public class ActivityService {
                     );
 
             if (!activities.isEmpty()) {
-                return getRandomActivityFromList(activities);
+                Activity result = getRandomUnusedActivity(activities, usedIds);
+
+                if (result != null) {
+                    return result;
+                }
             }
 
             // 3. Категория + выбранное место,
@@ -60,7 +70,11 @@ public class ActivityService {
                     );
 
             if (!activities.isEmpty()) {
-                return getRandomActivityFromList(activities);
+                Activity result = getRandomUnusedActivity(activities, usedIds);
+
+                if (result != null) {
+                    return result;
+                }
             }
 
             // 4. Категория + любое место
@@ -71,38 +85,60 @@ public class ActivityService {
                     );
 
             if (!activities.isEmpty()) {
-                return getRandomActivityFromList(activities);
+                Activity result = getRandomUnusedActivity(activities, usedIds);
+
+                if (result != null) {
+                    return result;
+                }
             }
-        }
 
-        // 5. Просто категория + подходящее время
-        activities = activityRepository
-                .findByCategoryAndDurationLessThanEqual(
-                        category,
-                        maxDuration
-                );
+            // 5. Просто категория + подходящее время
+            activities = activityRepository
+                    .findByCategoryAndDurationLessThanEqual(
+                            category,
+                            maxDuration
+                    );
 
-        if (!activities.isEmpty()) {
-            return getRandomActivityFromList(activities);
-        }
+            if (!activities.isEmpty()) {
+                Activity result = getRandomUnusedActivity(activities, usedIds);
 
-        // 6. Просто категория
-        activities = activityRepository
-                .findByCategory(category);
+                if (result != null) {
+                    return result;
+                }
+            }
 
-        if (!activities.isEmpty()) {
-            return getRandomActivityFromList(activities);
+            // 6. Просто категория
+            activities = activityRepository
+                    .findByCategory(category);
+
+            if (!activities.isEmpty()) {
+                Activity result = getRandomUnusedActivity(activities, usedIds);
+
+                if (result != null) {
+                    return result;
+                }
+            }
         }
 
         // 7. Ничего не найдено
         return null;
     }
 
-    private Activity getRandomActivityFromList(
-            List<Activity> activities) {
 
-        int randomIndex = random.nextInt(activities.size());
+    private Activity getRandomUnusedActivity(
+            List<Activity> activities,
+            Set<Long> usedIds) {
 
-        return activities.get(randomIndex);
+        List<Activity> unusedActivities = activities.stream()
+                .filter(activity -> !usedIds.contains(activity.getId()))
+                .toList();
+
+        if (unusedActivities.isEmpty()) {
+            return null;
+        }
+
+        int randomIndex = random.nextInt(unusedActivities.size());
+
+        return unusedActivities.get(randomIndex);
     }
 }

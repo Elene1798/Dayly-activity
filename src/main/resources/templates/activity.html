@@ -86,6 +86,7 @@
     <div>
 
             <a class="button"
+               th:if="${activity != null}"
                th:href="@{'/activity?category=' + ${selectedCategory}
         + '&duration=' + ${selectedDuration}
         + '&location=' + ${selectedLocation}}">
