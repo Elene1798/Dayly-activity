@@ -11,7 +11,6 @@ import java.util.Random;
 public class ActivityService {
 
     private final ActivityRepository activityRepository;
-
     private final Random random = new Random();
 
     public ActivityService(ActivityRepository activityRepository) {
@@ -23,63 +22,87 @@ public class ActivityService {
             int maxDuration,
             String location) {
 
-        // 1. Идеальное совпадение:
-        // категория + место + подходящее время
+        List<Activity> activities;
 
-        List<Activity> activities =
-                activityRepository
-                        .findByCategoryAndLocationAndDurationLessThanEqual(
-                                category,
-                                location,
-                                maxDuration
-                        );
+        // Если пользователь выбрал конкретное место
+        if (!"anywhere".equals(location)) {
+
+            // 1. Категория + место + подходящее время
+            activities = activityRepository
+                    .findByCategoryAndLocationAndDurationLessThanEqual(
+                            category,
+                            location,
+                            maxDuration
+                    );
+
+            if (!activities.isEmpty()) {
+                return getRandomActivityFromList(activities);
+            }
+
+            // 2. Категория + любое место + подходящее время
+            activities = activityRepository
+                    .findByCategoryAndLocationAndDurationLessThanEqual(
+                            category,
+                            "anywhere",
+                            maxDuration
+                    );
+
+            if (!activities.isEmpty()) {
+                return getRandomActivityFromList(activities);
+            }
+
+            // 3. Категория + выбранное место,
+            // даже если занятие дольше указанного времени
+            activities = activityRepository
+                    .findByCategoryAndLocation(
+                            category,
+                            location
+                    );
+
+            if (!activities.isEmpty()) {
+                return getRandomActivityFromList(activities);
+            }
+
+            // 4. Категория + любое место
+            activities = activityRepository
+                    .findByCategoryAndLocation(
+                            category,
+                            "anywhere"
+                    );
+
+            if (!activities.isEmpty()) {
+                return getRandomActivityFromList(activities);
+            }
+        }
+
+        // 5. Просто категория + подходящее время
+        activities = activityRepository
+                .findByCategoryAndDurationLessThanEqual(
+                        category,
+                        maxDuration
+                );
 
         if (!activities.isEmpty()) {
             return getRandomActivityFromList(activities);
         }
 
-
-        // 2. Если ничего нет —
-        // ищем категорию + место,
-        // но уже без ограничения по времени
-
-        activities =
-                activityRepository
-                        .findByCategoryAndLocation(
-                                category,
-                                location
-                        );
+        // 6. Просто категория
+        activities = activityRepository
+                .findByCategory(category);
 
         if (!activities.isEmpty()) {
             return getRandomActivityFromList(activities);
         }
 
-
-        // 3. Если и этого нет —
-        // ищем просто категорию
-
-        activities =
-                activityRepository.findByCategory(category);
-
-        if (!activities.isEmpty()) {
-            return getRandomActivityFromList(activities);
-        }
-
-
-        // 4. Вообще ничего не нашли
-
+        // 7. Ничего не найдено
         return null;
     }
-
 
     private Activity getRandomActivityFromList(
             List<Activity> activities) {
 
-        int randomIndex =
-                random.nextInt(activities.size());
+        int randomIndex = random.nextInt(activities.size());
 
         return activities.get(randomIndex);
     }
 }
-
-

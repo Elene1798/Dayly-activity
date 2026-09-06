@@ -70,38 +70,36 @@
 
     </div>
 
-    <div>
-
-        <a class="button"
-           th:href="@{'/activity?category=' + ${selectedCategory}
-        + '&duration=' + ${selectedDuration}
-        + '&location=' + ${selectedLocation}}">
-
-            🎲 Другое занятие
-
-        </a>
-
-    </div>
 
     <div class="activity-card"
          th:if="${activity == null}">
 
         <h2>
-            😔 Пока нет подходящих занятий
+            😔 Пока нет подходящих занятий, попробуй изменить категорию, время или место
         </h2>
 
         <p>
             Попробуй выбрать другую категорию
         </p>
-
     </div>
+
+    <div>
+
+            <a class="button"
+               th:href="@{'/activity?category=' + ${selectedCategory}
+        + '&duration=' + ${selectedDuration}
+        + '&location=' + ${selectedLocation}}">
+
+                🎲 Другое занятие
+
+            </a>
+
         <a class="button"
            href="/">
 
             ← Вернуться назад
 
         </a>
-
     </div>
 
 </body>
