@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="ru"
+      xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Избранное</title>
+
+    <link rel="stylesheet"
+          th:href="@{/css/style.css}">
+</head>
+
+<body>
+
+<div class="container">
+
+    <h1>Избранное</h1>
+
+    <div th:if="${favorites.isEmpty()}">
+
+        <p>
+            У тебя пока нет избранных занятий.
+        </p>
+
+        <a class="button"
+           th:href="@{/}">
+            Вернуться на главную
+        </a>
+
+    </div>
+
+    <div th:unless="${favorites.isEmpty()}">
+
+        <div th:each="favorite : ${favorites}"
+             class="activity-card">
+
+            <h2 th:text="${favorite.activity.title}">
+                Название
+            </h2>
+
+            <p th:text="${favorite.activity.description}">
+                Описание
+            </p>
+
+            <p>
+                ⏱
+                <span th:text="${favorite.activity.duration}">
+                    30
+                </span>
+                минут
+            </p>
+
+            <p>
+                📍
+                <span th:text="${favorite.activity.location}">
+                    Дом
+                </span>
+            </p>
+
+            <form th:action="@{'/favorites/delete/' + ${favorite.id}}"
+                  method="post">
+
+                <input type="hidden"
+                       th:name="${_csrf.parameterName}"
+                       th:value="${_csrf.token}">
+
+                <button type="submit"
+                        class="button">
+                    Удалить
+                </button>
+
+            </form>
+
+        </div>
+
+    </div>
+
+    <br>
+
+    <a class="button"
+       th:href="@{/}">
+        На главную
+    </a>
+
+</div>
+
+</body>
+</html>

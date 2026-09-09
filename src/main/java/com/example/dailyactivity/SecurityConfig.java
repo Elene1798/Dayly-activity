@@ -1,13 +1,14 @@
 package com.example.dailyactivity;
 
+import com.example.dailyactivity.model.User;
+import com.example.dailyactivity.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
-import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.provisioning.InMemoryUserDetailsManager;
 import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.factory.PasswordEncoderFactories;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
@@ -28,15 +29,36 @@ public class SecurityConfig {
 
     @Bean
     public UserDetailsService userDetailsService(
+            UserRepository userRepository,
             PasswordEncoder passwordEncoder) {
 
-        UserDetails admin = User.builder()
-                .username(adminUsername)
-                .password(passwordEncoder.encode(adminPassword))
-                .roles("ADMIN")
-                .build();
+        return username -> {
 
-        return new InMemoryUserDetailsManager(admin);
+            // Администратор остаётся отдельным аккаунтом
+            if (username.equals(adminUsername)) {
+                return org.springframework.security.core.userdetails.User
+                        .builder()
+                        .username(adminUsername)
+                        .password(passwordEncoder.encode(adminPassword))
+                        .roles("ADMIN")
+                        .build();
+            }
+
+            // Обычные пользователи берутся из PostgreSQL
+            User user = userRepository.findByUsername(username)
+                    .orElseThrow(() ->
+                            new UsernameNotFoundException(
+                                    "Пользователь не найден"
+                            )
+                    );
+
+            return org.springframework.security.core.userdetails.User
+                    .builder()
+                    .username(user.getUsername())
+                    .password(user.getPassword())
+                    .roles(user.getRole())
+                    .build();
+        };
     }
 
     @Bean
@@ -48,15 +70,28 @@ public class SecurityConfig {
                         .requestMatchers(
                                 "/",
                                 "/activity",
-                                "/css/**"
+                                "/css/**",
+                                "/login",
+                                "/register",
+                                "/register/**"
                         ).permitAll()
-                        .requestMatchers("/admin/**").hasRole("ADMIN")
-                        .anyRequest().permitAll()
-                )
-                .formLogin(form -> form
-                        .defaultSuccessUrl("/admin", true)
+
+                        .requestMatchers("/favorites").authenticated()
+                        .requestMatchers("/favorites/**").authenticated()
+
+                        .requestMatchers("/admin/**")
+                        .hasRole("ADMIN")
+
+                        .anyRequest()
                         .permitAll()
                 )
+
+                .formLogin(form -> form
+                        .loginPage("/login")
+                        .defaultSuccessUrl("/", true)
+                        .permitAll()
+                )
+
                 .logout(logout -> logout
                         .logoutSuccessUrl("/")
                         .permitAll()

@@ -7,6 +7,7 @@ import org.springframework.stereotype.Service;
 import java.util.List;
 import java.util.Random;
 import java.util.Set;
+import java.util.Optional;
 
 @Service
 public class ActivityService {
@@ -124,6 +125,9 @@ public class ActivityService {
         return null;
     }
 
+    public Optional<Activity> getActivityById(Long id) {
+        return activityRepository.findById(id);
+    }
 
     private Activity getRandomUnusedActivity(
             List<Activity> activities,

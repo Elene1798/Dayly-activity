@@ -15,6 +15,58 @@
 </head>
 
 <body>
+<div class="top-menu">
+
+    <div class="top-menu-right">
+
+        <div th:if="${#authorization.expression('isAuthenticated()')}">
+
+            <span class="username">
+                👤
+                <span th:text="${#authentication.name}">
+                    Пользователь
+                </span>
+            </span>
+
+            <a th:href="@{/favorites}"
+               class="top-link">
+                Избранное
+            </a>
+
+            <form th:action="@{/logout}"
+                  method="post"
+                  class="logout-form">
+
+                <input type="hidden"
+                       th:name="${_csrf.parameterName}"
+                       th:value="${_csrf.token}">
+
+                <button type="submit"
+                        class="top-link logout-button">
+                    Выйти
+                </button>
+
+            </form>
+
+        </div>
+
+        <div th:unless="${#authorization.expression('isAuthenticated()')}">
+
+            <a th:href="@{/login}"
+               class="top-link">
+                Вход
+            </a>
+
+            <a th:href="@{/register}"
+               class="top-link register-link">
+                Регистрация
+            </a>
+
+        </div>
+
+    </div>
+
+</div>
 
 <div class="container">
 
@@ -39,6 +91,119 @@
                 30
             </span>
             минут
+
+            <div class="activity-actions">
+
+                <!-- ЛАЙК -->
+                <div th:if="${loggedIn}">
+
+                    <form th:action="@{'/activity/' + ${activity.id} + '/like'}"
+                          method="post">
+
+                        <input type="hidden"
+                               name="category"
+                               th:value="${selectedCategory}">
+
+                        <input type="hidden"
+                               name="duration"
+                               th:value="${selectedDuration}">
+
+                        <input type="hidden"
+                               name="location"
+                               th:value="${selectedLocation}">
+
+                        <input type="hidden"
+                               th:name="${_csrf.parameterName}"
+                               th:value="${_csrf.token}">
+
+                        <button type="submit"
+                                class="icon-button"
+                                th:classappend="${liked} ? ' active' : ''"
+                                th:title="${liked} ? 'Убрать лайк' : 'Мне нравится'">
+
+                <span th:text="${liked} ? '❤️' : '♡'">
+                    ♡
+                </span>
+
+                        </button>
+
+                    </form>
+
+                </div>
+
+
+                <!-- ИЗБРАННОЕ -->
+                <div th:if="${loggedIn}">
+
+                    <form th:action="@{'/activity/' + ${activity.id} + '/favorite'}"
+                          method="post">
+
+                        <input type="hidden"
+                               name="category"
+                               th:value="${selectedCategory}">
+
+                        <input type="hidden"
+                               name="duration"
+                               th:value="${selectedDuration}">
+
+                        <input type="hidden"
+                               name="location"
+                               th:value="${selectedLocation}">
+
+                        <input type="hidden"
+                               th:name="${_csrf.parameterName}"
+                               th:value="${_csrf.token}">
+
+                        <button type="submit"
+                                class="icon-button"
+                                th:classappend="${favorite} ? ' active' : ''"
+                                th:title="${favorite} ? 'Убрать из избранного' : 'Добавить в избранное'">
+
+                <span th:text="${favorite} ? '⭐' : '☆'">
+                    ☆
+                </span>
+
+                        </button>
+
+                    </form>
+
+                </div>
+
+
+                <!-- ДЛЯ ГОСТЯ -->
+                <div th:unless="${loggedIn}">
+
+                    <button type="button"
+                            class="icon-button"
+                            title="Войдите, чтобы поставить лайк"
+                            onclick="showAuthMessage()">
+
+                        ♡
+
+                    </button>
+
+                    <button type="button"
+                            class="icon-button"
+                            title="Войдите, чтобы добавить в избранное"
+                            onclick="showAuthMessage()">
+
+                        ☆
+
+                    </button>
+
+                </div>
+
+            </div>
+
+            <div id="auth-message"
+                 class="auth-message">
+
+                Чтобы поставить лайк или добавить занятие в избранное,
+                <a th:href="@{/login}">войдите</a>
+                или
+                <a th:href="@{/register}">зарегистрируйтесь</a>.
+
+            </div>
 
         </div>
 
@@ -102,6 +267,18 @@
 
         </a>
     </div>
+
+    <script>
+        function showAuthMessage() {
+            const message = document.getElementById("auth-message");
+
+            message.classList.add("show");
+
+            setTimeout(function () {
+                message.classList.remove("show");
+            }, 4000);
+        }
+    </script>
 
 </body>
 
