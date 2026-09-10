@@ -5,9 +5,9 @@ import com.example.dailyactivity.repository.ActivityRepository;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.Random;
 import java.util.Set;
-import java.util.Optional;
 
 @Service
 public class ActivityService {
@@ -27,122 +27,40 @@ public class ActivityService {
 
         List<Activity> activities;
 
-        // Если пользователь выбрал конкретное место
-        if (!"anywhere".equals(location)) {
-
-            // 1. Категория + место + подходящее время
+        // Если выбрано "Везде" — учитываем только категорию и время
+        if ("anywhere".equals(location)) {
+            activities = activityRepository
+                    .findByCategoryAndDurationLessThanEqual(
+                            category,
+                            maxDuration
+                    );
+        } else {
+            // В обычном случае учитываем категорию, место и время
             activities = activityRepository
                     .findByCategoryAndLocationAndDurationLessThanEqual(
                             category,
                             location,
                             maxDuration
                     );
-
-            if (!activities.isEmpty()) {
-                Activity result = getRandomUnusedActivity(activities, usedIds);
-
-                if (result != null) {
-                    return result;
-                }
-            }
-
-            // 2. Категория + любое место + подходящее время
-            activities = activityRepository
-                    .findByCategoryAndLocationAndDurationLessThanEqual(
-                            category,
-                            "anywhere",
-                            maxDuration
-                    );
-
-            if (!activities.isEmpty()) {
-                Activity result = getRandomUnusedActivity(activities, usedIds);
-
-                if (result != null) {
-                    return result;
-                }
-            }
-
-            // 3. Категория + выбранное место,
-            // даже если занятие дольше указанного времени
-            activities = activityRepository
-                    .findByCategoryAndLocation(
-                            category,
-                            location
-                    );
-
-            if (!activities.isEmpty()) {
-                Activity result = getRandomUnusedActivity(activities, usedIds);
-
-                if (result != null) {
-                    return result;
-                }
-            }
-
-            // 4. Категория + любое место
-            activities = activityRepository
-                    .findByCategoryAndLocation(
-                            category,
-                            "anywhere"
-                    );
-
-            if (!activities.isEmpty()) {
-                Activity result = getRandomUnusedActivity(activities, usedIds);
-
-                if (result != null) {
-                    return result;
-                }
-            }
-
-            // 5. Просто категория + подходящее время
-            activities = activityRepository
-                    .findByCategoryAndDurationLessThanEqual(
-                            category,
-                            maxDuration
-                    );
-
-            if (!activities.isEmpty()) {
-                Activity result = getRandomUnusedActivity(activities, usedIds);
-
-                if (result != null) {
-                    return result;
-                }
-            }
-
-            // 6. Просто категория
-            activities = activityRepository
-                    .findByCategory(category);
-
-            if (!activities.isEmpty()) {
-                Activity result = getRandomUnusedActivity(activities, usedIds);
-
-                if (result != null) {
-                    return result;
-                }
-            }
         }
 
-        // 7. Ничего не найдено
-        return null;
+        // Убираем занятия, которые уже показывали
+        List<Activity> availableActivities = activities.stream()
+                .filter(activity -> !usedIds.contains(activity.getId()))
+                .toList();
+
+        // Если подходящих новых занятий больше нет
+        if (availableActivities.isEmpty()) {
+            return null;
+        }
+
+        // Выбираем случайное занятие
+        return availableActivities.get(
+                random.nextInt(availableActivities.size())
+        );
     }
 
     public Optional<Activity> getActivityById(Long id) {
         return activityRepository.findById(id);
-    }
-
-    private Activity getRandomUnusedActivity(
-            List<Activity> activities,
-            Set<Long> usedIds) {
-
-        List<Activity> unusedActivities = activities.stream()
-                .filter(activity -> !usedIds.contains(activity.getId()))
-                .toList();
-
-        if (unusedActivities.isEmpty()) {
-            return null;
-        }
-
-        int randomIndex = random.nextInt(unusedActivities.size());
-
-        return unusedActivities.get(randomIndex);
     }
 }

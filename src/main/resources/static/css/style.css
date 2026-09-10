@@ -355,11 +355,13 @@ form .button {
     position: relative;
     margin-top: 20px;
     top: 20px;
+    color: white;
 }
 
 .auth-link a {
     font-weight: bold;
-    text-decoration: none;
+    color: aliceblue;
+    text-decoration: underline;
 }
 
 .auth-error,
@@ -392,6 +394,8 @@ form .button {
     text-decoration: none;
     font-weight: bold;
     transition: 0.2s;
+    margin-top: 20px;
+    margin: 2px;
 }
 
 .top-link:hover {
@@ -400,6 +404,7 @@ form .button {
 
 .register-link {
     border: 1px solid rgba(255, 255, 255, 0.7);
+    margin: 18px;
 }
 
 .username {
@@ -484,6 +489,240 @@ form .button {
     border-radius: 20px;
     padding: 25px;
     margin: 20px 0;
+}
+
+/* =========================
+   СТРАНИЦА ЗАНЯТИЯ
+   ========================= */
+
+.activity-card {
+    background: white;
+    border-radius: 25px;
+    padding: 35px;
+    margin-top: 30px;
+
+    box-shadow: 0 15px 40px rgba(0, 0, 0, 0.15);
+
+    text-align: left;
+}
+
+.activity-card h2 {
+    text-align: center;
+
+    font-size: 30px;
+
+    color: #333;
+
+    margin-top: 10px;
+    margin-bottom: 20px;
+}
+
+.activity-description {
+    font-size: 18px;
+    line-height: 1.6;
+
+    color: #555;
+
+    text-align: center;
+
+    margin-bottom: 25px;
+}
+
+
+/* КАРТИНКА */
+
+.activity-image {
+    width: 100%;
+
+    margin-bottom: 25px;
+
+    overflow: hidden;
+
+    border-radius: 20px;
+}
+
+.activity-image img {
+    display: block;
+
+    width: 100%;
+    max-height: 400px;
+
+    object-fit: cover;
+}
+
+
+/* ОСНОВНАЯ ИНФОРМАЦИЯ */
+
+.activity-info {
+    display: flex;
+
+    justify-content: center;
+
+    gap: 30px;
+
+    margin: 25px 0;
+
+    padding: 15px;
+
+    background: #f5f6ff;
+
+    border-radius: 15px;
+
+    color: #555;
+
+    font-size: 16px;
+}
+
+
+/* СЕКЦИИ */
+
+.activity-section {
+    margin-top: 25px;
+
+    padding: 20px;
+
+    background: #f8f8fb;
+
+    border-radius: 15px;
+}
+
+.activity-section h3 {
+    margin-top: 0;
+    margin-bottom: 12px;
+
+    color: #333;
+
+    font-size: 20px;
+}
+
+.activity-text {
+    margin: 0;
+
+    color: #555;
+
+    font-size: 16px;
+
+    line-height: 1.7;
+
+    white-space: pre-line;
+}
+
+
+/* ИНТЕРЕСНЫЙ ФАКТ */
+
+.fact-section {
+    background: #fff8e7;
+
+    border-left: 5px solid #f0b429;
+}
+
+
+/* МАТЕРИАЛЫ */
+
+.activity-materials {
+    margin-top: 25px;
+
+    padding: 20px;
+
+    background: #f3f4ff;
+
+    border-radius: 15px;
+
+    text-align: center;
+}
+
+.activity-materials h3 {
+    margin-top: 0;
+    margin-bottom: 18px;
+
+    color: #333;
+}
+
+
+/* КНОПКИ МАТЕРИАЛОВ */
+
+.material-button {
+    display: inline-block;
+
+    margin: 5px;
+
+    padding: 12px 20px;
+
+    border-radius: 25px;
+
+    background: white;
+
+    color: #667eea;
+
+    border: 2px solid #667eea;
+
+    text-decoration: none;
+
+    font-weight: bold;
+
+    transition: transform 0.2s,
+    background 0.2s,
+    color 0.2s;
+}
+
+.material-button:hover {
+    transform: translateY(-2px);
+
+    background: #667eea;
+
+    color: white;
+}
+
+
+/* НАВИГАЦИЯ */
+
+.activity-navigation {
+    display: flex;
+
+    justify-content: center;
+
+    gap: 20px;
+
+    flex-wrap: wrap;
+
+    margin-top: 20px;
+}
+
+.activity-navigation .button {
+    margin-top: 10px;
+}
+
+
+/* АДАПТИВНОСТЬ */
+
+@media (max-width: 700px) {
+
+    .activity-card {
+        padding: 20px;
+    }
+
+    .activity-card h2 {
+        font-size: 24px;
+    }
+
+    .activity-description {
+        font-size: 16px;
+    }
+
+    .activity-info {
+        flex-direction: column;
+
+        align-items: center;
+
+        gap: 10px;
+    }
+
+    .material-button {
+        display: block;
+
+        margin: 10px 0;
+    }
+
 }
 /* =========================
    ПЛАНШЕТ

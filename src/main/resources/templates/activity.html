@@ -15,6 +15,7 @@
 </head>
 
 <body>
+
 <div class="top-menu">
 
     <div class="top-menu-right">
@@ -68,173 +69,308 @@
 
 </div>
 
+
 <div class="container">
 
     <h1>Твоё занятие на сегодня</h1>
 
+
+    <!-- =========================
+         ЗАНЯТИЕ
+         ========================= -->
+
     <div class="activity-card"
          th:if="${activity != null}">
+
+
+        <!-- КАРТИНКА -->
+
+        <div class="activity-image"
+             th:if="${activity.imageUrl != null and !#strings.isEmpty(activity.imageUrl)}">
+
+            <img th:src="${activity.imageUrl}"
+                 alt="Изображение занятия">
+
+        </div>
+
+
+        <!-- НАЗВАНИЕ -->
 
         <h2 th:text="${activity.title}">
             Название занятия
         </h2>
+
+
+        <!-- ОПИСАНИЕ -->
 
         <p class="activity-description"
            th:text="${activity.description}">
             Описание занятия
         </p>
 
-        <div class="duration">
 
-            ⏱
-            <span th:text="${activity.duration}">
-                30
+        <!-- ОСНОВНАЯ ИНФОРМАЦИЯ -->
+
+        <div class="activity-info">
+
+            <span>
+                ⏱
+                <strong th:text="${activity.duration}">
+                    30
+                </strong>
+                минут
             </span>
-            минут
 
-            <div class="activity-actions">
+            <span>
 
-                <!-- ЛАЙК -->
-                <div th:if="${loggedIn}">
+                📍
 
-                    <form th:action="@{'/activity/' + ${activity.id} + '/like'}"
-                          method="post">
+                <span th:switch="${activity.location}">
 
-                        <input type="hidden"
-                               name="category"
-                               th:value="${selectedCategory}">
+                    <span th:case="'home'">
+                        Дома
+                    </span>
 
-                        <input type="hidden"
-                               name="duration"
-                               th:value="${selectedDuration}">
+                    <span th:case="'outside'">
+                        На улице
+                    </span>
 
-                        <input type="hidden"
-                               name="location"
-                               th:value="${selectedLocation}">
+                    <span th:case="'friends'">
+                        С друзьями
+                    </span>
 
-                        <input type="hidden"
-                               th:name="${_csrf.parameterName}"
-                               th:value="${_csrf.token}">
+                    <span th:case="'anywhere'">
+                        Где угодно
+                    </span>
 
-                        <button type="submit"
-                                class="icon-button"
-                                th:classappend="${liked} ? ' active' : ''"
-                                th:title="${liked} ? 'Убрать лайк' : 'Мне нравится'">
-
-                <span th:text="${liked} ? '❤️' : '♡'">
-                    ♡
                 </span>
 
-                        </button>
+            </span>
 
-                    </form>
-
-                </div>
+        </div>
 
 
-                <!-- ИЗБРАННОЕ -->
-                <div th:if="${loggedIn}">
+        <!-- =========================
+             ИНСТРУКЦИЯ
+             ========================= -->
 
-                    <form th:action="@{'/activity/' + ${activity.id} + '/favorite'}"
-                          method="post">
+        <div class="activity-section"
+             th:if="${activity.instructions != null and !#strings.isEmpty(activity.instructions)}">
 
-                        <input type="hidden"
-                               name="category"
-                               th:value="${selectedCategory}">
+            <h3>📝 Что нужно сделать</h3>
 
-                        <input type="hidden"
-                               name="duration"
-                               th:value="${selectedDuration}">
+            <p class="activity-text"
+               th:text="${activity.instructions}">
+                Инструкция
+            </p>
 
-                        <input type="hidden"
-                               name="location"
-                               th:value="${selectedLocation}">
-
-                        <input type="hidden"
-                               th:name="${_csrf.parameterName}"
-                               th:value="${_csrf.token}">
-
-                        <button type="submit"
-                                class="icon-button"
-                                th:classappend="${favorite} ? ' active' : ''"
-                                th:title="${favorite} ? 'Убрать из избранного' : 'Добавить в избранное'">
-
-                <span th:text="${favorite} ? '⭐' : '☆'">
-                    ☆
-                </span>
-
-                        </button>
-
-                    </form>
-
-                </div>
+        </div>
 
 
-                <!-- ДЛЯ ГОСТЯ -->
-                <div th:unless="${loggedIn}">
+        <!-- =========================
+             ПОЛЬЗА
+             ========================= -->
 
-                    <button type="button"
+        <div class="activity-section"
+             th:if="${activity.benefit != null and !#strings.isEmpty(activity.benefit)}">
+
+            <h3>💡 Зачем это делать</h3>
+
+            <p class="activity-text"
+               th:text="${activity.benefit}">
+                Польза занятия
+            </p>
+
+        </div>
+
+
+        <!-- =========================
+             ИНТЕРЕСНЫЙ ФАКТ
+             ========================= -->
+
+        <div class="activity-section fact-section"
+             th:if="${activity.interestingFact != null and !#strings.isEmpty(activity.interestingFact)}">
+
+            <h3>🤓 Интересный факт</h3>
+
+            <p class="activity-text"
+               th:text="${activity.interestingFact}">
+                Интересный факт
+            </p>
+
+        </div>
+
+
+        <!-- =========================
+             МАТЕРИАЛЫ
+             ========================= -->
+
+        <div class="activity-materials"
+             th:if="${(activity.videoUrl != null and !#strings.isEmpty(activity.videoUrl))
+                    or (activity.linkUrl != null and !#strings.isEmpty(activity.linkUrl))}">
+
+            <h3>📎 Полезные материалы</h3>
+
+
+            <!-- ВИДЕО -->
+
+            <a class="material-button"
+               th:if="${activity.videoUrl != null and !#strings.isEmpty(activity.videoUrl)}"
+               th:href="${activity.videoUrl}"
+               target="_blank"
+               rel="noopener noreferrer">
+
+                🎬 Смотреть видео
+
+            </a>
+
+
+            <!-- ССЫЛКА -->
+
+            <a class="material-button"
+               th:if="${activity.linkUrl != null and !#strings.isEmpty(activity.linkUrl)}"
+               th:href="${activity.linkUrl}"
+               target="_blank"
+               rel="noopener noreferrer">
+
+                🔗 Открыть полезный материал
+
+            </a>
+
+        </div>
+
+
+        <!-- =========================
+             ЛАЙК / ИЗБРАННОЕ
+             ========================= -->
+
+        <div class="activity-actions">
+
+
+            <!-- ЛАЙК -->
+
+            <div th:if="${loggedIn}">
+
+                <form th:action="@{'/activity/' + ${activity.id} + '/like'}"
+                      method="post">
+
+                    <input type="hidden"
+                           name="category"
+                           th:value="${selectedCategory}">
+
+                    <input type="hidden"
+                           name="duration"
+                           th:value="${selectedDuration}">
+
+                    <input type="hidden"
+                           name="location"
+                           th:value="${selectedLocation}">
+
+                    <input type="hidden"
+                           th:name="${_csrf.parameterName}"
+                           th:value="${_csrf.token}">
+
+                    <button type="submit"
                             class="icon-button"
-                            title="Войдите, чтобы поставить лайк"
-                            onclick="showAuthMessage()">
+                            th:classappend="${liked} ? ' active' : ''"
+                            th:title="${liked} ? 'Убрать лайк' : 'Мне нравится'">
 
-                        ♡
+                        <span th:text="${liked} ? '❤️' : '♡'">
+                            ♡
+                        </span>
 
                     </button>
 
-                    <button type="button"
-                            class="icon-button"
-                            title="Войдите, чтобы добавить в избранное"
-                            onclick="showAuthMessage()">
-
-                        ☆
-
-                    </button>
-
-                </div>
+                </form>
 
             </div>
 
-            <div id="auth-message"
-                 class="auth-message">
 
-                Чтобы поставить лайк или добавить занятие в избранное,
-                <a th:href="@{/login}">войдите</a>
-                или
-                <a th:href="@{/register}">зарегистрируйтесь</a>.
+            <!-- ИЗБРАННОЕ -->
+
+            <div th:if="${loggedIn}">
+
+                <form th:action="@{'/activity/' + ${activity.id} + '/favorite'}"
+                      method="post">
+
+                    <input type="hidden"
+                           name="category"
+                           th:value="${selectedCategory}">
+
+                    <input type="hidden"
+                           name="duration"
+                           th:value="${selectedDuration}">
+
+                    <input type="hidden"
+                           name="location"
+                           th:value="${selectedLocation}">
+
+                    <input type="hidden"
+                           th:name="${_csrf.parameterName}"
+                           th:value="${_csrf.token}">
+
+                    <button type="submit"
+                            class="icon-button"
+                            th:classappend="${favorite} ? ' active' : ''"
+                            th:title="${favorite} ? 'Убрать из избранного' : 'Добавить в избранное'">
+
+                        <span th:text="${favorite} ? '⭐' : '☆'">
+                            ☆
+                        </span>
+
+                    </button>
+
+                </form>
+
+            </div>
+
+
+            <!-- ДЛЯ ГОСТЯ -->
+
+            <div th:unless="${loggedIn}">
+
+                <button type="button"
+                        class="icon-button"
+                        title="Войдите, чтобы поставить лайк"
+                        onclick="showAuthMessage()">
+
+                    ♡
+
+                </button>
+
+                <button type="button"
+                        class="icon-button"
+                        title="Войдите, чтобы добавить в избранное"
+                        onclick="showAuthMessage()">
+
+                    ☆
+
+                </button>
 
             </div>
 
         </div>
 
-        <p>
 
-            📍
+        <!-- СООБЩЕНИЕ ДЛЯ ГОСТЯ -->
 
-            <span th:switch="${activity.location}">
+        <div id="auth-message"
+             class="auth-message">
 
-        <span th:case="'home'">
-            Дома
-        </span>
+            Чтобы поставить лайк или добавить занятие в избранное,
+            <a th:href="@{/login}">войдите</a>
+            или
+            <a th:href="@{/register}">зарегистрируйтесь</a>.
 
-        <span th:case="'outside'">
-            На улице
-        </span>
+        </div>
 
-        <span th:case="'friends'">
-            С друзьями
-        </span>
-
-        <span th:case="'anywhere'">
-            Где угодно
-        </span>
-
-    </span>
-
-        </p>
 
     </div>
 
+
+    <!-- =========================
+         НЕТ ЗАНЯТИЙ
+         ========================= -->
 
     <div class="activity-card"
          th:if="${activity == null}">
@@ -244,21 +380,28 @@
         </h2>
 
         <p>
-            Попробуй выбрать другую категорию
+            Попробуй выбрать другую категорию.
         </p>
+
     </div>
 
-    <div>
 
-            <a class="button"
-               th:if="${activity != null}"
-               th:href="@{'/activity?category=' + ${selectedCategory}
-        + '&duration=' + ${selectedDuration}
-        + '&location=' + ${selectedLocation}}">
+    <!-- =========================
+         КНОПКИ
+         ========================= -->
 
-                🎲 Другое занятие
+    <div class="activity-navigation">
 
-            </a>
+        <a class="button"
+           th:if="${activity != null}"
+           th:href="@{'/activity?category=' + ${selectedCategory}
+                    + '&duration=' + ${selectedDuration}
+                    + '&location=' + ${selectedLocation}}">
+
+            🎲 Другое занятие
+
+        </a>
+
 
         <a class="button"
            href="/">
@@ -266,18 +409,26 @@
             ← Вернуться назад
 
         </a>
+
     </div>
 
+
     <script>
+
         function showAuthMessage() {
-            const message = document.getElementById("auth-message");
+
+            const message =
+                document.getElementById("auth-message");
 
             message.classList.add("show");
 
             setTimeout(function () {
+
                 message.classList.remove("show");
+
             }, 4000);
         }
+
     </script>
 
 </body>

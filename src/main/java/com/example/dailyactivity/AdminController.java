@@ -29,18 +29,32 @@ public class AdminController {
 
     @PostMapping("/add")
     public String addActivity(
+
             @RequestParam String title,
             @RequestParam String description,
             @RequestParam String category,
             @RequestParam int duration,
-            @RequestParam String location) {
+            @RequestParam String location,
+
+            @RequestParam(required = false) String instructions,
+            @RequestParam(required = false) String benefit,
+            @RequestParam(required = false) String interestingFact,
+            @RequestParam(required = false) String imageUrl,
+            @RequestParam(required = false) String linkUrl,
+            @RequestParam(required = false) String videoUrl) {
 
         Activity activity = new Activity(
                 title,
                 description,
                 category,
                 duration,
-                location
+                location,
+                instructions,
+                benefit,
+                interestingFact,
+                imageUrl,
+                linkUrl,
+                videoUrl
         );
 
         activityRepository.save(activity);

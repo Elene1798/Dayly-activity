@@ -25,8 +25,6 @@
     </p>
 
 
-    <!-- ФОРМА ДОБАВЛЕНИЯ -->
-
     <div class="activity-card">
 
         <h2>Добавить новое занятие</h2>
@@ -83,9 +81,15 @@
 
             </select>
 
+
+            <p>
+                <label>
+                    Место:
+                </label>
             </p>
 
-            <select name="location" required>
+            <select name="location"
+                    required>
 
                 <option value="home">
                     🏠 Дома
@@ -105,6 +109,7 @@
 
             </select>
 
+
             <p>
                 <label>
                     Длительность в минутах:
@@ -115,6 +120,80 @@
                    name="duration"
                    min="1"
                    required>
+
+
+            <hr>
+
+            <h3>Дополнительная информация</h3>
+
+
+            <p>
+                <label>
+                    📝 Инструкция:
+                </label>
+            </p>
+
+            <textarea name="instructions"
+                      rows="6"
+                      placeholder="Например:
+1. Возьми лист бумаги.
+2. Поставь таймер на 15 минут.
+3. Попробуй нарисовать предмет одной линией."></textarea>
+
+
+            <p>
+                <label>
+                    💡 Зачем это делать:
+                </label>
+            </p>
+
+            <textarea name="benefit"
+                      rows="4"
+                      placeholder="Например: помогает отвлечься и потренировать внимание."></textarea>
+
+
+            <p>
+                <label>
+                    🤓 Интересный факт:
+                </label>
+            </p>
+
+            <textarea name="interestingFact"
+                      rows="4"
+                      placeholder="Интересный факт, связанный с этим занятием."></textarea>
+
+
+            <p>
+                <label>
+                    🖼️ Ссылка на картинку:
+                </label>
+            </p>
+
+            <input type="url"
+                   name="imageUrl"
+                   placeholder="https://...">
+
+
+            <p>
+                <label>
+                    🔗 Ссылка на полезный материал:
+                </label>
+            </p>
+
+            <input type="url"
+                   name="linkUrl"
+                   placeholder="https://...">
+
+
+            <p>
+                <label>
+                    🎬 Ссылка на видео:
+                </label>
+            </p>
+
+            <input type="url"
+                   name="videoUrl"
+                   placeholder="https://...">
 
 
             <br>
