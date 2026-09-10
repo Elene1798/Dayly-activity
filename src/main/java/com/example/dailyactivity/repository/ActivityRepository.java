@@ -1,11 +1,14 @@
 package com.example.dailyactivity.repository;
 
 import com.example.dailyactivity.model.Activity;
+import java.util.Optional;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.List;
 
 public interface ActivityRepository extends JpaRepository<Activity, Long> {
+
+    Optional<Activity> findByTitle(String title);
 
     List<Activity> findByCategory(String category);
 
@@ -24,4 +27,6 @@ public interface ActivityRepository extends JpaRepository<Activity, Long> {
             String category,
             String location
     );
+
+
 }
