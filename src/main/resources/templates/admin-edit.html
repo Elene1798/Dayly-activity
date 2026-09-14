@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Редактирование занятия</title>
+    <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+<div class="container">
+    <h1>Редактирование занятия</h1>
+
+    <div class="activity-card">
+        <form th:action="@{'/admin/edit/' + ${activity.id}}" method="post">
+            <p><label>Название:</label></p>
+            <input type="text" name="title" th:value="${activity.title}" required>
+
+            <p><label>Описание:</label></p>
+            <textarea name="description" rows="5" required th:text="${activity.description}"></textarea>
+
+            <p><label>Категория:</label></p>
+            <select name="category" required>
+                <option value="active" th:selected="${activity.category == 'active'}">🏃 Активность</option>
+                <option value="creative" th:selected="${activity.category == 'creative'}">🎨 Творчество</option>
+                <option value="learning" th:selected="${activity.category == 'learning'}">📚 Обучение</option>
+                <option value="entertainment" th:selected="${activity.category == 'entertainment'}">🎮 Развлечения</option>
+            </select>
+
+            <p><label>Место:</label></p>
+            <select name="location" required>
+                <option value="home" th:selected="${activity.location == 'home'}">🏠 Дома</option>
+                <option value="outside" th:selected="${activity.location == 'outside'}">🌳 На улице</option>
+                <option value="friends" th:selected="${activity.location == 'friends'}">👥 С друзьями</option>
+                <option value="anywhere" th:selected="${activity.location == 'anywhere'}">🌎 Где угодно</option>
+            </select>
+
+            <p><label>Длительность в минутах:</label></p>
+            <input type="number" name="duration" min="1" th:value="${activity.duration}" required>
+
+            <hr>
+            <h3>Дополнительная информация</h3>
+
+            <p><label>📝 Инструкция:</label></p>
+            <textarea name="instructions" rows="6" th:text="${activity.instructions}"></textarea>
+
+            <p><label>💡 Зачем это делать:</label></p>
+            <textarea name="benefit" rows="4" th:text="${activity.benefit}"></textarea>
+
+            <p><label>🤓 Интересный факт:</label></p>
+            <textarea name="interestingFact" rows="4" th:text="${activity.interestingFact}"></textarea>
+
+            <p><label>🖼️ Ссылка на картинку:</label></p>
+            <input type="url" name="imageUrl" th:value="${activity.imageUrl}">
+
+            <p><label>🔗 Ссылка на полезный материал:</label></p>
+            <input type="url" name="linkUrl" th:value="${activity.linkUrl}">
+
+            <p><label>🎬 Ссылка на видео:</label></p>
+            <input type="url" name="videoUrl" th:value="${activity.videoUrl}">
+
+            <br>
+            <button class="button" type="submit">💾 Сохранить изменения</button>
+            <a class="button" th:href="@{/admin}">← Назад</a>
+        </form>
+    </div>
+</div>
+</body>
+</html>

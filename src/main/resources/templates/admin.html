@@ -248,6 +248,11 @@
             </p>
 
 
+            <a class="button"
+               th:href="@{'/admin/edit/' + ${activity.id}}">
+                ✏️ Редактировать
+            </a>
+
             <form th:action="@{'/admin/delete/' + ${activity.id}}"
                   method="post">
 

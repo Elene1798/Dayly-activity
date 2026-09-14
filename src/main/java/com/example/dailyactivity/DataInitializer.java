@@ -2,6 +2,7 @@ package com.example.dailyactivity;
 
 import com.example.dailyactivity.model.Activity;
 import com.example.dailyactivity.repository.ActivityRepository;
+import com.example.dailyactivity.repository.FavoriteRepository;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Component;
 
@@ -9,9 +10,11 @@ import org.springframework.stereotype.Component;
 public class DataInitializer implements CommandLineRunner {
 
     private final ActivityRepository activityRepository;
+    private final FavoriteRepository favoriteRepository;
 
-    public DataInitializer(ActivityRepository activityRepository) {
+    public DataInitializer(ActivityRepository activityRepository, FavoriteRepository favoriteRepository) {
         this.activityRepository = activityRepository;
+        this.favoriteRepository = favoriteRepository;
     }
 
     @Override
@@ -262,6 +265,17 @@ public class DataInitializer implements CommandLineRunner {
                 "https://www.kinopoisk.ru/film/258687/?socialAlias=MjEzMzcyMTM%3D",
                 null
         );
+
+        migrateOldFavorites();
+    }
+
+    private void migrateOldFavorites() {
+        favoriteRepository.findAll().forEach(favorite -> {
+            if (!favorite.hasSnapshot() && favorite.getActivity() != null) {
+                favorite.copyFromActivity(favorite.getActivity());
+                favoriteRepository.save(favorite);
+            }
+        });
     }
 
     private void saveIfMissing(
@@ -277,20 +291,34 @@ public class DataInitializer implements CommandLineRunner {
             String linkUrl,
             String videoUrl) {
 
-        if (activityRepository.findByTitle(title).isEmpty()) {
-            activityRepository.save(new Activity(
-                    title,
-                    description,
-                    category,
-                    duration,
-                    location,
-                    instructions,
-                    benefit,
-                    interestingFact,
-                    imageUrl,
-                    linkUrl,
-                    videoUrl
-            ));
+        String sourceKey = "builtin:" + title;
+
+        Activity activity = activityRepository.findBySourceKey(sourceKey).orElse(null);
+
+        // Одноразово подхватываем уже существующие 28 системных занятий
+        // по названию и присваиваем им стабильный sourceKey.
+        if (activity == null) {
+            activity = activityRepository.findByTitle(title).orElse(null);
         }
+
+        if (activity == null) {
+            activity = new Activity();
+        }
+
+        activity.setSourceKey(sourceKey);
+        activity.setTitle(title);
+        activity.setDescription(description);
+        activity.setCategory(category);
+        activity.setDuration(duration);
+        activity.setLocation(location);
+        activity.setInstructions(instructions);
+        activity.setBenefit(benefit);
+        activity.setInterestingFact(interestingFact);
+        activity.setImageUrl(imageUrl);
+        activity.setLinkUrl(linkUrl);
+        activity.setVideoUrl(videoUrl);
+
+        activityRepository.save(activity);
     }
+
 }

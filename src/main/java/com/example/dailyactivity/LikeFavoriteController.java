@@ -122,11 +122,22 @@ public class LikeFavoriteController {
             return "redirect:/login";
         }
 
-        model.addAttribute(
-                "favorites",
-                favoriteRepository.findByUser(user)
-        );
+        var favorites = favoriteRepository.findByUser(user);
 
+        // Одноразово заполняем снимки для избранного, созданного
+        // до появления механизма snapshot. Пользовательские данные не теряются.
+        boolean changed = false;
+        for (Favorite favorite : favorites) {
+            if (!favorite.hasSnapshot() && favorite.getActivity() != null) {
+                favorite.copyFromActivity(favorite.getActivity());
+                changed = true;
+            }
+        }
+        if (changed) {
+            favoriteRepository.saveAll(favorites);
+        }
+
+        model.addAttribute("favorites", favorites);
         return "favorites";
     }
 

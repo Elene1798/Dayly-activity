@@ -10,6 +10,8 @@ public interface ActivityRepository extends JpaRepository<Activity, Long> {
 
     Optional<Activity> findByTitle(String title);
 
+    Optional<Activity> findBySourceKey(String sourceKey);
+
     List<Activity> findByCategory(String category);
 
     List<Activity> findByCategoryAndDurationLessThanEqual(

@@ -42,7 +42,11 @@ public class HomeController {
     }
 
     @GetMapping("/")
-    public String home() {
+    public String home(HttpSession session) {
+        // Возвращение на главную означает новый выбор.
+        // Старый список "Другое занятие" больше не должен влиять
+        // на следующий вход в категорию.
+        session.removeAttribute("activityHistory");
         return "index";
     }
 

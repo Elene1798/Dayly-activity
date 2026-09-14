@@ -10,6 +10,9 @@ public class Activity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Column(unique = true)
+    private String sourceKey;
+
     private String title;
 
     @Column(length = 2000)
@@ -87,6 +90,14 @@ public class Activity {
 
     public Long getId() {
         return id;
+    }
+
+    public String getSourceKey() {
+        return sourceKey;
+    }
+
+    public void setSourceKey(String sourceKey) {
+        this.sourceKey = sourceKey;
     }
 
     public String getTitle() {
