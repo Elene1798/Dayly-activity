@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="ru" xmlns="http://www.w3.org/1999/html">
+<html lang="ru" xmlns:th="http://www.thymeleaf.org">
 
 <head>
 
@@ -8,7 +8,7 @@
     <meta name="viewport"
           content="width=device-width, initial-scale=1.0">
 
-    <title>Чем заняться сегодня?</title>
+    <title>Daily Activity</title>
 
     <link rel="stylesheet"
           href="/css/style.css">
@@ -70,24 +70,42 @@
 
 </div>
 
-<div class="container">
 
-    <h1>Чем заняться сегодня?</h1>
+<div class="container home-container">
 
-    <p class="subtitle">
-        Выбери категорию, время и место
-    </p>
+    <div class="hero">
+
+        <div class="hero-badge">
+            ✨ Daily Activity
+        </div>
+
+        <h1>
+            Чем займёмся сегодня?
+        </h1>
+
+        <p class="subtitle">
+            Выбери то, чего хочется прямо сейчас
+        </p>
+
+    </div>
 
 
     <form action="/activity"
-          method="get">
+          method="get"
+          class="activity-form">
 
-        <h2 style="color: white;">
-            1. Что тебе хочется?
+
+        <!-- =========================
+             КАТЕГОРИИ
+             ========================= -->
+
+        <h2>
+            Что тебе хочется?
         </h2>
 
 
         <div class="categories">
+
 
             <label class="category-card">
 
@@ -97,12 +115,20 @@
                        required>
 
                 <span class="category-content">
-            <span class="category-icon">🏃</span>
-            <span class="category-title">Активность</span>
-            <span class="category-description">
-                Двигаться и быть активнее
-            </span>
-        </span>
+
+                    <span class="category-icon">
+                        🏃
+                    </span>
+
+                    <span class="category-title">
+                        Активность
+                    </span>
+
+                    <span class="category-description">
+                        Двигаться и быть активнее
+                    </span>
+
+                </span>
 
             </label>
 
@@ -114,12 +140,20 @@
                        value="creative">
 
                 <span class="category-content">
-            <span class="category-icon">🎨</span>
-            <span class="category-title">Творчество</span>
-            <span class="category-description">
-                Создать что-то новое
-            </span>
-        </span>
+
+                    <span class="category-icon">
+                        🎨
+                    </span>
+
+                    <span class="category-title">
+                        Творчество
+                    </span>
+
+                    <span class="category-description">
+                        Создать что-то новое
+                    </span>
+
+                </span>
 
             </label>
 
@@ -131,12 +165,20 @@
                        value="learning">
 
                 <span class="category-content">
-            <span class="category-icon">📚</span>
-            <span class="category-title">Обучение</span>
-            <span class="category-description">
-                Узнать что-нибудь новое
-            </span>
-        </span>
+
+                    <span class="category-icon">
+                        📚
+                    </span>
+
+                    <span class="category-title">
+                        Обучение
+                    </span>
+
+                    <span class="category-description">
+                        Узнать что-нибудь новое
+                    </span>
+
+                </span>
 
             </label>
 
@@ -148,33 +190,103 @@
                        value="entertainment">
 
                 <span class="category-content">
-            <span class="category-icon">🎮</span>
-            <span class="category-title">Развлечения</span>
-            <span class="category-description">
-                Отдохнуть и получить удовольствие
-            </span>
-        </span>
+
+                    <span class="category-icon">
+                        🎮
+                    </span>
+
+                    <span class="category-title">
+                        Развлечения
+                    </span>
+
+                    <span class="category-description">
+                        Отдохнуть и получить удовольствие
+                    </span>
+
+                </span>
 
             </label>
+
+
+            <!-- =========================
+                 ДЛЯ ДВОИХ
+                 ========================= -->
+
+            <label class="category-card couple-card">
+
+                <input type="radio"
+                       name="category"
+                       value="couple">
+
+                <span class="category-content">
+
+                    <span class="category-icon">
+                        💕
+                    </span>
+
+                    <span class="category-title">
+                        Для двоих
+                    </span>
+
+                    <span class="category-description">
+                        Провести время вместе
+                    </span>
+
+                </span>
+
+            </label>
+
+
+            <!-- =========================
+                 УДИВИ МЕНЯ
+                 ========================= -->
+
+            <a href="/surprise"
+               class="category-card surprise-card">
+
+                <span class="category-content">
+
+                    <span class="category-icon">
+                        ✨
+                    </span>
+
+                    <span class="category-title">
+                        Удиви меня
+                    </span>
+
+                    <span class="category-description">
+                        Выбери что-нибудь случайное
+                    </span>
+
+                </span>
+
+            </a>
+
 
         </div>
 
 
-        <h2 style="color: white; margin-top: 50px;">
-            2. Сколько у тебя времени?
+        <!-- =========================
+             ВРЕМЯ
+             ========================= -->
+
+        <h2 class="section-title">
+            Сколько у тебя времени?
         </h2>
 
 
         <div class="time-options">
 
+
             <label class="time-card">
 
                 <input type="radio"
                        name="duration"
-                       value="15"
-                       required>
+                       value="15">
 
-                ⚡ 15 минут
+
+                <span>⚡</span>
+                <span>15 минут</span>
 
             </label>
 
@@ -185,7 +297,8 @@
                        name="duration"
                        value="30">
 
-                🕐 30 минут
+                <span>🕐</span>
+                <span>30 минут</span>
 
             </label>
 
@@ -196,7 +309,8 @@
                        name="duration"
                        value="60">
 
-                🕑 1 час
+                <span>🕑</span>
+                <span>1 час</span>
 
             </label>
 
@@ -207,28 +321,38 @@
                        name="duration"
                        value="120">
 
-                🌙 2 часа
+                <span>🌙</span>
+                <span>2 часа</span>
 
             </label>
 
+
         </div>
 
-        <h2 style="color: white; margin-top: 50px;">
-            3. Где ты находишься?
+
+        <!-- =========================
+             МЕСТО
+             ========================= -->
+
+        <h2 class="section-title">
+            Где ты находишься?
         </h2>
 
+
         <div class="time-options">
+
 
             <label class="time-card">
 
                 <input type="radio"
                        name="location"
-                       value="home"
-                       required>
+                       value="home">
 
-                🏠 Дома
+                <span>🏠</span>
+                <span>Дома</span>
 
             </label>
+
 
             <label class="time-card">
 
@@ -236,9 +360,11 @@
                        name="location"
                        value="outside">
 
-                🌳 На улице
+                <span>🌳</span>
+                <span>На улице</span>
 
             </label>
+
 
             <label class="time-card">
 
@@ -246,9 +372,11 @@
                        name="location"
                        value="friends">
 
-                👥 С друзьями
+                <span>👥</span>
+                <span>С друзьями</span>
 
             </label>
+
 
             <label class="time-card">
 
@@ -256,24 +384,34 @@
                        name="location"
                        value="anywhere">
 
-                🌎 Где угодно
+                <span>🌎</span>
+                <span>Где угодно</span>
 
             </label>
+
+
         </div>
+
+
+        <!-- =========================
+             КНОПКА
+             ========================= -->
 
         <div class="button-container">
-        <button class="button"
-                type="submit">
 
-            🎲 Подобрать занятие
+            <button class="button"
+                    type="submit">
 
-        </button>
+                🎲 Подобрать занятие
+
+            </button>
+
         </div>
+
 
     </form>
 
 </div>
-
 
 </body>
 

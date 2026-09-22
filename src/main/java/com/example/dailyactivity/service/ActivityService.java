@@ -21,40 +21,81 @@ public class ActivityService {
 
     public Activity getRandomActivity(
             String category,
-            int maxDuration,
+            Integer maxDuration,
             String location,
             Set<Long> usedIds) {
 
-        List<Activity> activities;
+        List<Activity> activities =
+                activityRepository.findByCategory(category);
 
-        // Если выбрано "Везде" — учитываем только категорию и время
-        if ("anywhere".equals(location)) {
-            activities = activityRepository
-                    .findByCategoryAndDurationLessThanEqual(
-                            category,
-                            maxDuration
-                    );
-        } else {
-            // В обычном случае учитываем категорию, место и время
-            activities = activityRepository
-                    .findByCategoryAndLocationAndDurationLessThanEqual(
-                            category,
-                            location,
-                            maxDuration
-                    );
-        }
-
-        // Убираем занятия, которые уже показывали
         List<Activity> availableActivities = activities.stream()
-                .filter(activity -> !usedIds.contains(activity.getId()))
+
+                // Фильтр по времени, если он выбран
+                .filter(activity ->
+                        maxDuration == null
+                                || activity.getDuration() <= maxDuration)
+
+                // Фильтр по месту, если он выбран
+                .filter(activity ->
+                        location == null
+                                || "anywhere".equals(location)
+                                || location.equals(activity.getLocation()))
+
+                // Не показываем уже использованные занятия
+                .filter(activity ->
+                        !usedIds.contains(activity.getId()))
+
                 .toList();
 
-        // Если подходящих новых занятий больше нет
         if (availableActivities.isEmpty()) {
             return null;
         }
 
-        // Выбираем случайное занятие
+        return availableActivities.get(
+                random.nextInt(availableActivities.size())
+        );
+    }
+
+    public Activity getRandomSurpriseActivity(Set<Long> usedIds) {
+
+        List<Activity> activities =
+                activityRepository.findAll();
+
+        List<Activity> availableActivities = activities.stream()
+
+                // "Для двоих" не участвует в "Удиви меня"
+                .filter(activity ->
+                        !"couple".equals(activity.getCategory()))
+
+                // Не показываем уже использованные занятия
+                .filter(activity ->
+                        !usedIds.contains(activity.getId()))
+
+                .toList();
+
+        if (availableActivities.isEmpty()) {
+            return null;
+        }
+
+        return availableActivities.get(
+                random.nextInt(availableActivities.size())
+        );
+    }
+
+    public Activity getRandomCoupleActivity(Set<Long> usedIds) {
+
+        List<Activity> activities =
+                activityRepository.findByCategory("couple");
+
+        List<Activity> availableActivities = activities.stream()
+                .filter(activity ->
+                        !usedIds.contains(activity.getId()))
+                .toList();
+
+        if (availableActivities.isEmpty()) {
+            return null;
+        }
+
         return availableActivities.get(
                 random.nextInt(availableActivities.size())
         );

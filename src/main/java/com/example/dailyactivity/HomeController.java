@@ -47,27 +47,155 @@ public class HomeController {
         // Старый список "Другое занятие" больше не должен влиять
         // на следующий вход в категорию.
         session.removeAttribute("activityHistory");
+
         return "index";
     }
 
-    @GetMapping("/activity")
-    public String getActivity(
-            @RequestParam String category,
-            @RequestParam int duration,
-            @RequestParam String location,
+    @GetMapping("/surprise")
+    public String surprise(
             @RequestParam(required = false) Long activityId,
             Model model,
             HttpSession session,
             Authentication authentication) {
 
-        String historyKey = category + "|" + duration + "|" + location;
-
         Map<String, Set<Long>> history =
-                (Map<String, Set<Long>>) session.getAttribute("activityHistory");
+                (Map<String, Set<Long>>) session.getAttribute(
+                        "activityHistory"
+                );
 
         if (history == null) {
             history = new HashMap<>();
             session.setAttribute("activityHistory", history);
+        }
+
+        Set<Long> usedIds = history.computeIfAbsent(
+                "surprise",
+                key -> new HashSet<>()
+        );
+
+        Activity activity;
+
+        if (activityId != null) {
+
+            activity = activityService
+                    .getActivityById(activityId)
+                    .orElse(null);
+
+        } else {
+
+            activity = activityService.getRandomSurpriseActivity(usedIds);
+
+            if (activity != null) {
+                usedIds.add(activity.getId());
+            }
+        }
+
+        model.addAttribute("activity", activity);
+
+        model.addAttribute(
+                "selectedCategory",
+                activity != null ? activity.getCategory() : null
+        );
+
+        model.addAttribute(
+                "selectedDuration",
+                activity != null ? activity.getDuration() : null
+        );
+
+        model.addAttribute(
+                "selectedLocation",
+                activity != null ? activity.getLocation() : null
+        );
+
+        model.addAttribute("surprise", true);
+
+        boolean loggedIn =
+                authentication != null
+                        && authentication.isAuthenticated()
+                        && !"anonymousUser".equals(
+                        authentication.getPrincipal()
+                );
+
+        model.addAttribute("loggedIn", loggedIn);
+
+        if (loggedIn && activity != null) {
+
+            User user = userRepository
+                    .findByUsername(authentication.getName())
+                    .orElse(null);
+
+            if (user != null) {
+
+                model.addAttribute(
+                        "liked",
+                        likeRepository
+                                .findByUserAndActivity(user, activity)
+                                .isPresent()
+                );
+
+                model.addAttribute(
+                        "favorite",
+                        favoriteRepository
+                                .findByUserAndActivity(user, activity)
+                                .isPresent()
+                );
+
+            } else {
+                model.addAttribute("liked", false);
+                model.addAttribute("favorite", false);
+            }
+
+        } else {
+            model.addAttribute("liked", false);
+            model.addAttribute("favorite", false);
+        }
+
+        return "activity";
+    }
+
+    @GetMapping("/activity")
+    public String getActivity(
+            @RequestParam String category,
+            @RequestParam(required = false) Integer duration,
+            @RequestParam(required = false) String location,
+            @RequestParam(required = false) Long activityId,
+            Model model,
+            HttpSession session,
+            Authentication authentication) {
+
+        /*
+         * Если фильтр не выбран, записываем это как "any".
+         *
+         * Благодаря этому:
+         *
+         * active + любое время + любое место
+         * active + 30 минут + любое место
+         * active + любое время + дома
+         * active + 30 минут + дома
+         *
+         * будут иметь разные истории "Другое занятие".
+         */
+        String durationKey =
+                duration == null ? "any" : String.valueOf(duration);
+
+        String locationKey =
+                location == null ? "any" : location;
+
+        String historyKey =
+                category + "|" + durationKey + "|" + locationKey;
+
+        Map<String, Set<Long>> history =
+                (Map<String, Set<Long>>) session.getAttribute(
+                        "activityHistory"
+                );
+
+        if (history == null) {
+            history = new HashMap<>();
+
+            session.setAttribute(
+                    "activityHistory",
+                    history
+            );
         }
 
         Set<Long> usedIds = history.computeIfAbsent(
@@ -77,6 +205,11 @@ public class HomeController {
 
         Activity activity;
 
+        /*
+         * Если открываем конкретное занятие,
+         * например из избранного или после лайка,
+         * загружаем его непосредственно по ID.
+         */
         if (activityId != null) {
 
             activity = activityService
@@ -95,13 +228,6 @@ public class HomeController {
             if (activity != null) {
                 usedIds.add(activity.getId());
             }
-        }
-
-        if (activity == null) {
-            model.addAttribute(
-                    "message",
-                    "Пока нет подходящих занятий, попробуй изменить категорию, время или место"
-            );
         }
 
         model.addAttribute(
@@ -124,37 +250,50 @@ public class HomeController {
                 location
         );
 
-        boolean liked = false;
-        boolean favorite = false;
+        model.addAttribute(
+                "surprise",
+                false
+        );
 
-        if (authentication != null &&
-                authentication.isAuthenticated() &&
-                !authentication.getName().equals("anonymousUser")) {
+        boolean loggedIn =
+                authentication != null
+                        && authentication.isAuthenticated()
+                        && !"anonymousUser".equals(
+                        authentication.getPrincipal()
+                );
+
+        model.addAttribute(
+                "loggedIn",
+                loggedIn
+        );
+
+        if (loggedIn && activity != null) {
 
             User user = userRepository
                     .findByUsername(authentication.getName())
                     .orElse(null);
 
-            if (user != null && activity != null) {
+            if (user != null) {
 
-                liked = likeRepository
-                        .findByUserAndActivity(user, activity)
-                        .isPresent();
+                model.addAttribute(
+                        "liked",
+                        likeRepository.findByUserAndActivity(user, activity).isPresent()
+                );
 
-                favorite = favoriteRepository
-                        .findByUserAndActivity(user, activity)
-                        .isPresent();
+                model.addAttribute(
+                        "favorite",
+                        favoriteRepository.findByUserAndActivity(user, activity).isPresent()
+                );
+
+            } else {
+                model.addAttribute("liked", false);
+                model.addAttribute("favorite", false);
             }
-        }
 
-        model.addAttribute("liked", liked);
-        model.addAttribute("favorite", favorite);
-        model.addAttribute(
-                "loggedIn",
-                authentication != null &&
-                        authentication.isAuthenticated() &&
-                        !authentication.getName().equals("anonymousUser")
-        );
+        } else {
+            model.addAttribute("liked", false);
+            model.addAttribute("favorite", false);
+        }
 
         return "activity";
     }

@@ -267,6 +267,10 @@
                            th:value="${selectedLocation}">
 
                     <input type="hidden"
+                           name="surprise"
+                           th:value="${surprise}">
+
+                    <input type="hidden"
                            th:name="${_csrf.parameterName}"
                            th:value="${_csrf.token}">
 
@@ -304,6 +308,10 @@
                     <input type="hidden"
                            name="location"
                            th:value="${selectedLocation}">
+
+                    <input type="hidden"
+                           name="surprise"
+                           th:value="${surprise}">
 
                     <input type="hidden"
                            th:name="${_csrf.parameterName}"
@@ -393,12 +401,22 @@
     <div class="activity-navigation">
 
         <a class="button"
-           th:if="${activity != null}"
-           th:href="@{'/activity?category=' + ${selectedCategory}
-                    + '&duration=' + ${selectedDuration}
-                    + '&location=' + ${selectedLocation}}">
+           th:if="${activity != null and surprise}"
+           href="/surprise">
 
             🎲 Другое занятие
+
+        </a>
+
+        <a class="button"
+           th:if="${activity != null and !surprise}"
+           th:href="@{/activity(
+       category=${selectedCategory},
+       duration=${selectedDuration},
+       location=${selectedLocation}
+   )}">
+            🎲 Другое занятие
+        </a>
 
         </a>
 

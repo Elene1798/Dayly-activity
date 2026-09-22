@@ -37,8 +37,9 @@ public class LikeFavoriteController {
     public String toggleLike(
             @PathVariable Long activityId,
             @RequestParam String category,
-            @RequestParam int duration,
-            @RequestParam String location,
+            @RequestParam(required = false) Integer duration,
+            @RequestParam(required = false) String location,
+            @RequestParam(required = false, defaultValue = "false") boolean surprise,
             Authentication authentication) {
 
         User user = getCurrentUser(authentication);
@@ -61,12 +62,18 @@ public class LikeFavoriteController {
                         () -> likeRepository.save(new Like(user, activity))
                 );
 
+        if (surprise) {
+            return "redirect:/surprise?activityId=" + activityId;
+        }
+
         return "redirect:/activity?category="
                 + category
-                + "&duration="
-                + duration
-                + "&location="
-                + location
+                + (duration != null
+                ? "&duration=" + duration
+                : "")
+                + (location != null
+                ? "&location=" + location
+                : "")
                 + "&activityId="
                 + activityId;
     }
@@ -75,8 +82,9 @@ public class LikeFavoriteController {
     public String toggleFavorite(
             @PathVariable Long activityId,
             @RequestParam String category,
-            @RequestParam int duration,
-            @RequestParam String location,
+            @RequestParam(required = false) Integer duration,
+            @RequestParam(required = false) String location,
+            @RequestParam(required = false, defaultValue = "false") boolean surprise,
             Authentication authentication) {
 
         User user = getCurrentUser(authentication);
@@ -101,12 +109,18 @@ public class LikeFavoriteController {
                         )
                 );
 
+        if (surprise) {
+            return "redirect:/surprise?activityId=" + activityId;
+        }
+
         return "redirect:/activity?category="
                 + category
-                + "&duration="
-                + duration
-                + "&location="
-                + location
+                + (duration != null
+                ? "&duration=" + duration
+                : "")
+                + (location != null
+                ? "&location=" + location
+                : "")
                 + "&activityId="
                 + activityId;
     }
