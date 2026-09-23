@@ -552,6 +552,7 @@ form .button {
    ========================= */
 
 .activity-card {
+    color: black;
     background: white;
     border-radius: 25px;
     padding: 35px;
