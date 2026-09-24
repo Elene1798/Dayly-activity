@@ -1,9 +1,11 @@
 package com.example.dailyactivity;
 
 import com.example.dailyactivity.model.User;
+import com.example.dailyactivity.repository.DailyRecommendationRepository;
 import com.example.dailyactivity.repository.FavoriteRepository;
 import com.example.dailyactivity.repository.LikeRepository;
 import com.example.dailyactivity.repository.UserRepository;
+import com.example.dailyactivity.service.RecommendationService;
 import org.springframework.security.core.Authentication;
 
 import com.example.dailyactivity.model.Activity;
@@ -15,6 +17,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 
 import jakarta.servlet.http.HttpSession;
 
+import java.time.LocalDate;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -24,21 +27,26 @@ import java.util.Set;
 public class HomeController {
 
     private final ActivityService activityService;
-
+    private final RecommendationService recommendationService;
     private final UserRepository userRepository;
     private final LikeRepository likeRepository;
     private final FavoriteRepository favoriteRepository;
+    private final DailyRecommendationRepository dailyRecommendationRepository;
 
     public HomeController(
             ActivityService activityService,
+            RecommendationService recommendationService,
             UserRepository userRepository,
             LikeRepository likeRepository,
-            FavoriteRepository favoriteRepository) {
+            FavoriteRepository favoriteRepository,
+            DailyRecommendationRepository dailyRecommendationRepository) {
 
         this.activityService = activityService;
+        this.recommendationService = recommendationService;
         this.userRepository = userRepository;
         this.likeRepository = likeRepository;
         this.favoriteRepository = favoriteRepository;
+        this.dailyRecommendationRepository = dailyRecommendationRepository;
     }
 
     @GetMapping("/")
@@ -74,6 +82,7 @@ public class HomeController {
         );
 
         Activity activity;
+        boolean personalRecommendation = false;
 
         if (activityId != null) {
 
@@ -83,12 +92,78 @@ public class HomeController {
 
         } else {
 
-            activity = activityService.getRandomSurpriseActivity(usedIds);
+            activity = null;
 
-            if (activity != null) {
-                usedIds.add(activity.getId());
+            boolean loggedIn =
+                    authentication != null
+                            && authentication.isAuthenticated()
+                            && !"anonymousUser".equals(
+                            authentication.getPrincipal()
+                    );
+
+            if (loggedIn) {
+
+                User user = userRepository
+                        .findByUsername(authentication.getName())
+                        .orElse(null);
+
+                if (user != null) {
+
+                    LocalDate today = LocalDate.now();
+
+                    DailyRecommendation dailyRecommendation =
+                            dailyRecommendationRepository
+                                    .findByUserAndRecommendationDate(
+                                            user,
+                                            today
+                                    )
+                                    .orElse(null);
+
+                    if (dailyRecommendation != null) {
+
+                    } else {
+
+                        Activity recommended =
+                                recommendationService
+                                        .getPersonalRecommendation(user);
+
+                        if (recommended != null) {
+
+                            dailyRecommendation =
+                                    new DailyRecommendation(
+                                            user,
+                                            recommended,
+                                            today
+                                    );
+
+                            dailyRecommendationRepository.save(
+                                    dailyRecommendation
+                            );
+
+                            activity = recommended;
+                            personalRecommendation = true;
+
+                            usedIds.add(recommended.getId());
+                        }
+                    }
+                }
+            }
+
+            if (activity == null) {
+
+                activity =
+                        activityService.getRandomSurpriseActivity(usedIds);
+
+                if (activity != null) {
+                    usedIds.add(activity.getId());
+                }
             }
         }
+
+        model.addAttribute(
+                "personalRecommendation",
+                personalRecommendation
+        );
 
         model.addAttribute("activity", activity);
 
@@ -163,18 +238,6 @@ public class HomeController {
             HttpSession session,
             Authentication authentication) {
 
-        /*
-         * Если фильтр не выбран, записываем это как "any".
-         *
-         * Благодаря этому:
-         *
-         * active + любое время + любое место
-         * active + 30 минут + любое место
-         * active + любое время + дома
-         * active + 30 минут + дома
-         *
-         * будут иметь разные истории "Другое занятие".
-         */
         String durationKey =
                 duration == null ? "any" : String.valueOf(duration);
 

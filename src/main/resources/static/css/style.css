@@ -778,6 +778,28 @@ form .button {
     text-decoration: none;
 }
 
+/* Персональная рекомендация */
+.personal-recommendation {
+    margin: 18px 0 20px;
+    padding: 14px 18px;
+    border-radius: 14px;
+    background: rgba(255, 255, 255, 0.18);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    text-align: center;
+}
+
+.personal-recommendation-title {
+    font-size: 18px;
+    font-weight: 700;
+    margin-bottom: 6px;
+}
+
+.personal-recommendation-text {
+    font-size: 14px;
+    line-height: 1.5;
+    opacity: 0.9;
+}
+
 /* АДАПТИВНОСТЬ */
 
 @media (max-width: 700px) {

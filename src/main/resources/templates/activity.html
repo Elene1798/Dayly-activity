@@ -100,6 +100,37 @@
             Название занятия
         </h2>
 
+        <div class="personal-recommendation"
+             th:if="${personalRecommendation}">
+            <div class="personal-recommendation-title">
+                ✨ Для тебя
+            </div>
+
+            <div class="personal-recommendation-text"
+                 th:switch="${activity.category}">
+
+        <span th:case="'active'">
+            Ты часто выбираешь активные занятия — подобрали для тебя рекомендацию
+        </span>
+
+                <span th:case="'creative'">
+            Ты часто выбираешь творческие занятия — подобрали для тебя рекомендацию
+        </span>
+
+                <span th:case="'learning'">
+            Ты часто выбираешь обучение — подобрали для тебя рекомендацию
+        </span>
+
+                <span th:case="'entertainment'">
+            Ты часто выбираешь развлечения — подобрали для тебя рекомендацию
+        </span>
+
+                <span th:case="'couple'">
+            Ты часто выбираешь занятия для двоих — подобрали для тебя рекомендацию
+        </span>
+
+            </div>
+        </div>
 
         <!-- ОПИСАНИЕ -->
 
@@ -410,21 +441,20 @@
 
         <a class="button"
            th:if="${activity != null and !surprise}"
-           th:href="@{/activity(
-       category=${selectedCategory},
-       duration=${selectedDuration},
-       location=${selectedLocation}
-   )}">
+           th:href="${'/activity?category=' + selectedCategory
+       + (selectedDuration != null and !#strings.isEmpty(selectedDuration.toString())
+           ? '&duration=' + selectedDuration
+           : '')
+       + (selectedLocation != null and !#strings.isEmpty(selectedLocation.toString())
+           ? '&location=' + selectedLocation
+           : '')}">
             🎲 Другое занятие
         </a>
-
-        </a>
-
 
         <a class="button"
            href="/">
 
-            ← Вернуться назад
+            ← Вернуться на главную
 
         </a>
 
