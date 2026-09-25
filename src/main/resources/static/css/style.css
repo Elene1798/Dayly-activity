@@ -780,24 +780,1520 @@ form .button {
 
 /* Персональная рекомендация */
 .personal-recommendation {
-    margin: 18px 0 20px;
-    padding: 14px 18px;
-    border-radius: 14px;
-    background: rgba(255, 255, 255, 0.18);
-    border: 1px solid rgba(255, 255, 255, 0.3);
+    margin: 0 0 28px;
+    padding: 22px 24px;
+
+    border-radius: 18px;
+    text-align: center;
+
+    background: linear-gradient(
+            135deg,
+            rgba(255, 255, 255, 0.22),
+            rgba(255, 255, 255, 0.10)
+    );
+
+    border: 1px solid rgba(255, 255, 255, 0.35);
+
+    box-shadow:
+            0 8px 24px rgba(40, 25, 90, 0.12),
+            0 0 18px rgba(255, 255, 255, 0.08);
+
+    animation: recommendationAppear 0.8s ease-out both;
+}
+
+/* Крупная надпись «Для тебя» */
+.personal-recommendation-title {
+    margin-bottom: 10px;
+
+    color: indigo;
+    font-size: clamp(26px, 3vw, 34px);
+    font-weight: 800;
+    line-height: 1.2;
+
+    text-shadow: 0 3px 14px rgba(40, 25, 90, 0.2);
+}
+
+/* Пояснение под заголовком */
+.personal-recommendation-text {
+    color: darkblue;
+    font-size: 16px;
+    line-height: 1.6;
+}
+
+/* Плавное появление снизу */
+@keyframes recommendationAppear {
+    from {
+        opacity: 0;
+        transform: translateY(22px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+/* Личный раздел */
+
+.hero-link {
+    display: block;
+    text-decoration: none;
+    color: inherit;
+}
+
+.personal-section {
+    text-align: center;
+    margin-top: 30px;
+}
+
+.personal-section h2 {
+    margin-bottom: 25px;
+}
+
+.favorites-section-button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+
+    margin-top: 32px;
+    margin-bottom: 38px;
+
+    padding: 16px 36px;
+    border-radius: 16px;
+
+    background: rgba(255, 255, 255, 0.95);
+    color: #667eea;
+
+    font-size: 18px;
+    font-weight: 700;
+
+    text-decoration: none;
+
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+
+    transition:
+            transform 0.2s ease,
+            box-shadow 0.2s ease;
+}
+
+.favorites-section-button:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 12px 28px rgba(0, 0, 0, 0.2);
+}
+
+/* Челлендж дня */
+
+.daily-challenge {
+    margin: 0 auto 0;
+    max-width: 650px;
+    padding: 28px;
+    border-radius: 24px;
+
+    background: linear-gradient(
+            135deg,
+            rgba(255, 193, 7, 0.95),
+            rgba(255, 111, 0, 0.95)
+    );
+
+    color: white;
+
+    box-shadow:
+            0 15px 35px rgba(0, 0, 0, 0.2);
+
     text-align: center;
 }
 
-.personal-recommendation-title {
-    font-size: 18px;
-    font-weight: 700;
-    margin-bottom: 6px;
+.daily-challenge-title {
+    font-size: 25px;
+    font-weight: 800;
+    margin-bottom: 18px;
 }
 
-.personal-recommendation-text {
+.daily-challenge-content h3 {
+    font-size: 22px;
+    margin: 0 0 12px;
+}
+
+.daily-challenge-content p {
+    margin: 0 auto;
+    max-width: 520px;
+    line-height: 1.6;
+    font-size: 16px;
+}
+
+.daily-challenge-actions {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 12px;
+    margin-top: 24px;
+}
+
+.daily-challenge-actions form {
+    margin: 0;
+}
+
+.challenge-start-button,
+.challenge-decline-button,
+.challenge-complete-button {
+    border: none;
+    border-radius: 12px;
+    padding: 12px 24px;
+    font-size: 15px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.challenge-start-button {
+    background: white;
+    color: #f57c00;
+    box-shadow: 0 6px 18px rgba(0, 0, 0, 0.2);
+}
+
+.challenge-decline-button {
+    background: rgba(255, 255, 255, 0.2);
+    color: white;
+    border: 1px solid rgba(255, 255, 255, 0.5);
+}
+
+.challenge-complete-button {
+    background: white;
+    color: #e65100;
+    padding: 14px 30px;
+    font-size: 16px;
+    box-shadow: 0 6px 18px rgba(0, 0, 0, 0.2);
+}
+
+.challenge-start-button:hover,
+.challenge-decline-button:hover,
+.challenge-complete-button:hover {
+    transform: translateY(-2px);
+}
+
+.daily-challenge-status {
+    margin-top: 22px;
+    font-size: 17px;
+    font-weight: 700;
+}
+
+.challenge-streak {
+    margin-top: -15px;
+    margin-bottom: 22px;
+
+    font-size: 18px;
+    font-weight: 700;
+
+    color: white;
+}
+
+/* Имя пользователя */
+
+.profile-name-row {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 8px;
+}
+
+.profile-name {
+    margin: 0;
+}
+
+.edit-name-button {
+    border: none;
+    background: transparent;
+    padding: 4px;
+    font-size: 18px;
+    cursor: pointer;
+    transition: transform 0.2s ease;
+}
+
+.edit-name-button:hover {
+    transform: scale(1.15);
+}
+
+.name-edit-form {
+    display: none;
+    justify-content: center;
+    align-items: center;
+    gap: 8px;
+    margin-top: 12px;
+}
+
+.name-edit-form.show {
+    display: flex;
+}
+
+.name-edit-form input {
+    width: auto;
+    min-width: 120px;
+    max-width: 280px;
+    padding: 7px 12px;
+    border-radius: 10px;
+    border: 1px solid #ddd;
+    font-size: 16px;
+    text-align: center;
+}
+
+.save-name-button {
+    padding: 7px 14px;
+    border: none;
+    border-radius: 10px;
+    background: white;
+    color: #667eea;
+    font-weight: bold;
+    cursor: pointer;
+}
+/* =========================
+   ИМЯ В ЛИЧНОМ РАЗДЕЛЕ
+   ========================= */
+
+.profile-name-form {
+    margin: 35px 0 0;
+    text-align: center;
+}
+
+.profile-name-row {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 7px;
+    min-height: 42px;
+}
+
+.profile-name {
+    font-size: 28px;
+    font-weight: 700;
+    color: white;
+}
+
+.profile-name.hide {
+    display: none;
+}
+
+.profile-name-input {
+    display: none;
+
+    width: 10ch;
+    max-width: 30ch;
+
+    padding: 5px 9px;
+
+    border: none;
+    border-radius: 10px;
+
+    background: white;
+    color: #333;
+
+    font-size: 24px;
+    font-weight: 700;
+    text-align: center;
+
+    outline: none;
+}
+
+.profile-name-input.show {
+    display: inline-block;
+}
+
+.edit-name-button {
+    border: none;
+    background: transparent;
+
+    padding: 3px;
+
+    font-size: 18px;
+    line-height: 1;
+
+    color: white;
+
+    cursor: pointer;
+
+    transition: transform 0.2s ease;
+}
+
+.edit-name-button:hover {
+    transform: scale(1.15);
+}
+
+.challenge-streak {
+    margin-top: 12px;
+    text-align: center;
+
+    font-size: 18px;
+    font-weight: 700;
+    color: white;
+}
+
+.username-link {
+    text-decoration: none;
+    color: white;
+    cursor: pointer;
+}
+
+.username-link:hover {
+    text-decoration: underline;
+}
+/* =========================
+   КНОПКИ ЧЕЛЛЕНДЖА
+   ========================= */
+
+.challenge-actions {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 14px;
+
+    margin-top: 28px;
+}
+
+.challenge-button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+
+    min-width: 150px;
+    padding: 13px 24px;
+
+    border-radius: 14px;
+
+    font-family: inherit;
+    font-size: 16px;
+    font-weight: 700;
+
+    cursor: pointer;
+
+    transition:
+            transform 0.2s ease,
+            box-shadow 0.2s ease,
+            background 0.2s ease;
+}
+
+.challenge-button:hover {
+    transform: translateY(-2px);
+}
+
+.challenge-button.primary {
+    background: white;
+    color: #667eea;
+    border: 2px solid white;
+
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+}
+
+.challenge-button.primary:hover {
+    background: #f7f7ff;
+    box-shadow: 0 12px 25px rgba(0, 0, 0, 0.2);
+}
+
+.challenge-button.secondary {
+    background: rgba(255, 255, 255, 0.12);
+    color: white;
+    border: 2px solid rgba(255, 255, 255, 0.7);
+}
+
+.challenge-button.secondary:hover {
+    background: rgba(255, 255, 255, 0.22);
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.12);
+}
+
+.daily-challenge {
+    margin-top: 10px;
+    margin-bottom: 30px;
+}
+
+.daily-challenge h2 {
+    margin-bottom: 22px;
+}
+
+.daily-challenge p {
+    margin-bottom: 0;
+}
+
+/* =========================
+   ФИНАЛЬНЫЙ ВИД ЛИЧНОГО РАЗДЕЛА
+   ========================= */
+
+/* Имя пользователя */
+.profile-name-form {
+    margin-top: 55px;
+    margin-bottom: 8px;
+    text-align: center;
+}
+
+.profile-name-row {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 10px;
+    min-height: 52px;
+}
+
+.profile-name {
+    margin: 0;
+    font-size: 38px;
+    font-weight: 800;
+    color: white;
+    text-shadow: 0 3px 12px rgba(0, 0, 0, 0.22);
+    letter-spacing: 0.3px;
+}
+
+.edit-name-button {
+    border: none;
+    background: transparent;
+    padding: 5px;
+    font-size: 20px;
+    line-height: 1;
+    color: white;
+    cursor: pointer;
+    text-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+}
+
+.edit-name-button:hover {
+    transform: scale(1.15);
+}
+
+
+/* Серия выполненных челленджей */
+.challenge-streak {
+    margin-top: 6px;
+    margin-bottom: 42px;
+
+    text-align: center;
+
+    font-size: 22px;
+    font-weight: 800;
+    color: white;
+
+    text-shadow: 0 3px 10px rgba(0, 0, 0, 0.22);
+}
+
+
+/* Кнопки челленджа */
+.daily-challenge-actions {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 16px;
+    margin-top: 28px;
+}
+
+.daily-challenge-actions form {
+    margin: 0;
+}
+
+
+/* Приступить */
+.challenge-start-button {
+    min-width: 155px;
+    padding: 13px 26px;
+
+    border: 2px solid white;
+    border-radius: 15px;
+
+    background: white;
+    color: #f57c00;
+
+    font-family: inherit;
+    font-size: 16px;
+    font-weight: 700;
+
+    cursor: pointer;
+
+    box-shadow: 0 7px 18px rgba(0, 0, 0, 0.18);
+
+    transition:
+            transform 0.2s ease,
+            box-shadow 0.2s ease,
+            background 0.2s ease;
+}
+
+.challenge-start-button:hover {
+    transform: translateY(-3px);
+    background: #fffaf5;
+    box-shadow: 0 11px 24px rgba(0, 0, 0, 0.22);
+}
+
+
+/* Отказаться */
+.challenge-decline-button {
+    min-width: 155px;
+    padding: 13px 26px;
+
+    border: 2px solid rgba(255, 255, 255, 0.75);
+    border-radius: 15px;
+
+    background: rgba(255, 255, 255, 0.16);
+    color: white;
+
+    font-family: inherit;
+    font-size: 16px;
+    font-weight: 700;
+
+    cursor: pointer;
+
+    transition:
+            transform 0.2s ease,
+            background 0.2s ease,
+            box-shadow 0.2s ease;
+}
+
+.challenge-decline-button:hover {
+    transform: translateY(-3px);
+    background: rgba(255, 255, 255, 0.25);
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+}
+
+
+/* Завершить занятие */
+.challenge-complete-button {
+    min-width: 220px;
+    padding: 14px 30px;
+
+    border: 2px solid white;
+    border-radius: 15px;
+
+    background: white;
+    color: #e65100;
+
+    font-family: inherit;
+    font-size: 17px;
+    font-weight: 800;
+
+    cursor: pointer;
+
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+
+    transition:
+            transform 0.2s ease,
+            box-shadow 0.2s ease,
+            background 0.2s ease;
+}
+
+.challenge-complete-button:hover {
+    transform: translateY(-3px);
+    background: #fff8f2;
+    box-shadow: 0 12px 26px rgba(0, 0, 0, 0.24);
+}
+
+
+/* Немного воздуха внутри карточки */
+.daily-challenge {
+    margin-top: 10px;
+    margin-bottom: 35px;
+}
+
+/* ========================================
+   ЛИЧНЫЙ КАБИНЕТ — НОВЫЙ МАКЕТ
+   ======================================== */
+
+.section-page {
+    min-height: 100vh;
+}
+
+
+/* Шапка на всю ширину */
+
+.section-header {
+    width: 100%;
+    min-height: 76px;
+    box-sizing: border-box;
+
+    padding: 12px 4.5%;
+
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 20px;
+
+    background: rgba(255, 255, 255, 0.10);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.18);
+}
+
+.section-header-brand {
+    display: inline-flex;
+    align-items: center;
+    text-decoration: none;
+}
+
+.section-header-brand .hero-badge {
+    margin: 0;
+}
+
+.section-header-user {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 24px;
+}
+
+.section-header-username {
+    color: white;
+    font-size: 15px;
+    font-weight: 600;
+    white-space: nowrap;
+}
+
+.section-header .logout-form {
+    margin: 0;
+}
+
+.section-header .logout-button {
+    font-family: inherit;
+    cursor: pointer;
+}
+
+
+/* Две колонки */
+
+.section-layout {
+    width: min(1400px, 92%);
+    margin: 42px auto 60px;
+
+    display: grid;
+    grid-template-columns: minmax(260px, 0.75fr) minmax(0, 1.6fr);
+    align-items: start;
+    gap: 32px;
+}
+
+
+/* Левая колонка */
+
+.section-sidebar {
+    display: flex;
+    flex-direction: column;
+    gap: 22px;
+}
+
+.profile-card {
+    padding: 34px 24px;
+    border-radius: 24px;
+
+    background: rgba(255, 255, 255, 0.13);
+    border: 1px solid rgba(255, 255, 255, 0.22);
+
+    box-shadow: 0 14px 35px rgba(40, 25, 90, 0.13);
+
+    text-align: center;
+}
+
+.profile-name-form {
+    margin: 0;
+    text-align: center;
+}
+
+.profile-name-row {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    min-height: 48px;
+}
+
+.profile-name {
+    max-width: 100%;
+    overflow-wrap: anywhere;
+
+    color: white;
+    font-size: clamp(25px, 2.5vw, 36px);
+    font-weight: 800;
+    text-shadow: 0 3px 12px rgba(0, 0, 0, 0.2);
+}
+
+.profile-name.hide {
+    display: none;
+}
+
+.profile-name-input {
+    display: none;
+
+    box-sizing: content-box;
+    width: 10ch;
+    max-width: 100%;
+
+    padding: 7px 10px;
+    border: 0;
+    border-radius: 10px;
+
+    background: white;
+    color: #333;
+
+    font: inherit;
+    font-size: 24px;
+    font-weight: 700;
+    text-align: center;
+}
+
+.profile-name-input.show {
+    display: inline-block;
+}
+
+.edit-name-button {
+    flex-shrink: 0;
+
+    padding: 5px;
+    border: 0;
+    background: transparent;
+
+    color: white;
+    font-size: 19px;
+    cursor: pointer;
+
+    transition: transform 0.2s ease;
+}
+
+.edit-name-button:hover {
+    transform: scale(1.12);
+}
+
+
+/* Огонёк */
+
+.challenge-streak {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 7px;
+
+    margin: 15px 0 0;
+
+    color: white;
+    font-size: 23px;
+    font-weight: 800;
+    text-shadow: 0 3px 10px rgba(0, 0, 0, 0.2);
+}
+
+.streak-label {
     font-size: 14px;
-    line-height: 1.5;
+    font-weight: 500;
     opacity: 0.9;
+    text-shadow: none;
+}
+
+
+/* Избранное */
+
+.favorites-section-button {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    width: 100%;
+    box-sizing: border-box;
+
+    margin-top: 30px;
+    padding: 17px 20px;
+
+    border-radius: 15px;
+    background: white;
+    color: #667eea;
+
+    font-size: 17px;
+    font-weight: 800;
+    text-decoration: none;
+
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.12);
+
+    transition:
+            transform 0.2s ease,
+            box-shadow 0.2s ease;
+}
+
+.favorites-section-button:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 12px 26px rgba(0, 0, 0, 0.18);
+}
+
+
+/* Небольшой текст в левой колонке */
+
+.profile-note {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+
+    padding: 18px 20px;
+    border-radius: 18px;
+
+    background: rgba(255, 255, 255, 0.09);
+    color: rgba(255, 255, 255, 0.9);
+}
+
+.profile-note-icon {
+    font-size: 21px;
+}
+
+.profile-note p {
+    margin: 0;
+    font-size: 14px;
+    line-height: 1.6;
+}
+
+
+/* Правая колонка: карточка челленджа */
+
+.section-main {
+    min-width: 0;
+}
+
+.daily-challenge {
+    box-sizing: border-box;
+    width: 100%;
+
+    margin: 0;
+    padding: 30px clamp(22px, 3vw, 42px);
+
+    border-radius: 25px;
+
+    background: linear-gradient(135deg, #ffb900 0%, #ff7900 100%);
+    color: white;
+
+    box-shadow: 0 18px 42px rgba(65, 35, 90, 0.2);
+}
+
+.daily-challenge-heading {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 15px;
+
+    margin-bottom: 26px;
+}
+
+.daily-challenge-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+
+    width: 54px;
+    height: 54px;
+
+    border-radius: 17px;
+    background: rgba(255, 255, 255, 0.2);
+
+    font-size: 29px;
+}
+
+.daily-challenge-title {
+    margin: 0;
+    color: white;
+
+    font-size: clamp(24px, 2.5vw, 32px);
+    font-weight: 800;
+}
+
+.daily-challenge-subtitle {
+    margin: 6px 0 0;
+    color: rgba(255, 255, 255, 0.9);
+    font-size: 15px;
+}
+
+
+/* Содержимое занятия */
+
+.daily-challenge-content {
+    min-width: 0;
+}
+
+.challenge-image {
+    width: 100%;
+    max-height: 340px;
+    margin-bottom: 24px;
+    overflow: hidden;
+    border-radius: 18px;
+}
+
+.challenge-image img {
+    display: block;
+    width: 100%;
+    max-height: 340px;
+    object-fit: cover;
+}
+
+.challenge-activity-title {
+    margin: 0 0 12px;
+
+    color: white;
+    font-size: clamp(23px, 2.3vw, 30px);
+    line-height: 1.25;
+    font-weight: 800;
+}
+
+.challenge-activity-description {
+    margin: 0;
+
+    color: rgba(255, 255, 255, 0.96);
+    font-size: 16px;
+    line-height: 1.7;
+}
+
+.challenge-meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 20px;
+    justify-content: center;
+
+    margin-top: 20px;
+}
+
+.challenge-meta-item {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+
+    padding: 8px 12px;
+    border: 1px solid rgba(255, 255, 255, 0.35);
+    border-radius: 10px;
+
+    background: rgba(255, 255, 255, 0.13);
+    color: white;
+
+    font-size: 14px;
+    font-weight: 600;
+}
+
+
+/* Инструкция, польза, факт */
+
+.challenge-info-section {
+    margin-top: 24px;
+    padding-top: 20px;
+
+    border-top: 1px solid rgba(255, 255, 255, 0.3);
+}
+
+.challenge-info-section h3,
+.challenge-materials h3 {
+    margin: 0 0 10px;
+
+    color: white;
+    font-size: 18px;
+    font-weight: 800;
+}
+
+.challenge-info-section p {
+    margin: 0;
+
+    color: rgba(255, 255, 255, 0.96);
+    font-size: 15px;
+    line-height: 1.75;
+
+    white-space: pre-line;
+}
+
+.challenge-fact {
+    padding: 18px;
+    border: 0;
+    border-radius: 15px;
+    background: rgba(255, 255, 255, 0.14);
+}
+
+
+/* Материалы */
+
+.challenge-materials {
+    margin-top: 25px;
+    padding-top: 22px;
+
+    border-top: 1px solid rgba(255, 255, 255, 0.3);
+}
+
+.challenge-material-links {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    justify-content: center;
+}
+
+.challenge-material-links .material-button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+
+    margin: 0;
+    padding: 11px 16px;
+
+    border: 1px solid rgba(255, 255, 255, 0.6);
+    border-radius: 12px;
+
+    background: rgba(255, 255, 255, 0.16);
+    color: white;
+
+    font-size: 14px;
+    font-weight: 700;
+    text-decoration: none;
+
+    transition: background 0.2s ease, transform 0.2s ease;
+}
+
+.challenge-material-links .material-button:hover {
+    transform: translateY(-2px);
+    background: rgba(255, 255, 255, 0.27);
+}
+
+
+/* Кнопки внизу карточки */
+
+.daily-challenge-actions {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: flex-start;
+    align-items: center;
+    gap: 14px;
+
+    margin-top: 30px;
+    padding-top: 22px;
+
+    border-top: 1px solid rgba(255, 255, 255, 0.3);
+}
+
+.daily-challenge-actions form {
+    margin: 0;
+}
+
+.challenge-start-button,
+.challenge-decline-button,
+.challenge-complete-button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+
+    min-height: 48px;
+    box-sizing: border-box;
+    padding: 12px 23px;
+
+    border-radius: 13px;
+
+    font-family: inherit;
+    font-size: 15px;
+    font-weight: 800;
+
+    cursor: pointer;
+
+    transition:
+            transform 0.2s ease,
+            box-shadow 0.2s ease,
+            background 0.2s ease;
+}
+
+.challenge-start-button,
+.challenge-complete-button {
+    border: 2px solid white;
+    background: white;
+    color: #e66a00;
+
+    box-shadow: 0 7px 18px rgba(110, 50, 0, 0.15);
+}
+
+.challenge-decline-button {
+    border: 2px solid rgba(255, 255, 255, 0.75);
+    background: rgba(255, 255, 255, 0.13);
+    color: white;
+}
+
+.challenge-start-button:hover,
+.challenge-decline-button:hover,
+.challenge-complete-button:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 10px 22px rgba(110, 50, 0, 0.2);
+}
+
+.challenge-decline-button:hover {
+    background: rgba(255, 255, 255, 0.23);
+}
+
+
+/* Статусы */
+
+.daily-challenge-status {
+    margin-top: 28px;
+    padding: 17px 20px;
+
+    border: 1px solid rgba(255, 255, 255, 0.4);
+    border-radius: 14px;
+
+    background: rgba(255, 255, 255, 0.17);
+    color: white;
+
+    font-size: 17px;
+    font-weight: 800;
+    text-align: center;
+}
+
+.empty-challenge {
+    min-height: 200px;
+}
+
+/* ========================================
+   ЛИЧНЫЙ КАБИНЕТ — ЦЕНТРИРОВАННЫЙ МАКЕТ
+   ======================================== */
+
+/* Центральная область с полями по бокам */
+.section-layout {
+    width: min(1080px, calc(100% - 64px));
+    margin: 36px auto 60px;
+
+    display: grid;
+    grid-template-columns: 280px minmax(0, 650px);
+    justify-content: center;
+    align-items: start;
+    gap: 28px;
+}
+
+/* Левая колонка */
+.section-sidebar {
+    min-width: 0;
+}
+
+/* Карточка челленджа */
+.section-main {
+    min-width: 0;
+    width: 100%;
+    max-width: 650px;
+    justify-self: center;
+}
+
+.daily-challenge {
+    width: 100%;
+    max-width: 650px;
+    margin: 0 auto;
+    padding: 26px 30px;
+    box-sizing: border-box;
+    border-radius: 22px;
+
+}
+
+/* Заголовок карточки */
+.daily-challenge-heading {
+    margin-bottom: 35px;
+}
+
+.daily-challenge-title {
+    font-size: 27px;
+    justify-content: center;
+}
+
+/* Немного компактнее содержимое */
+.challenge-image {
+    max-height: 280px;
+}
+
+.challenge-image img {
+    max-height: 280px;
+}
+
+.challenge-activity-title {
+    font-size: 25px;
+}
+
+.challenge-activity-description {
+    font-size: 15px;
+    line-height: 1.65;
+}
+
+/* Кнопки — по центру карточки */
+.daily-challenge-actions {
+    justify-content: center;
+    align-items: center;
+    gap: 14px;
+}
+
+.daily-challenge-actions form {
+    display: flex;
+    justify-content: center;
+    margin: 0;
+}
+
+.challenge-start-button,
+.challenge-decline-button,
+.challenge-complete-button {
+    min-width: 150px;
+    padding: 11px 20px;
+    font-size: 14px;
+}
+
+/* ========================================
+   ЕДИНАЯ ШАПКА САЙТА
+   ======================================== */
+
+.site-header {
+    width: 100%;
+    min-height: 76px;
+    box-sizing: border-box;
+
+    padding: 12px clamp(20px, 4.5%, 72px);
+
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 20px;
+
+    background: rgba(255, 255, 255, 0.10);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.18);
+}
+
+.site-header-brand {
+    display: inline-flex;
+    align-items: center;
+    flex-shrink: 0;
+    text-decoration: none;
+}
+
+.site-header-brand .hero-badge {
+    margin: 0;
+}
+
+.site-header-actions {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    flex-wrap: wrap;
+    gap: 22px;
+}
+
+.site-header-username,
+.site-header-link {
+    color: white;
+    font-family: inherit;
+    font-size: 15px;
+    font-weight: 600;
+    text-decoration: none;
+    white-space: nowrap;
+}
+
+.site-header-username {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.site-header-link {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+
+    padding: 9px 0;
+    border: 0;
+    background: transparent;
+    cursor: pointer;
+
+    transition: opacity 0.2s ease;
+}
+
+.site-header-link:hover,
+.site-header-username:hover {
+    opacity: 0.78;
+}
+
+.site-header-register {
+    padding: 10px 17px;
+    border: 1px solid rgba(255, 255, 255, 0.65);
+    border-radius: 11px;
+}
+
+.site-header-logout-form {
+    display: inline-flex;
+    margin: 0;
+}
+
+/* Правильное расположение шапки и содержимого */
+body.page-with-header {
+    display: block;
+    min-height: 100vh;
+}
+
+body.page-with-header .site-header {
+    width: 100%;
+    box-sizing: border-box;
+    margin: 0;
+}
+
+body.page-with-header > .container {
+    margin-left: auto;
+    margin-right: auto;
+}
+
+/* Адаптация для телефонов */
+
+@media (max-width: 600px) {
+    .site-header {
+        min-height: 64px;
+        padding: 10px 16px;
+        gap: 12px;
+    }
+
+    .site-header-brand .hero-badge {
+        font-size: 13px;
+        padding: 9px 12px;
+    }
+
+    .site-header-actions {
+        gap: 12px;
+    }
+
+    .site-header-username,
+    .site-header-link {
+        font-size: 13px;
+    }
+
+    .site-header-register {
+        padding: 8px 10px;
+    }
+
+    
+@media (max-width: 400px) {
+    .site-header {
+        align-items: flex-start;
+    }
+
+    .site-header-actions {
+        gap: 8px 12px;
+    }
+}
+
+/* Планшеты */
+@media (max-width: 850px) {
+    .section-layout {
+        width: min(650px, calc(100% - 40px));
+        margin: 28px auto 45px;
+        grid-template-columns: minmax(0, 1fr);
+        gap: 24px;
+    }
+
+    .section-main {
+        max-width: none;
+        justify-content: center;
+        text-align: center;
+    }
+
+    .daily-challenge {
+        max-width: none;
+        justify-content: center;
+        text-align: center;
+    }
+}
+
+/* Телефоны */
+@media (max-width: 560px) {
+    .section-layout {
+        width: calc(100% - 28px);
+        margin-top: 20px;
+    }
+
+    .daily-challenge {
+        padding: 22px 18px;
+    }
+
+    .daily-challenge-actions {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .daily-challenge-actions form,
+    .daily-challenge-actions button {
+        width: 100%;
+    }
+}
+
+/* Адаптация под планшеты и телефоны */
+
+@media (max-width: 850px) {
+    .section-layout {
+        grid-template-columns: minmax(0, 1fr);
+        width: min(680px, 92%);
+        gap: 24px;
+        margin-top: 28px;
+    }
+
+    .section-sidebar {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+        align-items: stretch;
+        gap: 16px;
+    }
+
+    .profile-card {
+        padding: 25px 18px;
+    }
+
+    .profile-note {
+        align-items: center;
+    }
+}
+
+@media (max-width: 560px) {
+    .section-header {
+        min-height: 64px;
+        padding: 10px 4%;
+        gap: 10px;
+    }
+
+    .section-header .hero-badge {
+        font-size: 13px;
+        padding: 9px 12px;
+    }
+
+    .section-header-user {
+        gap: 12px;
+    }
+
+    .section-header-username {
+        font-size: 13px;
+    }
+
+    .section-header .logout-button {
+        font-size: 13px;
+        padding: 5px 0;
+    }
+
+    .section-layout {
+        width: 92%;
+        margin-top: 20px;
+    }
+
+    .section-sidebar {
+        grid-template-columns: minmax(0, 1fr);
+    }
+
+    .profile-note {
+        display: none;
+    }
+
+    .daily-challenge {
+        padding: 23px 19px;
+        border-radius: 20px;
+    }
+
+    .daily-challenge-icon {
+        width: 45px;
+        height: 45px;
+        font-size: 24px;
+    }
+
+    .challenge-meta {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .daily-challenge-actions {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .daily-challenge-actions form,
+    .daily-challenge-actions button {
+        width: 100%;
+    }
+
+    .challenge-material-links {
+        flex-direction: column;
+    }
+
+    .challenge-material-links .material-button {
+        width: 100%;
+        box-sizing: border-box;
+    }
 }
 
 /* АДАПТИВНОСТЬ */
@@ -897,4 +2393,27 @@ form .button {
         padding: 25px;
     }
 
+}
+
+@media (max-width: 560px) {
+    .personal-recommendation {
+        margin-bottom: 22px;
+        padding: 18px 16px;
+        border-radius: 15px;
+    }
+
+    .personal-recommendation-title {
+        font-size: 27px;
+    }
+
+    .personal-recommendation-text {
+        font-size: 14px;
+    }
+}
+
+/* Учитываем настройку пользователя на уменьшение анимации */
+@media (prefers-reduced-motion: reduce) {
+    .personal-recommendation {
+        animation: none;
+    }
 }

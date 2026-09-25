@@ -55,6 +55,8 @@ public class AuthController {
                 passwordEncoder.encode(password)
         );
 
+        user.setDisplayName(username);
+
         userRepository.save(user);
 
         return "redirect:/login?registered";

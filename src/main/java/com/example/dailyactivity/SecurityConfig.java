@@ -78,6 +78,7 @@ public class SecurityConfig {
 
                         .requestMatchers("/favorites").authenticated()
                         .requestMatchers("/favorites/**").authenticated()
+                        .requestMatchers("/section").authenticated()
 
                         .requestMatchers("/admin/**")
                         .hasRole("ADMIN")
@@ -88,7 +89,7 @@ public class SecurityConfig {
 
                 .formLogin(form -> form
                         .loginPage("/login")
-                        .defaultSuccessUrl("/", true)
+                        .defaultSuccessUrl("/section", true)
                         .permitAll()
                 )
 

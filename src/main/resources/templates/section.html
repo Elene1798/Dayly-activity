@@ -1,0 +1,384 @@
+<!DOCTYPE html>
+<html lang="ru"
+      xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Личный кабинет — Daily Activity</title>
+
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+</head>
+
+<body class="section-page">
+
+<!-- ШАПКА -->
+<header class="section-header">
+
+    <a th:href="@{/}" class="section-header-brand">
+        <span class="hero-badge">✨ Daily Activity</span>
+    </a>
+
+    <div class="section-header-user">
+
+        <span class="section-header-username">
+            👤
+            <span th:text="${#authentication.name}">Пользователь</span>
+        </span>
+
+        <form th:action="@{/logout}"
+              method="post"
+              class="logout-form">
+
+            <input type="hidden"
+                   th:name="${_csrf.parameterName}"
+                   th:value="${_csrf.token}">
+
+            <button type="submit"
+                    class="top-link logout-button">
+                Выйти
+            </button>
+
+        </form>
+
+    </div>
+
+</header>
+
+
+<!-- ОСНОВНОЕ СОДЕРЖИМОЕ -->
+<main class="section-layout">
+
+    <!-- ЛЕВАЯ КОЛОНКА -->
+    <aside class="section-sidebar">
+
+        <div class="profile-card">
+
+            <form th:action="@{/section/name}"
+                  method="post"
+                  class="profile-name-form"
+                  id="profileNameForm">
+
+                <input type="hidden"
+                       th:name="${_csrf.parameterName}"
+                       th:value="${_csrf.token}">
+
+                <div class="profile-name-row">
+
+                    <span class="profile-name"
+                          id="profileName"
+                          th:text="${user.displayName != null
+                                    and !user.displayName.isBlank()
+                                    ? user.displayName
+                                    : user.username}">
+                        Пользователь
+                    </span>
+
+                    <input type="text"
+                           name="displayName"
+                           id="displayNameInput"
+                           class="profile-name-input"
+                           th:value="${user.displayName != null
+                                      and !user.displayName.isBlank()
+                                      ? user.displayName
+                                      : user.username}"
+                           maxlength="50"
+                           required>
+
+                    <button type="button"
+                            class="edit-name-button"
+                            id="editNameButton"
+                            onclick="toggleNameEdit()"
+                            title="Изменить имя"
+                            aria-label="Изменить имя">
+                        ✏️
+                    </button>
+
+                </div>
+
+            </form>
+
+            <div class="challenge-streak"
+                 th:if="${completedCount > 0}">
+                🔥
+                <span th:text="${completedCount}">1</span>
+            </div>
+
+            <a th:href="@{/favorites}"
+               class="favorites-section-button">
+                ⭐ Избранное
+            </a>
+
+        </div>
+
+        <div class="profile-note">
+            <span class="profile-note-icon">✨</span>
+            <p>Каждый день — возможность попробовать что-то новое</p>
+        </div>
+
+    </aside>
+
+
+    <!-- ПРАВАЯ КОЛОНКА -->
+    <section class="section-main">
+
+        <div class="daily-challenge"
+             th:if="${challenge != null}">
+
+            <div class="daily-challenge-heading">
+                <div class="daily-challenge-icon">🔥</div>
+
+                <div>
+                    <h1 class="daily-challenge-title">
+                        Челлендж дня
+                    </h1>
+                    <p class="daily-challenge-subtitle">
+                        Твоё занятие на сегодня
+                    </p>
+                </div>
+            </div>
+
+
+            <div class="daily-challenge-content">
+
+                <!-- Изображение -->
+                <div class="challenge-image"
+                     th:if="${challenge.activity.imageUrl != null
+                             and !#strings.isEmpty(challenge.activity.imageUrl)}">
+
+                    <img th:src="${challenge.activity.imageUrl}"
+                         th:alt="${challenge.activity.title}">
+                </div>
+
+
+                <!-- Название и описание -->
+                <h2 class="challenge-activity-title"
+                    th:text="${challenge.activity.title}">
+                    Название занятия
+                </h2>
+
+                <p class="challenge-activity-description"
+                   th:text="${challenge.activity.description}">
+                    Описание занятия
+                </p>
+
+
+                <!-- Время и место -->
+                <div class="challenge-meta">
+
+                    <span class="challenge-meta-item">
+                        ⏱
+                        <span th:text="${challenge.activity.duration}">30</span>
+                        минут
+                    </span>
+
+                    <span class="challenge-meta-item">
+                        📍
+                        <span th:text="${challenge.activity.location}">Дома</span>
+                    </span>
+
+                </div>
+
+
+                <!-- Инструкция -->
+                <div class="challenge-info-section"
+                     th:if="${challenge.activity.instructions != null
+                             and !#strings.isEmpty(challenge.activity.instructions)}">
+
+                    <h3>📝 Что нужно сделать</h3>
+
+                    <p th:text="${challenge.activity.instructions}">
+                        Инструкция к занятию
+                    </p>
+
+                </div>
+
+
+                <!-- Польза -->
+                <div class="challenge-info-section"
+                     th:if="${challenge.activity.benefit != null
+                             and !#strings.isEmpty(challenge.activity.benefit)}">
+
+                    <h3>💡 Зачем это делать</h3>
+
+                    <p th:text="${challenge.activity.benefit}">
+                        Польза занятия
+                    </p>
+
+                </div>
+
+
+                <!-- Интересный факт -->
+                <div class="challenge-info-section challenge-fact"
+                     th:if="${challenge.activity.interestingFact != null
+                             and !#strings.isEmpty(challenge.activity.interestingFact)}">
+
+                    <h3>🤓 Интересный факт</h3>
+
+                    <p th:text="${challenge.activity.interestingFact}">
+                        Интересный факт
+                    </p>
+
+                </div>
+
+
+                <!-- Полезные материалы -->
+                <div class="challenge-materials"
+                     th:if="${(challenge.activity.videoUrl != null
+                               and !#strings.isEmpty(challenge.activity.videoUrl))
+                              or
+                              (challenge.activity.linkUrl != null
+                               and !#strings.isEmpty(challenge.activity.linkUrl))}">
+
+                    <h3>📎 Полезные материалы</h3>
+
+                    <div class="challenge-material-links">
+
+                        <a class="material-button"
+                           th:if="${challenge.activity.videoUrl != null
+                                   and !#strings.isEmpty(challenge.activity.videoUrl)}"
+                           th:href="${challenge.activity.videoUrl}"
+                           target="_blank"
+                           rel="noopener noreferrer">
+                            🎬 Смотреть видео
+                        </a>
+
+                        <a class="material-button"
+                           th:if="${challenge.activity.linkUrl != null
+                                   and !#strings.isEmpty(challenge.activity.linkUrl)}"
+                           th:href="${challenge.activity.linkUrl}"
+                           target="_blank"
+                           rel="noopener noreferrer">
+                            🔗 Открыть полезный материал
+                        </a>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <!-- КНОПКИ И СТАТУСЫ -->
+
+            <div class="daily-challenge-actions"
+                 th:if="${challenge.status.name() == 'AVAILABLE'}">
+
+                <form th:action="@{/section/challenge/start}"
+                      method="post">
+
+                    <input type="hidden"
+                           th:name="${_csrf.parameterName}"
+                           th:value="${_csrf.token}">
+
+                    <button type="submit"
+                            class="challenge-start-button">
+                        Приступить
+                    </button>
+
+                </form>
+
+                <form th:action="@{/section/challenge/decline}"
+                      method="post">
+
+                    <input type="hidden"
+                           th:name="${_csrf.parameterName}"
+                           th:value="${_csrf.token}">
+
+                    <button type="submit"
+                            class="challenge-decline-button">
+                        Отказаться
+                    </button>
+
+                </form>
+
+            </div>
+
+
+            <div class="daily-challenge-actions"
+                 th:if="${challenge.status.name() == 'IN_PROGRESS'}">
+
+                <form th:action="@{/section/challenge/complete}"
+                      method="post">
+
+                    <input type="hidden"
+                           th:name="${_csrf.parameterName}"
+                           th:value="${_csrf.token}">
+
+                    <button type="submit"
+                            class="challenge-complete-button">
+                        ✓ Завершить занятие
+                    </button>
+
+                </form>
+
+            </div>
+
+
+            <div class="daily-challenge-status"
+                 th:if="${challenge.status.name() == 'COMPLETED'}">
+                🔥 Челлендж выполнен!
+            </div>
+
+            <div class="daily-challenge-status"
+                 th:if="${challenge.status.name() == 'DECLINED'}">
+                Челлендж пропущен. Попробуй снова завтра
+            </div>
+
+        </div>
+
+
+        <!-- Если занятия не найдены -->
+        <div class="daily-challenge empty-challenge"
+             th:if="${challenge == null}">
+
+            <div class="daily-challenge-heading">
+                <div class="daily-challenge-icon">✨</div>
+
+                <div>
+                    <h1 class="daily-challenge-title">
+                        Пока нет челленджа
+                    </h1>
+                    <p class="daily-challenge-subtitle">
+                        Загляни сюда немного позже
+                    </p>
+                </div>
+            </div>
+
+        </div>
+
+    </section>
+
+</main>
+
+
+<script>
+    function toggleNameEdit() {
+        const name = document.getElementById('profileName');
+        const input = document.getElementById('displayNameInput');
+        const button = document.getElementById('editNameButton');
+        const form = document.getElementById('profileNameForm');
+
+        const editing = input.classList.contains('show');
+
+        if (!editing) {
+            name.classList.add('hide');
+            input.classList.add('show');
+
+            button.textContent = '✓';
+            button.title = 'Сохранить имя';
+            button.setAttribute('aria-label', 'Сохранить имя');
+
+            input.focus();
+            input.select();
+        } else {
+            if (input.value.trim() !== '') {
+                form.requestSubmit();
+            }
+        }
+    }
+</script>
+
+</body>
+</html>

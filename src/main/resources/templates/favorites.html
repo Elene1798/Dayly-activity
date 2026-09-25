@@ -10,71 +10,62 @@
           th:href="@{/css/style.css}">
 </head>
 
-<body>
+<body class="page-with-header">
 
-<div class="top-menu">
+<header class="site-header">
 
-    <div class="top-menu-right">
+    <a th:href="@{/}" class="site-header-brand">
+        <span class="hero-badge">✨ Daily Activity</span>
+    </a>
 
-        <div th:if="${#authorization.expression('isAuthenticated()')}">
+    <nav class="site-header-actions">
 
-            <span class="username">
+        <!-- Авторизованный пользователь -->
+        <th:block th:if="${#authorization.expression('isAuthenticated()')}">
+
+            <a th:href="@{/section}"
+               class="site-header-username">
                 👤
                 <span th:text="${#authentication.name}">
                     Пользователь
                 </span>
-            </span>
-
-            <a th:href="@{/favorites}"
-               class="top-link">
-                Избранное
             </a>
 
             <form th:action="@{/logout}"
                   method="post"
-                  class="logout-form">
+                  class="site-header-logout-form">
 
                 <input type="hidden"
                        th:name="${_csrf.parameterName}"
                        th:value="${_csrf.token}">
 
-                <button type="submit"
-                        class="top-link logout-button">
+                <button type="submit" class="site-header-link">
                     Выйти
                 </button>
 
             </form>
 
-        </div>
+        </th:block>
 
-        <div th:unless="${#authorization.expression('isAuthenticated()')}">
+        <!-- Гость -->
+        <th:block th:unless="${#authorization.expression('isAuthenticated()')}">
 
-            <a th:href="@{/login}"
-               class="top-link">
+            <a th:href="@{/login}" class="site-header-link">
                 Вход
             </a>
 
             <a th:href="@{/register}"
-               class="top-link register-link">
+               class="site-header-link site-header-register">
                 Регистрация
             </a>
 
-        </div>
+        </th:block>
 
-    </div>
+    </nav>
 
-</div>
+</header>
 
 <div class="container">
-
-    <a href="/"
-       class="hero hero-link">
-
-        <div class="hero-badge">
-            ✨ Daily Activity
-        </div>
-
-    </a>
 
     <h1>Избранное</h1>
 
