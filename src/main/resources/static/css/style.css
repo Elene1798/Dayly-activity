@@ -487,14 +487,19 @@ form .button {
 
 .activity-actions {
     display: flex;
-    justify-content: center;
+    flex-direction: row;
     align-items: center;
-    gap: 18px;
-    margin-top: 25px;
+    justify-content: center;
+    gap: 12px;
+    flex-wrap: nowrap;
 }
 
 .activity-actions form {
+    display: inline-flex;
+    align-items: center;
     margin: 0;
+    width: auto;
+    flex: 0 0 auto;
 }
 
 .icon-button {
@@ -2113,6 +2118,246 @@ body.page-with-header > .container {
     margin-left: auto;
     margin-right: auto;
 }
+/* =========================
+   СВЁРНУТЫЕ КАРТОЧКИ ИЗБРАННОГО
+   ========================= */
+
+.favorite-accordion {
+    padding: 0;
+    overflow: hidden;
+}
+
+/* Заголовок карточки */
+.favorite-accordion-title {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+
+    padding: 24px 30px;
+
+    color: #333;
+    font-size: 22px;
+    font-weight: 700;
+    line-height: 1.4;
+    text-align: left;
+
+    cursor: pointer;
+    list-style: none;
+
+    transition: background 0.2s ease;
+}
+
+/* Убираем стандартный маркер */
+.favorite-accordion-title::-webkit-details-marker {
+    display: none;
+}
+
+.favorite-accordion-title::marker {
+    content: "";
+}
+
+.favorite-accordion-title:hover {
+    background: #f5f4ff;
+}
+
+/* Стрелка */
+.favorite-accordion-icon {
+    flex-shrink: 0;
+    color: #667eea;
+    font-size: 26px;
+    line-height: 1;
+
+    transition: transform 0.25s ease;
+}
+
+/* Поворот стрелки при раскрытии */
+.favorite-accordion[open] .favorite-accordion-icon {
+    transform: rotate(180deg);
+}
+
+/* Содержимое раскрытой карточки */
+.favorite-accordion-content {
+    padding: 0 30px 30px;
+    animation: favoriteContentAppear 0.25s ease;
+}
+
+.favorite-accordion-content .activity-description {
+    margin-top: 0;
+}
+
+.favorite-accordion-content form {
+    margin-top: 20px;
+}
+
+@keyframes favoriteContentAppear {
+    from {
+        opacity: 0;
+        transform: translateY(-6px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* =========================
+   ГАЛОЧКА ВЫПОЛНЕНИЯ
+   ========================= */
+
+.icon-button.completion-button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+
+    width: 42px;
+    height: 42px;
+    padding: 0;
+
+    border: 2px solid #2e9d57;
+    border-radius: 50%;
+
+    background: white;
+    color: #2e9d57;
+
+    font-size: 25px;
+    font-weight: 800;
+    line-height: 1;
+
+    transition:
+            transform 0.2s ease,
+            background 0.2s ease,
+            color 0.2s ease,
+            box-shadow 0.2s ease;
+}
+
+/* Занятие уже выполнялось */
+.icon-button.completion-button.completed {
+    background: #2e9d57;
+    color: white;
+
+    box-shadow: 0 3px 10px rgba(46, 157, 87, 0.3);
+}
+
+/* Наведение */
+.icon-button.completion-button:hover {
+    transform: scale(1.1);
+    box-shadow: 0 4px 12px rgba(46, 157, 87, 0.25);
+}
+
+/* Фокус с клавиатуры */
+.icon-button.completion-button:focus-visible {
+    outline: 3px solid rgba(46, 157, 87, 0.4);
+    outline-offset: 3px;
+}
+/* =========================
+   КНОПКА «МОЯ АКТИВНОСТЬ»
+   ========================= */
+
+.my-activity-section-button {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    box-sizing: border-box;
+    margin-top: 10px;
+    padding: 20px 20px;
+
+    border: 2px solid #2e9d57;
+    border-radius: 30px;
+
+    background: #e4f7e9;
+    color: #247a42;
+
+    font-size: 16px;
+    font-weight: 700;
+    text-align: center;
+    text-decoration: none;
+
+    transition:
+            background 0.2s ease,
+            color 0.2s ease,
+            transform 0.2s ease,
+            box-shadow 0.2s ease;
+}
+
+.my-activity-section-button:hover {
+    background: #2e9d57;
+    color: #fff;
+    transform: translateY(-2px);
+    box-shadow: 0 5px 14px rgba(46, 157, 87, 0.22);
+}
+
+.my-activity-section-button:focus-visible {
+    outline: 3px solid rgba(46, 157, 87, 0.4);
+    outline-offset: 3px;
+}
+
+/* =========================
+   КНОПКА ОТМЕНЫ ВЫПОЛНЕНИЯ
+   ========================= */
+
+.icon-button.cancel-completion-button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 42px;
+    height: 42px;
+    padding: 0;
+
+    border: 2px solid #d9534f;
+    border-radius: 50%;
+    background: #fff;
+    color: #d9534f;
+
+    font-size: 23px;
+    font-weight: 700;
+    line-height: 1;
+    cursor: pointer;
+
+    transition:
+            transform 0.2s ease,
+            background 0.2s ease,
+            color 0.2s ease,
+            box-shadow 0.2s ease;
+}
+
+.icon-button.cancel-completion-button:hover {
+    transform: scale(1.1);
+    background: #d9534f;
+    color: #fff;
+    box-shadow: 0 4px 12px rgba(217, 83, 79, 0.25);
+}
+
+.icon-button.cancel-completion-button:focus-visible {
+    outline: 3px solid rgba(217, 83, 79, 0.35);
+    outline-offset: 3px;
+}
+
+/* Компактный вид на телефонах */
+@media (max-width: 600px) {
+    .favorite-accordion-title {
+        padding: 20px;
+        font-size: 18px;
+    }
+
+    .favorite-accordion-content {
+        padding: 0 20px 20px;
+    }
+}
+
+/* Учитываем настройку уменьшения анимации */
+@media (prefers-reduced-motion: reduce) {
+    .favorite-accordion-icon,
+    .favorite-accordion-title {
+        transition: none;
+    }
+
+    .favorite-accordion-content {
+        animation: none;
+    }
+}
 
 /* Адаптация для телефонов */
 
@@ -2183,6 +2428,7 @@ body.page-with-header > .container {
 
     .daily-challenge {
         padding: 22px 18px;
+        justify-content: center;
     }
 
     .daily-challenge-actions {
@@ -2263,6 +2509,7 @@ body.page-with-header > .container {
     .daily-challenge {
         padding: 23px 19px;
         border-radius: 20px;
+        justify-content: center;
     }
 
     .daily-challenge-icon {
@@ -2274,6 +2521,7 @@ body.page-with-header > .container {
     .challenge-meta {
         flex-direction: column;
         align-items: flex-start;
+        justify-content: center;
     }
 
     .daily-challenge-actions {

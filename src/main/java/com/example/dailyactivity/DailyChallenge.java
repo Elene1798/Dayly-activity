@@ -5,6 +5,7 @@ import com.example.dailyactivity.model.User;
 import jakarta.persistence.*;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 @Entity
 @Table(
@@ -33,6 +34,9 @@ public class DailyChallenge {
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private ChallengeStatus status;
+
+    @Column(name = "completed_at")
+    private LocalDateTime completedAt;
 
     public DailyChallenge() {
     }
@@ -83,5 +87,13 @@ public class DailyChallenge {
 
     public void setStatus(ChallengeStatus status) {
         this.status = status;
+    }
+
+    public LocalDateTime getCompletedAt() {
+        return completedAt;
+    }
+
+    public void setCompletedAt(LocalDateTime completedAt) {
+        this.completedAt = completedAt;
     }
 }

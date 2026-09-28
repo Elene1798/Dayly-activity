@@ -84,66 +84,122 @@
 
     <div th:unless="${favorites.isEmpty()}">
 
-        <div th:each="favorite : ${favorites}"
-             class="activity-card">
+        <details th:each="favorite : ${favorites}"
+                 class="activity-card favorite-accordion">
 
-            <div class="activity-image"
-                 th:if="${favorite.snapshotImageUrl != null and !#strings.isEmpty(favorite.snapshotImageUrl)}">
-                <img th:src="${favorite.snapshotImageUrl}" alt="Изображение занятия">
-            </div>
+            <summary class="favorite-accordion-title">
+        <span th:text="${favorite.snapshotTitle}">
+            Название занятия
+        </span>
 
-            <h2 th:text="${favorite.snapshotTitle}">Название</h2>
-            <p class="activity-description" th:text="${favorite.snapshotDescription}">Описание</p>
+                <span class="favorite-accordion-icon">⌄</span>
+            </summary>
 
-            <div class="favorite-meta">
-    <span class="favorite-meta-item">
-        ⏱ <span th:text="${favorite.snapshotDuration}">30</span> минут
+            <div class="favorite-accordion-content">
+
+                <div class="activity-image"
+                     th:if="${favorite.snapshotImageUrl != null and !#strings.isEmpty(favorite.snapshotImageUrl)}">
+
+                    <img th:src="${favorite.snapshotImageUrl}"
+                         alt="Изображение занятия">
+
+                </div>
+
+                <p class="activity-description"
+                   th:text="${favorite.snapshotDescription}">
+                    Описание
+                </p>
+
+                <div class="favorite-meta">
+
+            <span class="favorite-meta-item">
+                ⏱
+                <span th:text="${favorite.snapshotDuration}">30</span>
+                минут
+            </span>
+
+                    <span class="favorite-meta-item">
+    📍
+    <span th:switch="${favorite.snapshotLocation}">
+        <span th:case="'home'">Дома</span>
+        <span th:case="'outside'">На улице</span>
+        <span th:case="'friends'">С друзьями</span>
+        <span th:case="'anywhere'">Где угодно</span>
+        <span th:case="*"
+              th:text="${favorite.snapshotLocation}">Место</span>
     </span>
 
-                <span class="favorite-meta-item">
-        📍 <span th:text="${favorite.snapshotLocation}">Дом</span>
-    </span>
+                </div>
+
+                <div class="activity-section"
+                     th:if="${favorite.snapshotInstructions != null and !#strings.isEmpty(favorite.snapshotInstructions)}">
+
+                    <h3>📝 Что нужно сделать</h3>
+
+                    <p class="activity-text"
+                       th:text="${favorite.snapshotInstructions}"></p>
+
+                </div>
+
+                <div class="activity-section"
+                     th:if="${favorite.snapshotBenefit != null and !#strings.isEmpty(favorite.snapshotBenefit)}">
+
+                    <h3>💡 Зачем это делать</h3>
+
+                    <p class="activity-text"
+                       th:text="${favorite.snapshotBenefit}"></p>
+
+                </div>
+
+                <div class="activity-section fact-section"
+                     th:if="${favorite.snapshotInterestingFact != null and !#strings.isEmpty(favorite.snapshotInterestingFact)}">
+
+                    <h3>🤓 Интересный факт</h3>
+
+                    <p class="activity-text"
+                       th:text="${favorite.snapshotInterestingFact}"></p>
+
+                </div>
+
+                <div class="activity-materials"
+                     th:if="${(favorite.snapshotVideoUrl != null and !#strings.isEmpty(favorite.snapshotVideoUrl)) or (favorite.snapshotLinkUrl != null and !#strings.isEmpty(favorite.snapshotLinkUrl))}">
+
+                    <h3>📎 Полезные материалы</h3>
+
+                    <a class="material-button"
+                       th:if="${favorite.snapshotVideoUrl != null and !#strings.isEmpty(favorite.snapshotVideoUrl)}"
+                       th:href="${favorite.snapshotVideoUrl}"
+                       target="_blank"
+                       rel="noopener noreferrer">
+                        🎬 Смотреть видео
+                    </a>
+
+                    <a class="material-button"
+                       th:if="${favorite.snapshotLinkUrl != null and !#strings.isEmpty(favorite.snapshotLinkUrl)}"
+                       th:href="${favorite.snapshotLinkUrl}"
+                       target="_blank"
+                       rel="noopener noreferrer">
+                        🔗 Открыть полезный материал
+                    </a>
+
+                </div>
+
+                <form th:action="@{'/favorites/delete/' + ${favorite.id}}"
+                      method="post">
+
+                    <input type="hidden"
+                           th:name="${_csrf.parameterName}"
+                           th:value="${_csrf.token}">
+
+                    <button type="submit" class="button">
+                        Удалить
+                    </button>
+
+                </form>
+
             </div>
 
-            <div class="activity-section"
-                 th:if="${favorite.snapshotInstructions != null and !#strings.isEmpty(favorite.snapshotInstructions)}">
-                <h3>📝 Что нужно сделать</h3>
-                <p class="activity-text" th:text="${favorite.snapshotInstructions}"></p>
-            </div>
-
-            <div class="activity-section"
-                 th:if="${favorite.snapshotBenefit != null and !#strings.isEmpty(favorite.snapshotBenefit)}">
-                <h3>💡 Зачем это делать</h3>
-                <p class="activity-text" th:text="${favorite.snapshotBenefit}"></p>
-            </div>
-
-            <div class="activity-section fact-section"
-                 th:if="${favorite.snapshotInterestingFact != null and !#strings.isEmpty(favorite.snapshotInterestingFact)}">
-                <h3>🤓 Интересный факт</h3>
-                <p class="activity-text" th:text="${favorite.snapshotInterestingFact}"></p>
-            </div>
-
-            <div class="activity-materials"
-                 th:if="${(favorite.snapshotVideoUrl != null and !#strings.isEmpty(favorite.snapshotVideoUrl)) or (favorite.snapshotLinkUrl != null and !#strings.isEmpty(favorite.snapshotLinkUrl))}">
-                <h3>📎 Полезные материалы</h3>
-                <a class="material-button"
-                   th:if="${favorite.snapshotVideoUrl != null and !#strings.isEmpty(favorite.snapshotVideoUrl)}"
-                   th:href="${favorite.snapshotVideoUrl}" target="_blank" rel="noopener noreferrer">
-                    🎬 Смотреть видео
-                </a>
-                <a class="material-button"
-                   th:if="${favorite.snapshotLinkUrl != null and !#strings.isEmpty(favorite.snapshotLinkUrl)}"
-                   th:href="${favorite.snapshotLinkUrl}" target="_blank" rel="noopener noreferrer">
-                    🔗 Открыть полезный материал
-                </a>
-            </div>
-
-            <form th:action="@{'/favorites/delete/' + ${favorite.id}}" method="post">
-                <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}">
-                <button type="submit" class="button">Удалить</button>
-            </form>
-
-        </div>
+        </details>
 
     </div>
 

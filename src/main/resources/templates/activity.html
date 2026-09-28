@@ -370,6 +370,79 @@
 
             </div>
 
+            <!-- ВЫПОЛНЕНИЕ -->
+
+            <div th:if="${loggedIn}">
+
+                <form th:action="@{'/activity/' + ${activity.id} + '/complete'}"
+                      method="post">
+
+                    <input type="hidden"
+                           name="category"
+                           th:value="${selectedCategory}">
+
+                    <input type="hidden"
+                           name="duration"
+                           th:value="${selectedDuration}">
+
+                    <input type="hidden"
+                           name="location"
+                           th:value="${selectedLocation}">
+
+                    <input type="hidden"
+                           name="surprise"
+                           th:value="${surprise}">
+
+                    <input type="hidden"
+                           th:name="${_csrf.parameterName}"
+                           th:value="${_csrf.token}">
+
+                    <button type="submit"
+                            class="icon-button completion-button"
+                            th:classappend="${completed} ? ' completed' : ''"
+                            th:title="${completed} ? 'Отметить выполнение ещё раз' : 'Отметить выполнение'">
+
+                        ✓
+
+                    </button>
+
+                </form>
+
+                <form th:if="${loggedIn and completed}"
+                      th:action="@{'/activity/' + ${activity.id} + '/uncomplete'}"
+                      method="post">
+
+                    <input type="hidden"
+                           name="category"
+                           th:value="${selectedCategory}">
+
+                    <input type="hidden"
+                           name="duration"
+                           th:value="${selectedDuration}">
+
+                    <input type="hidden"
+                           name="location"
+                           th:value="${selectedLocation}">
+
+                    <input type="hidden"
+                           name="surprise"
+                           th:value="${surprise}">
+
+                    <input type="hidden"
+                           th:name="${_csrf.parameterName}"
+                           th:value="${_csrf.token}">
+
+                    <button type="submit"
+                            class="icon-button cancel-completion-button"
+                            title="Отменить последнее выполнение"
+                            aria-label="Отменить последнее выполнение">
+                        ✕
+                    </button>
+
+                </form>
+
+            </div>
+
 
             <!-- ДЛЯ ГОСТЯ -->
 
@@ -393,6 +466,15 @@
 
                 </button>
 
+                <button type="button"
+                        class="icon-button completion-button"
+                        title="Войдите, чтобы отмечать выполнение"
+                        onclick="showAuthMessage()">
+
+                    ✓
+
+                </button>
+
             </div>
 
         </div>
@@ -403,7 +485,7 @@
         <div id="auth-message"
              class="auth-message">
 
-            Чтобы поставить лайк или добавить занятие в избранное,
+            Чтобы поставить лайк, добавить занятие в избранное или отметить выполнение,
             <a th:href="@{/login}">войдите</a>
             или
             <a th:href="@{/register}">зарегистрируйтесь</a>.

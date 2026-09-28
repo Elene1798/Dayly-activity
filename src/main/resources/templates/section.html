@@ -110,6 +110,11 @@
                 ⭐ Избранное
             </a>
 
+            <a th:href="@{/my-activity}"
+               class="my-activity-section-button">
+                📅 Моя активность
+            </a>
+
         </div>
 
         <div class="profile-note">
@@ -174,9 +179,16 @@
                     </span>
 
                     <span class="challenge-meta-item">
-                        📍
-                        <span th:text="${challenge.activity.location}">Дома</span>
-                    </span>
+    📍
+    <span th:switch="${challenge.activity.location}">
+        <span th:case="'home'">Дома</span>
+        <span th:case="'outside'">На улице</span>
+        <span th:case="'friends'">С друзьями</span>
+        <span th:case="'anywhere'">Где угодно</span>
+        <span th:case="*"
+              th:text="${challenge.activity.location}">Место</span>
+    </span>
+
 
                 </div>
 

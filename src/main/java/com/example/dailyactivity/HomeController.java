@@ -1,10 +1,7 @@
 package com.example.dailyactivity;
 
 import com.example.dailyactivity.model.User;
-import com.example.dailyactivity.repository.DailyRecommendationRepository;
-import com.example.dailyactivity.repository.FavoriteRepository;
-import com.example.dailyactivity.repository.LikeRepository;
-import com.example.dailyactivity.repository.UserRepository;
+import com.example.dailyactivity.repository.*;
 import com.example.dailyactivity.service.RecommendationService;
 import org.springframework.security.core.Authentication;
 
@@ -32,6 +29,7 @@ public class HomeController {
     private final LikeRepository likeRepository;
     private final FavoriteRepository favoriteRepository;
     private final DailyRecommendationRepository dailyRecommendationRepository;
+    private final ActivityCompletionRepository activityCompletionRepository;
 
     public HomeController(
             ActivityService activityService,
@@ -39,7 +37,8 @@ public class HomeController {
             UserRepository userRepository,
             LikeRepository likeRepository,
             FavoriteRepository favoriteRepository,
-            DailyRecommendationRepository dailyRecommendationRepository) {
+            DailyRecommendationRepository dailyRecommendationRepository,
+            ActivityCompletionRepository activityCompletionRepository) {
 
         this.activityService = activityService;
         this.recommendationService = recommendationService;
@@ -47,6 +46,7 @@ public class HomeController {
         this.likeRepository = likeRepository;
         this.favoriteRepository = favoriteRepository;
         this.dailyRecommendationRepository = dailyRecommendationRepository;
+        this.activityCompletionRepository = activityCompletionRepository;
     }
 
     @GetMapping("/")
@@ -215,14 +215,22 @@ public class HomeController {
                                 .isPresent()
                 );
 
+                model.addAttribute(
+                        "completed",
+                        activityCompletionRepository
+                                .existsByUserAndActivityId(user, activity.getId())
+                );
+
             } else {
                 model.addAttribute("liked", false);
                 model.addAttribute("favorite", false);
+                model.addAttribute("completed", false);
             }
 
         } else {
             model.addAttribute("liked", false);
             model.addAttribute("favorite", false);
+            model.addAttribute("completed", false);
         }
 
         return "activity";
@@ -348,14 +356,22 @@ public class HomeController {
                         favoriteRepository.findByUserAndActivity(user, activity).isPresent()
                 );
 
+                model.addAttribute(
+                        "completed",
+                        activityCompletionRepository
+                                .existsByUserAndActivityId(user, activity.getId())
+                );
+
             } else {
                 model.addAttribute("liked", false);
                 model.addAttribute("favorite", false);
+                model.addAttribute("completed", false);
             }
 
         } else {
             model.addAttribute("liked", false);
             model.addAttribute("favorite", false);
+            model.addAttribute("completed", false);
         }
 
         return "activity";
