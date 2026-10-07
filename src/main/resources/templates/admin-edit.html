@@ -58,6 +58,20 @@
             <p><label>🎬 Ссылка на видео:</label></p>
             <input type="url" name="videoUrl" th:value="${activity.videoUrl}">
 
+            <p><label>🎮 Мини-игра:</label></p>
+            <select name="miniGameId">
+                <option value=""
+                        th:selected="${activity.miniGame == null}">
+                    Без мини-игры
+                </option>
+
+                <option th:each="game : ${miniGames}"
+                        th:value="${game.id}"
+                        th:text="${game.title}"
+                        th:selected="${activity.miniGame != null and activity.miniGame.id == game.id}">
+                </option>
+            </select>
+
             <br>
             <button class="button" type="submit">💾 Сохранить изменения</button>
             <a class="button" th:href="@{/admin}">← Назад</a>

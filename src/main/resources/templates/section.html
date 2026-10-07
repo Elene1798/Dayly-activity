@@ -105,6 +105,21 @@
                 <span th:text="${completedCount}">1</span>
             </div>
 
+            <a th:href="@{/achievements}" class="achievements-section-button">
+
+    <span class="achievements-section-button-title">
+        🏆 Мои достижения
+    </span>
+
+                <span class="achievements-section-button-progress">
+        Получено
+        <strong th:text="${earnedAchievementsCount}">0</strong>
+        из
+        <strong th:text="${totalAchievementsCount}">32</strong>
+    </span>
+
+            </a>
+
             <a th:href="@{/favorites}"
                class="favorites-section-button">
                 ⭐ Избранное

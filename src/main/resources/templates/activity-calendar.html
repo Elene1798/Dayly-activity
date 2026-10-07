@@ -148,6 +148,13 @@
             line-height: 1;
         }
 
+        .personal-completion-count {
+            font-size: 11px;
+            line-height: 1;
+            color: #4a90e2;
+            font-weight: 700;
+        }
+
         .calendar-legend {
             display: flex;
             justify-content: center;
@@ -284,29 +291,50 @@
         <span class="hero-badge">✨ Daily Activity</span>
     </a>
 
-    <div class="section-header-user">
+    <nav class="site-header-actions">
 
-        <span class="section-header-username">
-            👤
-            <span th:text="${#authentication.name}">Пользователь</span>
-        </span>
+        <!-- Авторизованный пользователь -->
+        <th:block th:if="${#authorization.expression('isAuthenticated()')}">
 
-        <form th:action="@{/logout}"
-              method="post"
-              class="logout-form">
+            <a th:href="@{/section}"
+               class="site-header-username">
+                👤
+                <span th:text="${#authentication.name}">
+                    Пользователь
+                </span>
+            </a>
 
-            <input type="hidden"
-                   th:name="${_csrf.parameterName}"
-                   th:value="${_csrf.token}">
+            <form th:action="@{/logout}"
+                  method="post"
+                  class="site-header-logout-form">
 
-            <button type="submit"
-                    class="top-link logout-button">
-                Выйти
-            </button>
+                <input type="hidden"
+                       th:name="${_csrf.parameterName}"
+                       th:value="${_csrf.token}">
 
-        </form>
+                <button type="submit" class="site-header-link">
+                    Выйти
+                </button>
 
-    </div>
+            </form>
+
+        </th:block>
+
+        <!-- Гость -->
+        <th:block th:unless="${#authorization.expression('isAuthenticated()')}">
+
+            <a th:href="@{/login}" class="site-header-link">
+                Вход
+            </a>
+
+            <a th:href="@{/register}"
+               class="site-header-link site-header-register">
+                Регистрация
+            </a>
+
+        </th:block>
+
+    </nav>
 
 </header>
 
@@ -328,6 +356,8 @@
            th:href="@{/my-activity(year=${nextMonth.year},month=${nextMonth.monthValue})}"
            aria-label="Следующий месяц">›</a>
     </div>
+
+
 
     <div class="calendar-grid">
 
@@ -357,6 +387,11 @@
                           th:text="${day.completionCount == 1 ? '✓' : '✓ ' + day.completionCount}">
                         ✓
                     </span>
+
+                    <span th:if="${day.hasPersonalActivities}"
+                          class="personal-completion-count">
+                        ✓
+                    </span>
                 </a>
             </th:block>
 
@@ -370,9 +405,114 @@
 
     <section class="day-details" th:if="${selectedDate != null}">
 
+        <div class="day-details-header">
+
         <h2 th:text="${#temporals.format(selectedDate, 'd MMMM yyyy')}">
             28 сентября 2026
         </h2>
+
+        <button type="button"
+                    class="personal-activity-button"
+                    id="personalActivityToggle">
+                ＋ Добавить занятие
+            </button>
+        </div>
+
+        <div class="personal-activity-form"
+             id="personalActivityForm"
+             style="display: none;">
+
+            <form th:action="@{/my-activity/personal/add}"
+                  method="post">
+
+                <input type="hidden"
+                       name="date"
+                       th:value="${selectedDate}">
+
+                <div class="personal-activity-field">
+                    <label for="personalTitle">
+                        Наименование занятия
+                    </label>
+
+                    <input type="text"
+                           id="personalTitle"
+                           name="title"
+                           placeholder="Например: Почитать книгу">
+                </div>
+
+                <div class="personal-activity-field">
+                    <label for="personalDescription">
+                        Описание
+                    </label>
+
+                    <textarea id="personalDescription"
+                              name="description"
+                              placeholder="Напиши немного подробнее"></textarea>
+                </div>
+
+                <div class="personal-activity-field">
+                    <label for="personalLink">
+                        Ссылка
+                    </label>
+
+                    <input type="url"
+                           id="personalLink"
+                           name="link"
+                           placeholder="https://...">
+                </div>
+
+                <button type="submit"
+                        class="personal-activity-submit"
+                        id="personalActivitySubmit"
+                        disabled>
+                    Добавить в мою активность
+                </button>
+            </form>
+        </div>
+
+        <div th:if="${!selectedDayPersonalActivities.isEmpty()}"
+             class="personal-activity-list">
+
+            <article class="personal-activity-item"
+                     th:each="personalActivity : ${selectedDayPersonalActivities}">
+
+                <div class="personal-activity-content">
+
+                    <h3 th:text="${personalActivity.title}">
+                        Название занятия
+                    </h3>
+
+                    <p th:if="${personalActivity.description != null
+           and !personalActivity.description.isBlank()}"
+                       th:text="${personalActivity.description}">
+                        Описание занятия
+                    </p>
+
+                    <a th:if="${personalActivity.link != null
+           and !personalActivity.link.isBlank()}"
+                       th:href="${personalActivity.link}"
+                       target="_blank"
+                       rel="noopener noreferrer">
+                        🔗 Открыть ссылку
+                    </a>
+
+                </div>
+
+                <form th:action="@{/my-activity/personal/delete/{id}(id=${personalActivity.id})}"
+                      method="post"
+                      class="personal-activity-delete-form">
+
+                    <button type="submit"
+                            class="personal-activity-delete"
+                            title="Удалить занятие">
+                        🗑 Удалить
+                    </button>
+
+                </form>
+
+            </article>
+
+        </div>
 
         <div th:if="${!selectedDayCompletions.isEmpty()}"
              class="completion-list">
@@ -439,6 +579,65 @@
     </a>
 
 </main>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+
+        const toggleButton =
+            document.getElementById("personalActivityToggle");
+
+        const form =
+            document.getElementById("personalActivityForm");
+
+        const submitButton =
+            document.getElementById("personalActivitySubmit");
+
+        if (!toggleButton || !form || !submitButton) {
+            return;
+        }
+
+        // Открытие / закрытие формы
+        toggleButton.addEventListener("click", function () {
+
+            if (form.style.display === "none" ||
+                form.style.display === "") {
+
+                form.style.display = "block";
+
+            } else {
+
+                form.style.display = "none";
+            }
+        });
+
+        // Только эти три поля влияют на доступность кнопки
+        const fields = [
+            document.getElementById("personalTitle"),
+            document.getElementById("personalDescription"),
+            document.getElementById("personalLink")
+        ];
+
+        function checkFields() {
+
+            const hasValue = fields.some(function (field) {
+                return field && field.value.trim() !== "";
+            });
+
+            submitButton.disabled = !hasValue;
+        }
+
+        fields.forEach(function (field) {
+
+            if (field) {
+                field.addEventListener("input", checkFields);
+            }
+
+        });
+
+        // При открытии страницы кнопка добавления отключена
+        checkFields();
+    });
+</script>
 
 </body>
 </html>

@@ -2215,11 +2215,11 @@ body.page-with-header > .container {
     height: 42px;
     padding: 0;
 
-    border: 2px solid #2e9d57;
+
     border-radius: 50%;
 
     background: white;
-    color: #2e9d57;
+    color: black;
 
     font-size: 25px;
     font-weight: 800;
@@ -2234,10 +2234,10 @@ body.page-with-header > .container {
 
 /* Занятие уже выполнялось */
 .icon-button.completion-button.completed {
-    background: #2e9d57;
-    color: white;
 
-    box-shadow: 0 3px 10px rgba(46, 157, 87, 0.3);
+    color: black;
+
+
 }
 
 /* Наведение */
@@ -2306,9 +2306,7 @@ body.page-with-header > .container {
     height: 42px;
     padding: 0;
 
-    border: 2px solid #d9534f;
     border-radius: 50%;
-    background: #fff;
     color: #d9534f;
 
     font-size: 23px;
@@ -2334,6 +2332,811 @@ body.page-with-header > .container {
     outline: 3px solid rgba(217, 83, 79, 0.35);
     outline-offset: 3px;
 }
+
+/* Адаптация под браузеры */
+
+.activity-actions {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 18px;
+    margin-top: 25px;
+    width: 100%;
+    flex-wrap: nowrap;
+}
+
+.activity-actions > div {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex: 0 0 auto;
+}
+
+.activity-actions form {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0;
+    padding: 0;
+    width: auto;
+}
+
+.icon-button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+
+    width: 44px;
+    height: 44px;
+
+    padding: 0;
+    margin: 0;
+
+    border: none;
+    outline: none;
+
+    background: transparent;
+    color: #333;
+
+    font-family: Arial, sans-serif;
+    font-size: 32px;
+    line-height: 1;
+
+    cursor: pointer;
+
+    -webkit-appearance: none;
+    appearance: none;
+
+    -webkit-tap-highlight-color: transparent;
+
+    transition: transform 0.2s;
+}
+
+.icon-button:hover {
+    transform: scale(1.2);
+}
+
+.icon-button.active {
+    transform: scale(1.05);
+}
+
+.activity-actions form {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    margin: 0;
+    padding: 0;
+}
+
+.activity-actions {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    gap: 18px;
+    width: 100%;
+
+    margin-top: 25px;
+}
+
+.challenge-meta {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 16px;
+    width: 100%;
+    flex-wrap: wrap;
+    text-align: center;
+}
+
+.challenge-meta-item {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+}
+
+/* Для персональных занятий в календаре */
+.day-details-header { display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
+    margin-bottom: 20px;
+}
+
+.day-details-header h2 {
+    margin: 0;
+}
+
+.personal-activity-toggle {
+    flex-shrink: 0;
+}
+
+.personal-activity-button {
+    border: none;
+    border-radius: 30px;
+    padding: 12px 20px;
+    background: #667eea;
+    color: #fff;
+    font-size: 15px;
+    cursor: pointer;
+    transition: background 0.2s, transform 0.2s;
+}
+
+.personal-activity-button:hover {
+    background: #5668d8;
+    transform: translateY(-1px);
+}
+
+.personal-activity-form {
+    margin-bottom: 25px;
+}
+
+.personal-activity-list {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    margin-bottom: 25px;
+}
+
+.personal-activity-item {
+    padding: 18px 20px;
+    border-radius: 14px;
+    background: #f7f7fb;
+    border-left: 4px solid #667eea;
+}
+
+.personal-activity-item h3 {
+    margin: 0 0 8px;
+    color: #333;
+    overflow-wrap: anywhere;
+}
+
+.personal-activity-item p {
+    margin: 0 0 10px;
+    color: #666;
+    line-height: 1.5;
+}
+
+.personal-activity-item a {
+    color: #667eea;
+    text-decoration: none;
+    font-weight: 600;
+}
+
+.personal-activity-item a:hover {
+    text-decoration: underline;
+}
+.personal-activity-form {
+    margin-top: 20px;
+    padding: 24px;
+    background: #f8f9ff;
+    border-radius: 18px;
+    border: 1px solid #e6e8f5;
+}
+
+.personal-activity-field {
+    margin-bottom: 18px;
+}
+
+.personal-activity-field label {
+    display: block;
+    margin-bottom: 8px;
+    font-weight: 600;
+    color: #444;
+}
+
+.personal-activity-field input,
+.personal-activity-field textarea {
+    width: 100%;
+    box-sizing: border-box;
+    padding: 13px 15px;
+    border: 1px solid #d9dced;
+    border-radius: 12px;
+    background: white;
+    color: #333;
+    font-size: 15px;
+    font-family: inherit;
+    outline: none;
+    transition: border-color 0.2s ease,
+    box-shadow 0.2s ease,
+    background 0.2s ease;
+}
+
+.personal-activity-field input {
+    height: 48px;
+}
+
+.personal-activity-field textarea {
+    min-height: 110px;
+    resize: vertical;
+}
+
+.personal-activity-field input::placeholder,
+.personal-activity-field textarea::placeholder {
+    color: #aaa;
+}
+
+.personal-activity-field input:focus,
+.personal-activity-field textarea:focus {
+    border-color: #667eea;
+    box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.12);
+    background: #fff;
+}
+
+.personal-activity-submit {
+    width: 100%;
+    margin-top: 5px;
+    padding: 14px 20px;
+    border: none;
+    border-radius: 12px;
+    background: linear-gradient(135deg, #667eea, #764ba2);
+    color: white;
+    font-size: 16px;
+    font-weight: 600;
+    font-family: inherit;
+    cursor: pointer;
+    transition: transform 0.2s ease,
+    box-shadow 0.2s ease,
+    opacity 0.2s ease;
+}
+
+.personal-activity-submit:hover:not(:disabled) {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 16px rgba(102, 126, 234, 0.3);
+}
+
+.personal-activity-submit:active:not(:disabled) {
+    transform: translateY(0);
+}
+
+.personal-activity-submit:disabled {
+    background: #d4d6df;
+    color: #888;
+    cursor: not-allowed;
+    box-shadow: none;
+}
+
+.personal-activity-item {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 20px;
+    padding: 18px 20px;
+    border-radius: 14px;
+    background: #f7f7fb;
+    border-left: 4px solid #667eea;
+}
+
+.personal-activity-content {
+    flex: 1;
+    min-width: 0;
+}
+
+.personal-activity-delete-form {
+    flex-shrink: 0;
+    margin: 0;
+}
+
+.personal-activity-delete {
+    padding: 9px 13px;
+    border: none;
+    border-radius: 10px;
+    background: #fff0f0;
+    color: #d9534f;
+    font-size: 14px;
+    font-weight: 600;
+    font-family: inherit;
+    cursor: pointer;
+    transition: background 0.2s ease,
+    transform 0.2s ease;
+}
+
+.personal-activity-delete:hover {
+    background: #ffe0e0;
+    transform: translateY(-1px);
+}
+
+.personal-activity-delete:active {
+    transform: translateY(0);
+}
+
+/* Запомнить меня */
+
+.remember-me {
+    margin: 15px 0 20px;
+}
+
+.remember-me label {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    color: white;
+    font-size: 16px;
+    cursor: pointer;
+}
+
+.remember-me input[type="checkbox"] {
+    width: 17px;
+    height: 17px;
+    cursor: pointer;
+    accent-color: #667eea;
+}
+
+/* =========================
+   Достижения в личном кабинете
+   ========================= */
+
+.section-achievements {
+    margin: 25px 0;
+    text-align: center;
+}
+
+.section-achievements-empty {
+    color: rgba(255, 255, 255, 0.8);
+    font-size: 14px;
+}
+
+.section-achievements-list {
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+
+.section-achievement-item {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    padding: 9px 14px;
+    background: rgba(255, 255, 255, 0.95);
+    border-radius: 14px;
+    text-decoration: none;
+    color: #333;
+    transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.section-achievement-item:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.15);
+}
+
+.section-achievement-icon {
+    font-size: 22px;
+}
+
+.section-achievement-title {
+    font-size: 14px;
+    font-weight: 600;
+}
+
+.section-achievements-link {
+    display: inline-block;
+    padding: 11px 20px;
+    background: rgba(255, 255, 255, 0.95);
+    border-radius: 15px;
+    color: #667eea;
+    text-decoration: none;
+    font-weight: 600;
+    transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.section-achievements-link:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.15);
+}
+
+.achievements-section-button {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+
+    width: 100%;
+    min-height: 90px;
+
+    box-sizing: border-box;
+
+    background: white;
+    border-radius: 20px;
+
+    text-decoration: none;
+
+    margin-top: 18px;
+
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.08);
+
+    transition:
+            transform 0.2s ease,
+            box-shadow 0.2s ease;
+}
+
+.achievements-section-button:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 12px 25px rgba(0, 0, 0, 0.12);
+}
+
+.achievements-section-button:active {
+    transform: translateY(0);
+}
+
+.achievements-section-button-title {
+    font-size: 19px;
+    font-weight: 700;
+    color: #667eea;
+}
+
+.achievements-section-button-progress {
+    margin-top: 6px;
+    font-size: 14px;
+    color: #777;
+}
+
+.achievements-section-button-progress strong {
+    color: #667eea;
+    font-weight: 700;
+}
+
+/* =========================
+   MINI GAMES ADMIN
+   ========================= */
+
+.mini-games-list {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    margin-top: 25px;
+}
+
+.mini-game-card {
+    background: #ffffff;
+    border-radius: 18px;
+    padding: 20px;
+    box-sizing: border-box;
+    box-shadow: 0 6px 18px rgba(0, 0, 0, 0.07);
+}
+
+.mini-game-card-header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 20px;
+}
+
+.mini-game-info {
+    min-width: 0;
+}
+
+.mini-game-title {
+    font-size: 19px;
+    font-weight: 700;
+    color: #333;
+}
+
+.mini-game-meta {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 6px;
+    margin-top: 8px;
+    font-size: 14px;
+    color: #777;
+}
+
+.mini-game-status {
+    flex-shrink: 0;
+    font-size: 14px;
+    font-weight: 600;
+}
+
+.mini-game-active {
+    color: #35a66f;
+}
+
+.mini-game-inactive {
+    color: #999;
+}
+
+.mini-game-description {
+    margin-top: 12px;
+    color: #666;
+    font-size: 14px;
+    line-height: 1.5;
+}
+
+.mini-game-actions {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-top: 18px;
+}
+
+.mini-game-edit-button,
+.mini-game-delete-button {
+    border: none;
+    border-radius: 10px;
+    padding: 9px 14px;
+    cursor: pointer;
+    font-size: 14px;
+    font-family: inherit;
+}
+
+.mini-game-edit-button {
+    background: #f0f1ff;
+    color: #667eea;
+    font-weight: 600;
+}
+
+.mini-game-edit-button:hover {
+    background: #e5e7ff;
+}
+
+.mini-game-delete-button {
+    background: #f5f5f5;
+    color: #888;
+}
+
+.mini-game-delete-button:hover {
+    background: #eeeeee;
+    color: #d9534f;
+}
+
+.mini-game-edit-form {
+    margin-top: 18px;
+    padding: 20px;
+    background: #f7f7ff;
+    border-radius: 15px;
+}
+
+.admin-edit-actions {
+    display: flex;
+    gap: 10px;
+    margin-top: 15px;
+}
+
+.secondary-button {
+    background: #eeeeee;
+    color: #555;
+}
+
+.admin-checkbox {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-top: 15px;
+}
+
+.mini-game-tasks-button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 9px 14px;
+    border-radius: 10px;
+    background: #f0f1ff;
+    color: #667eea;
+    text-decoration: none;
+    font-size: 14px;
+    font-weight: 600;
+}
+
+.mini-game-tasks-button:hover {
+    background: #e5e7ff;
+}
+
+.mini-game-tasks-list {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    margin-top: 20px;
+}
+
+.mini-game-task-card {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 15px;
+    padding: 16px 18px;
+    background: white;
+    border-radius: 15px;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.06);
+}
+
+.mini-game-task-content {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+
+.mini-game-task-content strong {
+    color: #333;
+}
+
+.mini-game-task-actions {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.empty-message {
+    text-align: center;
+    color: #888;
+    padding: 25px;
+}
+
+.mini-game-task-main {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.mini-game-task-status {
+    font-size: 13px;
+}
+
+.mini-game-task-actions {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.mini-game-task-edit-form {
+    margin-top: 15px;
+    padding: 18px;
+    background: #f7f7ff;
+    border-radius: 14px;
+}
+
+.word-game-card {
+    text-align: center;
+    max-width: 700px;
+    margin: 0 auto;
+}
+
+.word-game-description {
+    color: #777;
+    margin-bottom: 30px;
+}
+
+.word-game-task {
+    font-size: 20px;
+    font-weight: 600;
+    margin-bottom: 25px;
+}
+
+.word-game-letters,
+.word-game-answer {
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin: 20px 0;
+}
+
+.word-game-letter,
+.word-game-selected-letter {
+    width: 50px;
+    height: 50px;
+    border: none;
+    border-radius: 14px;
+    font-size: 22px;
+    font-weight: 700;
+    cursor: pointer;
+    background: white;
+    color: #667eea;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.08);
+    transition: transform 0.2s ease;
+}
+
+.word-game-letter:hover,
+.word-game-selected-letter:hover {
+    transform: translateY(-2px);
+}
+
+.word-game-letter:disabled {
+    opacity: 0.35;
+    cursor: default;
+}
+
+.word-game-selected-letter {
+    background: #667eea;
+    color: white;
+}
+
+.word-game-check {
+    margin-top: 25px;
+}
+
+.word-game-result {
+    min-height: 30px;
+    margin-top: 20px;
+    font-size: 18px;
+    font-weight: 600;
+}
+
+.word-game-result.success {
+    color: #2e9d5b;
+}
+
+.word-game-result.error {
+    color: #d9534f;
+}
+
+@media (max-width: 600px) {
+    .day-details-header {
+        align-items: flex-start;
+        gap: 12px;
+    }
+
+    .day-details-header h2 {
+        margin: 0;
+    }
+
+    .personal-activity-button {
+        padding: 10px 14px;
+        font-size: 14px;
+    }
+}
+
+.activity-mini-game {
+    margin: 30px 0;
+    padding: 28px 20px;
+    background: linear-gradient(135deg, #f5f3ff, #ffffff);
+    border-radius: 20px;
+    text-align: center;
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.06);
+}
+
+.activity-mini-game-icon {
+    font-size: 42px;
+    margin-bottom: 10px;
+}
+
+.activity-mini-game h3 {
+    margin: 0 0 10px;
+    font-size: 24px;
+    color: #667eea;
+}
+
+.activity-mini-game p {
+    margin: 0 auto 20px;
+    max-width: 500px;
+    color: #777;
+}
+
+.activity-mini-game-button {
+    display: inline-block;
+    margin-top: 5px;
+    text-decoration: none;
+}
+
+.activity-mini-game-content {
+    margin-top: 20px;
+}
+
+.mini-game-inline {
+    margin-top: 20px;
+}
+
+.activity-mini-game-button:disabled {
+    opacity: 0.7;
+    cursor: wait;
+}
+
+
+@media (max-width: 480px) {
+    .challenge-meta {
+        flex-direction: column;
+        gap: 10px;
+    }
+
+    .challenge-meta-item {
+        width: 100%;
+        justify-content: center;
+    }
+}
+
 
 /* Компактный вид на телефонах */
 @media (max-width: 600px) {
@@ -2664,4 +3467,16 @@ body.page-with-header > .container {
     .personal-recommendation {
         animation: none;
     }
+}
+
+@media (max-width: 480px) {
+     .activity-actions {
+        gap: 14px;
+     }
+
+     .icon-button {
+            width: 42px;
+            height: 42px;
+            font-size: 30px;
+     }
 }

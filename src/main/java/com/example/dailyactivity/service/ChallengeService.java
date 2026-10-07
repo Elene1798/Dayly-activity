@@ -22,17 +22,20 @@ public class ChallengeService {
     private final DailyChallengeRepository dailyChallengeRepository;
     private final ActivityRepository activityRepository;
     private final ActivityCompletionRepository activityCompletionRepository;
+    private final AchievementCheckerService achievementCheckerService;
 
     private final Random random = new Random();
 
     public ChallengeService(
             DailyChallengeRepository dailyChallengeRepository,
             ActivityRepository activityRepository,
-            ActivityCompletionRepository activityCompletionRepository) {
+            ActivityCompletionRepository activityCompletionRepository,
+            AchievementCheckerService achievementCheckerService) {
 
         this.dailyChallengeRepository = dailyChallengeRepository;
         this.activityRepository = activityRepository;
         this.activityCompletionRepository = activityCompletionRepository;
+        this.achievementCheckerService = achievementCheckerService;
     }
 
     public DailyChallenge getTodayChallenge(User user) {
@@ -117,6 +120,9 @@ public class ChallengeService {
             );
 
             activityCompletionRepository.save(completion);
+
+            achievementCheckerService
+                    .checkCompletionAchievements(challenge.getUser());
         }
     }
 

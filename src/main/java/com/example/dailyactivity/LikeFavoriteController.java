@@ -2,6 +2,8 @@ package com.example.dailyactivity;
 
 import com.example.dailyactivity.model.*;
 import com.example.dailyactivity.repository.*;
+import com.example.dailyactivity.service.AchievementCheckerService;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -17,19 +19,22 @@ public class LikeFavoriteController {
     private final LikeRepository likeRepository;
     private final FavoriteRepository favoriteRepository;
     private final ActivityCompletionRepository activityCompletionRepository;
+    private final AchievementCheckerService achievementCheckerService;
 
     public LikeFavoriteController(
             UserRepository userRepository,
             ActivityRepository activityRepository,
             LikeRepository likeRepository,
             FavoriteRepository favoriteRepository,
-            ActivityCompletionRepository activityCompletionRepository) {
+            ActivityCompletionRepository activityCompletionRepository,
+            AchievementCheckerService achievementCheckerService) {
 
         this.userRepository = userRepository;
         this.activityRepository = activityRepository;
         this.likeRepository = likeRepository;
         this.favoriteRepository = favoriteRepository;
         this.activityCompletionRepository = activityCompletionRepository;
+        this.achievementCheckerService = achievementCheckerService;
     }
 
     @PostMapping("/activity/{activityId}/like")
@@ -131,6 +136,7 @@ public class LikeFavoriteController {
             @RequestParam(required = false) Integer duration,
             @RequestParam(required = false) String location,
             @RequestParam(required = false, defaultValue = "false") boolean surprise,
+            @RequestParam(required = false, defaultValue = "false") boolean randomActivity,
             Authentication authentication) {
 
         User user = getCurrentUser(authentication);
@@ -147,15 +153,47 @@ public class LikeFavoriteController {
             return "redirect:/";
         }
 
-        ActivityCompletion completion = new ActivityCompletion(
-                user,
-                activity,
-                LocalDateTime.now(),
-                "CARD",
-                null
-        );
+        String source = randomActivity ? "RANDOM" : "CARD";
 
-        activityCompletionRepository.save(completion);
+        boolean alreadyCompleted =
+                activityCompletionRepository
+                        .findFirstByUserAndActivityIdAndSourceOrderByCompletedAtDesc(
+                                user,
+                                activityId,
+                                source
+                        )
+                        .isPresent();
+
+        if (!alreadyCompleted) {
+
+            LocalDateTime completedAt = LocalDateTime.now();
+
+            ActivityCompletion completion = new ActivityCompletion(
+                    user,
+                    activity,
+                    completedAt,
+                    randomActivity ? "RANDOM" : "CARD",
+                    null
+            );
+
+            try {
+                activityCompletionRepository.save(completion);
+
+                achievementCheckerService
+                        .checkCompletionAchievements(user);
+
+            } catch (DataIntegrityViolationException e) {
+
+                // Другой параллельный запрос уже создал это завершение.
+                // Повторно ничего не создаём.
+                System.out.println(
+                        "Повторное завершение не сохранено: "
+                                + "user=" + user.getId()
+                                + ", activity=" + activityId
+                                + ", source=" + source
+                );
+            }
+        }
 
         if (surprise) {
             return "redirect:/surprise?activityId=" + activityId;

@@ -11,7 +11,8 @@
 
     <title>Твоё занятие</title>
 
-    <link rel="stylesheet" href="/css/style.css">
+    <link rel="stylesheet"
+          th:href="@{/css/style.css(v=2)}">
 
 </head>
 
@@ -135,9 +136,41 @@
         <!-- ОПИСАНИЕ -->
 
         <p class="activity-description"
+           th:if="${activity.miniGame == null}"
            th:text="${activity.description}">
             Описание занятия
         </p>
+
+        <!-- =========================
+     МИНИ-ИГРА
+     ========================= -->
+
+        <div class="activity-mini-game"
+             th:if="${activity.miniGame != null}"
+             th:attr="
+        data-mini-game-id=${activity.miniGame.id},
+        data-activity-id=${activity.id}">
+
+            <div class="activity-mini-game-icon">🎮</div>
+
+            <h3 th:text="${activity.miniGame.title}">
+                Мини-игра
+            </h3>
+
+            <p th:if="${activity.miniGame.description != null
+              and !#strings.isEmpty(activity.miniGame.description)}"
+               th:text="${activity.miniGame.description}">
+                Попробуй свои силы!
+            </p>
+
+            <button type="button"
+                    class="button activity-mini-game-button">
+                🎮 Начать игру
+            </button>
+
+            <div class="activity-mini-game-content"></div>
+
+        </div>
 
         <div class="activity-image"
              th:if="${activity.imageUrl != null and !#strings.isEmpty(activity.imageUrl)}">
@@ -372,7 +405,7 @@
 
             <!-- ВЫПОЛНЕНИЕ -->
 
-            <div th:if="${loggedIn}">
+            <div th:if="${loggedIn and activity.miniGame == null}">
 
                 <form th:action="@{'/activity/' + ${activity.id} + '/complete'}"
                       method="post">
@@ -392,6 +425,10 @@
                     <input type="hidden"
                            name="surprise"
                            th:value="${surprise}">
+
+                    <input type="hidden"
+                           name="randomActivity"
+                           th:value="${randomActivity}">
 
                     <input type="hidden"
                            th:name="${_csrf.parameterName}"
@@ -468,6 +505,7 @@
 
                 <button type="button"
                         class="icon-button completion-button"
+                        th:if="${activity.miniGame == null}"
                         title="Войдите, чтобы отмечать выполнение"
                         onclick="showAuthMessage()">
 
@@ -567,6 +605,8 @@
         }
 
     </script>
+
+    <script th:src="@{/js/games/mini-game-inline.js}"></script>
 
 </body>
 

@@ -326,6 +326,10 @@ public class HomeController {
                 false
         );
 
+        model.addAttribute(
+                "randomActivity",
+                activityId == null);
+
         boolean loggedIn =
                 authentication != null
                         && authentication.isAuthenticated()

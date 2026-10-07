@@ -21,6 +21,14 @@ import java.time.LocalDateTime;
                 @UniqueConstraint(
                         name = "uk_completion_daily_challenge",
                         columnNames = "daily_challenge_id"
+                ),
+                @UniqueConstraint(
+                        name = "uk_completion_user_activity_source",
+                        columnNames = {
+                                "user_id",
+                                "activity_id",
+                                "source"
+                        }
                 )
         }
 )

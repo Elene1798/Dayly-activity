@@ -42,11 +42,13 @@ public class Activity {
     @Column(length = 2000)
     private String videoUrl;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "mini_game_id")
+    private MiniGame miniGame;
+
     public Activity() {
     }
 
-    // Старый конструктор оставляем,
-    // чтобы существующие занятия в DataInitializer продолжили работать
     public Activity(
             String title,
             String description,
@@ -144,6 +146,8 @@ public class Activity {
         return videoUrl;
     }
 
+    public MiniGame getMiniGame() {return miniGame;    }
+
     public void setTitle(String title) {
         this.title = title;
     }
@@ -187,4 +191,6 @@ public class Activity {
     public void setVideoUrl(String videoUrl) {
         this.videoUrl = videoUrl;
     }
+
+    public void setMiniGame(MiniGame miniGame) {this.miniGame = miniGame;}
 }

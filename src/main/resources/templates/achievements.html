@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="ru" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Мои достижения</title>
+
+    <link rel="stylesheet"
+          th:href="@{/css/style.css(v=2)}">
+
+    <style>
+        .achievements-page {
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 30px 20px 50px;
+        }
+
+        .achievements-header {
+            text-align: center;
+            margin-bottom: 35px;
+        }
+
+        .achievements-header h1 {
+            margin-bottom: 10px;
+        }
+
+        .achievements-progress {
+            color: white;
+            font-size: 15px;
+        }
+
+        .achievements-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 18px;
+        }
+
+        .achievement-card {
+            background: white;
+            border-radius: 20px;
+            padding: 22px;
+            text-align: center;
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.08);
+            transition: transform 0.2s;
+        }
+
+        .achievement-card:hover {
+            transform: translateY(-3px);
+        }
+
+        .achievement-icon {
+            font-size: 42px;
+            margin-bottom: 10px;
+        }
+
+        .achievement-title {
+            font-size: 18px;
+            font-weight: 700;
+            margin-bottom: 8px;
+        }
+
+        .achievement-description {
+            font-size: 14px;
+            color: #666;
+            line-height: 1.4;
+        }
+
+        .achievement-card.locked {
+            opacity: 0.45;
+            filter: grayscale(1);
+        }
+
+        .achievement-card.earned {
+            border: 2px solid rgba(102, 126, 234, 0.25);
+        }
+
+        .achievement-status {
+            margin-top: 12px;
+            font-size: 13px;
+            font-weight: 600;
+        }
+
+        .achievement-card.earned .achievement-status {
+            color: #4caf50;
+        }
+
+        .achievement-card.locked .achievement-status {
+            color: #999;
+        }
+
+        @media (max-width: 800px) {
+            .achievements-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        @media (max-width: 550px) {
+            .achievements-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+
+<header class="section-header">
+
+    <a th:href="@{/}" class="section-header-brand">
+        <span class="hero-badge">✨ Daily Activity</span>
+    </a>
+
+    <nav class="site-header-actions">
+
+        <!-- Авторизованный пользователь -->
+        <th:block th:if="${#authorization.expression('isAuthenticated()')}">
+
+            <a th:href="@{/section}"
+               class="site-header-username">
+                👤
+                <span th:text="${#authentication.name}">
+                    Пользователь
+                </span>
+            </a>
+
+            <form th:action="@{/logout}"
+                  method="post"
+                  class="site-header-logout-form">
+
+                <input type="hidden"
+                       th:name="${_csrf.parameterName}"
+                       th:value="${_csrf.token}">
+
+                <button type="submit" class="site-header-link">
+                    Выйти
+                </button>
+
+            </form>
+
+        </th:block>
+
+        <!-- Гость -->
+        <th:block th:unless="${#authorization.expression('isAuthenticated()')}">
+
+            <a th:href="@{/login}" class="site-header-link">
+                Вход
+            </a>
+
+            <a th:href="@{/register}"
+               class="site-header-link site-header-register">
+                Регистрация
+            </a>
+
+        </th:block>
+
+    </nav>
+
+</header>
+
+<body>
+
+<div class="achievements-page">
+
+    <div class="achievements-header">
+
+        <h1>🏆 Мои достижения</h1>
+
+        <div class="achievements-progress">
+            Получено
+            <span th:text="${earnedCount}">0</span>
+            из
+            <span th:text="${totalCount}">0</span>
+        </div>
+
+    </div>
+
+    <div class="achievements-grid">
+
+        <div th:each="achievement : ${achievements}"
+             class="achievement-card"
+             th:classappend="${achievement.earned} ? ' earned' : ' locked'">
+
+            <div class="achievement-icon"
+                 th:text="${achievement.type.icon}">
+                🏆
+            </div>
+
+            <div class="achievement-title"
+                 th:text="${achievement.type.title}">
+                Название
+            </div>
+
+            <div class="achievement-description"
+                 th:text="${achievement.type.description}">
+                Описание достижения
+            </div>
+
+            <div class="achievement-status"
+                 th:if="${achievement.earned}">
+                ✓ Получено
+            </div>
+
+            <div class="achievement-status"
+                 th:unless="${achievement.earned}">
+                🔒 Ещё не получено
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+</body>
+</html>

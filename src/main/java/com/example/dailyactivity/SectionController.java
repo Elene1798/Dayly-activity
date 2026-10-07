@@ -1,9 +1,10 @@
 package com.example.dailyactivity;
 
-import com.example.dailyactivity.model.ActivityCompletion;
-import com.example.dailyactivity.model.User;
+import com.example.dailyactivity.model.*;
 import com.example.dailyactivity.repository.ActivityCompletionRepository;
+import com.example.dailyactivity.repository.PersonalActivityRepository;
 import com.example.dailyactivity.repository.UserRepository;
+import com.example.dailyactivity.service.AchievementService;
 import com.example.dailyactivity.service.ChallengeService;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
@@ -25,15 +26,21 @@ public class SectionController {
     private final UserRepository userRepository;
     private final ChallengeService challengeService;
     private final ActivityCompletionRepository activityCompletionRepository;
+    private final PersonalActivityRepository personalActivityRepository;
+    private final AchievementService achievementService;
 
     public SectionController(
             UserRepository userRepository,
             ChallengeService challengeService,
-            ActivityCompletionRepository activityCompletionRepository) {
+            ActivityCompletionRepository activityCompletionRepository,
+            PersonalActivityRepository personalActivityRepository,
+            AchievementService achievementService) {
 
         this.userRepository = userRepository;
         this.challengeService = challengeService;
         this.activityCompletionRepository = activityCompletionRepository;
+        this.personalActivityRepository = personalActivityRepository;
+        this.achievementService = achievementService;
     }
 
     @GetMapping("/section")
@@ -48,11 +55,96 @@ public class SectionController {
         DailyChallenge challenge = challengeService.getTodayChallenge(user);
         long completedCount = challengeService.getCompletedCount(user);
 
+        List<UserAchievement> userAchievements =
+                achievementService.getUserAchievements(user);
+
+        List<AchievementView> achievementViews = new ArrayList<>();
+
+        for (UserAchievement userAchievement : userAchievements) {
+            for (AchievementType type : AchievementType.values()) {
+                if (type.getKey().equals(userAchievement.getAchievementKey())) {
+                    achievementViews.add(new AchievementView(type, true));
+                    break;
+                }
+            }
+        }
+
+        model.addAttribute("userAchievements", achievementViews);
+        model.addAttribute("earnedAchievementsCount", achievementViews.size());
+        model.addAttribute("totalAchievementsCount", AchievementType.values().length);
+
         model.addAttribute("user", user);
         model.addAttribute("challenge", challenge);
         model.addAttribute("completedCount", completedCount);
 
         return "section";
+    }
+
+    @PostMapping("/my-activity/personal/add")
+    public String addPersonalActivity(
+            Authentication authentication,
+            @RequestParam String title,
+            @RequestParam(required = false) String description,
+            @RequestParam(required = false) String link,
+            @RequestParam String date) {
+
+        User user = userRepository.findByUsername(authentication.getName())
+                .orElseThrow(() ->
+                        new IllegalStateException("Пользователь не найден"));
+
+        LocalDate activityDate = LocalDate.parse(date);
+
+        title = title.trim();
+
+        if (!title.isEmpty()) {
+            PersonalActivity personalActivity = new PersonalActivity(
+                    user,
+                    title,
+                    description != null ? description.trim() : null,
+                    link != null ? link.trim() : null,
+                    activityDate
+            );
+
+            personalActivityRepository.save(personalActivity);
+        }
+
+        return "redirect:/my-activity?year="
+                + activityDate.getYear()
+                + "&month="
+                + activityDate.getMonthValue()
+                + "&date="
+                + activityDate;
+    }
+
+    @PostMapping("/my-activity/personal/delete/{id}")
+    public String deletePersonalActivity(
+            Authentication authentication,
+            @PathVariable Long id) {
+
+        User user = userRepository.findByUsername(authentication.getName())
+                .orElseThrow(() ->
+                        new IllegalStateException("Пользователь не найден"));
+
+        PersonalActivity personalActivity =
+                personalActivityRepository.findById(id)
+                        .orElseThrow(() ->
+                                new IllegalStateException("Занятие не найдено"));
+
+        // Удалять можно только своё занятие
+        if (!personalActivity.getUser().getId().equals(user.getId())) {
+            throw new IllegalStateException("Нет доступа к этому занятию");
+        }
+
+        LocalDate activityDate = personalActivity.getActivityDate();
+
+        personalActivityRepository.delete(personalActivity);
+
+        return "redirect:/my-activity?year="
+                + activityDate.getYear()
+                + "&month="
+                + activityDate.getMonthValue()
+                + "&date="
+                + activityDate;
     }
 
     @GetMapping("/my-activity")
@@ -92,6 +184,14 @@ public class SectionController {
                         .findByUserAndCompletedAtGreaterThanEqualAndCompletedAtLessThanOrderByCompletedAtAsc(
                                 user, start, end);
 
+        List<PersonalActivity> personalActivities =
+                personalActivityRepository
+                        .findByUserAndActivityDateBetweenOrderByActivityDateAscCreatedAtAsc(
+                                user,
+                                firstDay,
+                                displayedMonth.atEndOfMonth()
+                        );
+
         LocalDate selectedDate = null;
 
         if (date != null && !date.isBlank()) {
@@ -119,6 +219,17 @@ public class SectionController {
             }
         }
 
+        List<PersonalActivity> selectedDayPersonalActivities =
+                new ArrayList<>();
+
+        if (selectedDate != null) {
+            for (PersonalActivity personalActivity : personalActivities) {
+                if (personalActivity.getActivityDate().equals(selectedDate)) {
+                    selectedDayPersonalActivities.add(personalActivity);
+                }
+            }
+        }
+
         // Список ячеек календаря: сначала пустые ячейки до первого числа,
         // затем все дни месяца.
         List<CalendarDay> calendarDays = new ArrayList<>();
@@ -140,10 +251,15 @@ public class SectionController {
                                     .equals(currentDate))
                     .count();
 
+            boolean hasPersonalActivities = personalActivities.stream()
+                    .anyMatch(personalActivity ->
+                            personalActivity.getActivityDate().equals(currentDate));
+
             calendarDays.add(new CalendarDay(
                     currentDate,
                     day,
                     count,
+                    hasPersonalActivities,
                     currentDate.equals(LocalDate.now()),
                     currentDate.equals(selectedDate)
             ));
@@ -175,9 +291,15 @@ public class SectionController {
         model.addAttribute("nextMonth", displayedMonth.plusMonths(1));
         model.addAttribute("selectedDate", selectedDate);
         model.addAttribute("selectedDayCompletions", selectedDayCompletions);
+        model.addAttribute("personalActivities", personalActivities);
+        model.addAttribute(
+                "selectedDayPersonalActivities",
+                selectedDayPersonalActivities
+        );
 
         return "activity-calendar";
     }
+
 
     @PostMapping("/section/challenge/start")
     public String startChallenge(Authentication authentication) {
@@ -251,6 +373,7 @@ public class SectionController {
         private final LocalDate date;
         private final int dayNumber;
         private final long completionCount;
+        private final boolean hasPersonalActivities;
         private final boolean today;
         private final boolean selected;
 
@@ -258,17 +381,19 @@ public class SectionController {
                 LocalDate date,
                 int dayNumber,
                 long completionCount,
+                boolean hasPersonalActivities,
                 boolean today,
                 boolean selected) {
             this.date = date;
             this.dayNumber = dayNumber;
             this.completionCount = completionCount;
+            this.hasPersonalActivities = hasPersonalActivities;
             this.today = today;
             this.selected = selected;
         }
 
         public static CalendarDay empty() {
-            return new CalendarDay(null, 0, 0, false, false);
+            return new CalendarDay(null, 0, 0, false, false, false);
         }
 
         public LocalDate getDate() {
@@ -295,8 +420,10 @@ public class SectionController {
             return selected;
         }
 
-        public boolean hasCompletions() {
-            return completionCount > 0;
+        public boolean hasCompletions() {return completionCount > 0;        }
+
+        public boolean hasPersonalActivities() {
+            return hasPersonalActivities;
         }
     }
 }

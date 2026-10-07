@@ -2,6 +2,7 @@ package com.example.dailyactivity;
 
 import com.example.dailyactivity.model.User;
 import com.example.dailyactivity.repository.UserRepository;
+import com.example.dailyactivity.service.UserVisitService;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -12,13 +13,16 @@ public class AuthController {
 
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
+    private final UserVisitService userVisitService;
 
     public AuthController(
             UserRepository userRepository,
-            PasswordEncoder passwordEncoder) {
+            PasswordEncoder passwordEncoder,
+            UserVisitService userVisitService) {
 
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
+        this.userVisitService = userVisitService;
     }
 
     @GetMapping("/register")

@@ -2,6 +2,8 @@ package com.example.dailyactivity;
 
 import com.example.dailyactivity.model.User;
 import com.example.dailyactivity.repository.UserRepository;
+import com.example.dailyactivity.service.AchievementCheckerService;
+import com.example.dailyactivity.service.UserVisitService;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -12,6 +14,7 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.factory.PasswordEncoderFactories;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
 
 @Configuration
 public class SecurityConfig {
@@ -63,7 +66,27 @@ public class SecurityConfig {
 
     @Bean
     public SecurityFilterChain securityFilterChain(
-            HttpSecurity http) throws Exception {
+            HttpSecurity http,
+            UserRepository userRepository,
+            UserVisitService userVisitService,
+            AchievementCheckerService achievementCheckerService) throws Exception {
+
+        AuthenticationSuccessHandler successHandler =
+                (request, response, authentication) -> {
+
+                    String username = authentication.getName();
+
+                    userRepository.findByUsername(username)
+                            .ifPresent(user -> {
+
+                                userVisitService.recordVisit(user);
+
+                                achievementCheckerService
+                                        .checkVisitAchievements(user);
+                            });
+
+                    response.sendRedirect("/section");
+                };
 
         http
                 .authorizeHttpRequests(auth -> auth
@@ -79,6 +102,7 @@ public class SecurityConfig {
                         .requestMatchers("/favorites").authenticated()
                         .requestMatchers("/favorites/**").authenticated()
                         .requestMatchers("/section").authenticated()
+                        .requestMatchers("/achievements").authenticated()
 
                         .requestMatchers("/admin/**")
                         .hasRole("ADMIN")
@@ -89,8 +113,12 @@ public class SecurityConfig {
 
                 .formLogin(form -> form
                         .loginPage("/login")
-                        .defaultSuccessUrl("/section", true)
+                        .successHandler(successHandler)
                         .permitAll()
+                )
+                .rememberMe(remember -> remember
+                        .key("daily-activity-remember-me")
+                        .tokenValiditySeconds(60 * 60 * 24 * 30)
                 )
 
                 .logout(logout -> logout

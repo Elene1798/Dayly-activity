@@ -14,6 +14,18 @@
 
 </head>
 
+<script>
+    function toggleMiniGameEdit(id) {
+        const form = document.getElementById('mini-game-edit-' + id);
+
+        if (form.style.display === 'none' || form.style.display === '') {
+            form.style.display = 'block';
+        } else {
+            form.style.display = 'none';
+        }
+    }
+</script>
+
 <body>
 
 <div class="container">
@@ -210,6 +222,324 @@
             </button>
 
         </form>
+
+        <section class="admin-section">
+
+            <h2>🎮 Мини-игры</h2>
+
+            <p class="admin-subtitle">
+                Добавляй интерактивные игры для пользователей
+            </p>
+
+            <form th:action="@{/admin/mini-game/add}" method="post">
+
+                <input
+                        type="text"
+                        name="title"
+                        placeholder="Название игры"
+                        required
+                >
+
+                <textarea
+                        name="description"
+                        placeholder="Описание"
+                ></textarea>
+
+                <select name="gameType" required>
+                    <option value="">Тип игры</option>
+                    <option value="MEMORY">🧠 Память</option>
+                    <option value="REACTION">⚡ Реакция</option>
+                    <option value="WORD">🔤 Слова</option>
+                    <option value="QUIZ">🧩 Викторина</option>
+                </select>
+
+                <select name="category" required>
+                    <option value="">Категория</option>
+                    <option value="active">🏃 Активность</option>
+                    <option value="creative">🎨 Творчество</option>
+                    <option value="learning">📚 Обучение</option>
+                    <option value="entertainment">🎮 Развлечения</option>
+                </select>
+
+                <input
+                        type="number"
+                        name="duration"
+                        min="1"
+                        placeholder="Длительность, минут"
+                        required
+                >
+
+                <textarea
+                        name="instructions"
+                        placeholder="Инструкция для пользователя"
+                ></textarea>
+
+                <button type="submit" class="button">
+                    🎮 Добавить мини-игру
+                </button>
+
+            </form>
+
+            <div class="mini-games-list">
+
+                <div
+                        class="mini-game-card"
+                        th:each="game : ${miniGames}"
+                >
+
+                    <div class="mini-game-card-header">
+
+                        <div class="mini-game-info">
+
+                            <div class="mini-game-title">
+                                🎮
+                                <strong th:text="${game.title}">
+                                    Название игры
+                                </strong>
+                            </div>
+
+                            <div class="mini-game-meta">
+
+                    <span th:if="${game.gameType == 'MEMORY'}">
+                        🧠 Память
+                    </span>
+
+                                <span th:if="${game.gameType == 'REACTION'}">
+                        ⚡ Реакция
+                    </span>
+
+                                <span th:if="${game.gameType == 'WORD'}">
+                        🔤 Слова
+                    </span>
+
+                                <span th:if="${game.gameType == 'QUIZ'}">
+                        🧩 Викторина
+                    </span>
+
+                                <span>·</span>
+
+                                <span th:switch="${game.category}">
+                        <span th:case="'active'">🏃 Активность</span>
+                        <span th:case="'creative'">🎨 Творчество</span>
+                        <span th:case="'learning'">📚 Обучение</span>
+                        <span th:case="'entertainment'">🎮 Развлечения</span>
+                    </span>
+
+                                <span>·</span>
+
+                                <span th:text="${game.duration + ' мин.'}">
+                        10 мин.
+                    </span>
+
+                            </div>
+
+                        </div>
+
+                        <div class="mini-game-status">
+
+                <span
+                        th:if="${game.active}"
+                        class="mini-game-active"
+                >
+                    🟢 Активна
+                </span>
+
+                            <span
+                                    th:unless="${game.active}"
+                                    class="mini-game-inactive"
+                            >
+                    ⚪ Выключена
+                </span>
+
+                        </div>
+
+                    </div>
+
+
+                    <div
+                            class="mini-game-description"
+                            th:if="${game.description != null and !game.description.isEmpty()}"
+                            th:text="${game.description}"
+                    >
+                        Описание игры
+                    </div>
+
+
+                    <div class="mini-game-actions">
+
+                        <a
+                                th:href="@{'/admin/mini-game/' + ${game.id} + '/tasks'}"
+                                class="mini-game-tasks-button"
+                        >
+                            🧩 Задания
+                        </a>
+
+                        <button
+                                type="button"
+                                class="mini-game-edit-button"
+                                th:onclick="'toggleMiniGameEdit(' + ${game.id} + ')'"
+                        >
+                            ✏️ Редактировать
+                        </button>
+
+                        <form
+                                th:action="@{'/admin/mini-game/delete/' + ${game.id}}"
+                                method="post"
+                        >
+                            <button
+                                    type="submit"
+                                    class="mini-game-delete-button"
+                                    onclick="return confirm('Удалить эту мини-игру?');"
+                            >
+                                🗑️ Удалить
+                            </button>
+                        </form>
+
+                    </div>
+
+
+                    <!-- Форма редактирования -->
+
+                    <form
+                            th:id="'mini-game-edit-' + ${game.id}"
+                            class="mini-game-edit-form"
+                            th:action="@{'/admin/mini-game/edit/' + ${game.id}}"
+                            method="post"
+                            style="display: none;"
+                    >
+
+                        <input
+                                type="text"
+                                name="title"
+                                th:value="${game.title}"
+                                placeholder="Название игры"
+                                required
+                        >
+
+                        <textarea
+                                name="description"
+                                th:text="${game.description}"
+                                placeholder="Описание"
+                        ></textarea>
+
+                        <select name="gameType" required>
+
+                            <option
+                                    value="MEMORY"
+                                    th:selected="${game.gameType == 'MEMORY'}"
+                            >
+                                🧠 Память
+                            </option>
+
+                            <option
+                                    value="REACTION"
+                                    th:selected="${game.gameType == 'REACTION'}"
+                            >
+                                ⚡ Реакция
+                            </option>
+
+                            <option
+                                    value="WORD"
+                                    th:selected="${game.gameType == 'WORD'}"
+                            >
+                                🔤 Слова
+                            </option>
+
+                            <option
+                                    value="QUIZ"
+                                    th:selected="${game.gameType == 'QUIZ'}"
+                            >
+                                🧩 Викторина
+                            </option>
+
+                        </select>
+
+                        <select name="category" required>
+
+                            <option
+                                    value="active"
+                                    th:selected="${game.category == 'active'}"
+                            >
+                                🏃 Активность
+                            </option>
+
+                            <option
+                                    value="creative"
+                                    th:selected="${game.category == 'creative'}"
+                            >
+                                🎨 Творчество
+                            </option>
+
+                            <option
+                                    value="learning"
+                                    th:selected="${game.category == 'learning'}"
+                            >
+                                📚 Обучение
+                            </option>
+
+                            <option
+                                    value="entertainment"
+                                    th:selected="${game.category == 'entertainment'}"
+                            >
+                                🎮 Развлечения
+                            </option>
+
+                        </select>
+
+                        <input
+                                type="number"
+                                name="duration"
+                                min="1"
+                                th:value="${game.duration}"
+                                placeholder="Длительность, минут"
+                                required
+                        >
+
+                        <textarea
+                                name="instructions"
+                                th:text="${game.instructions}"
+                                placeholder="Инструкция для пользователя"
+                        ></textarea>
+
+                        <label class="admin-checkbox">
+
+                            <input
+                                    type="checkbox"
+                                    name="active"
+                                    value="true"
+                                    th:checked="${game.active}"
+                            >
+
+                            🟢 Игра активна
+
+                        </label>
+
+                        <div class="admin-edit-actions">
+
+                            <button
+                                    type="submit"
+                                    class="button"
+                            >
+                                💾 Сохранить
+                            </button>
+
+                            <button
+                                    type="button"
+                                    class="button secondary-button"
+                                    th:onclick="'toggleMiniGameEdit(' + ${game.id} + ')'"
+                            >
+                                Отмена
+                            </button>
+
+                        </div>
+
+                    </form>
+
+                </div>
+
+            </div>
+
+        </section>
 
     </div>
 

@@ -44,7 +44,6 @@ public class ActivityService {
                 // Не показываем уже использованные занятия
                 .filter(activity ->
                         !usedIds.contains(activity.getId()))
-
                 .toList();
 
         if (availableActivities.isEmpty()) {

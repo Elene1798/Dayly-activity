@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html lang="ru"
+      xmlns:th="http://www.thymeleaf.org">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
+
+    <title>Задания мини-игры</title>
+
+    <link rel="stylesheet"
+          th:href="@{/css/style.css}">
+
+</head>
+
+<body>
+
+<div class="container">
+
+    <a th:href="@{/admin}"
+       class="site-header-link">
+        ← Вернуться в админку
+    </a>
+
+
+    <h1>
+        🧩 Задания
+    </h1>
+
+    <h2 th:text="${miniGame.title}">
+        Название игры
+    </h2>
+
+    <p th:text="${miniGame.description}">
+        Описание игры
+    </p>
+
+
+    <!-- Добавление задания -->
+
+    <section class="admin-section">
+
+        <h2>➕ Добавить задание</h2>
+
+        <form
+                th:action="@{'/admin/mini-game/' + ${miniGame.id} + '/tasks/add'}"
+                method="post"
+        >
+
+            <input
+                    type="text"
+                    name="content"
+                    placeholder="Задание / слово"
+                    required
+            >
+
+            <input
+                    type="text"
+                    name="answer"
+                    placeholder="Правильный ответ"
+                    required
+            >
+
+            <button
+                    type="submit"
+                    class="button"
+            >
+                🧩 Добавить
+            </button>
+
+        </form>
+
+    </section>
+
+
+    <!-- Список заданий -->
+
+    <section class="admin-section">
+
+        <h2>
+            📋 Все задания
+        </h2>
+
+        <div class="mini-game-tasks-list">
+
+            <div
+                    class="mini-game-task-card"
+                    th:each="task : ${tasks}"
+            >
+
+                <div class="mini-game-task-main">
+
+                    <div class="mini-game-task-content">
+
+                        <strong th:text="${task.content}">
+                            Задание
+                        </strong>
+
+                        <span>→</span>
+
+                        <strong th:text="${task.answer}">
+                            Ответ
+                        </strong>
+
+                    </div>
+
+                    <div class="mini-game-task-status">
+
+            <span
+                    th:if="${task.active}"
+                    class="mini-game-active"
+            >
+                🟢 Активно
+            </span>
+
+                        <span
+                                th:unless="${task.active}"
+                                class="mini-game-inactive"
+                        >
+                ⚪ Выключено
+            </span>
+
+                    </div>
+
+                </div>
+
+
+                <div class="mini-game-task-actions">
+
+                    <button
+                            type="button"
+                            class="mini-game-edit-button"
+                            th:onclick="'toggleTaskEdit(' + ${task.id} + ')'"
+                    >
+                        ✏️
+                    </button>
+
+
+                    <form
+                            th:action="@{'/admin/mini-game/task/delete/' + ${task.id}}"
+                            method="post"
+                    >
+
+                        <button
+                                type="submit"
+                                class="mini-game-delete-button"
+                                onclick="return confirm('Удалить это задание?');"
+                        >
+                            🗑️
+                        </button>
+
+                    </form>
+
+                </div>
+
+
+                <!-- Редактирование -->
+
+                <form
+                        th:id="'task-edit-' + ${task.id}"
+                        class="mini-game-task-edit-form"
+                        th:action="@{'/admin/mini-game/task/edit/' + ${task.id}}"
+                        method="post"
+                        style="display: none;"
+                >
+
+                    <input
+                            type="text"
+                            name="content"
+                            th:value="${task.content}"
+                            placeholder="Задание / слово"
+                            required
+                    >
+
+                    <input
+                            type="text"
+                            name="answer"
+                            th:value="${task.answer}"
+                            placeholder="Правильный ответ"
+                            required
+                    >
+
+                    <label class="admin-checkbox">
+
+                        <input
+                                type="checkbox"
+                                name="active"
+                                value="true"
+                                th:checked="${task.active}"
+                        >
+
+                        🟢 Задание активно
+
+                    </label>
+
+                    <div class="admin-edit-actions">
+
+                        <button
+                                type="submit"
+                                class="button"
+                        >
+                            💾 Сохранить
+                        </button>
+
+                        <button
+                                type="button"
+                                class="button secondary-button"
+                                th:onclick="'toggleTaskEdit(' + ${task.id} + ')'"
+                        >
+                            Отмена
+                        </button>
+
+                    </div>
+
+                </form>
+
+            </div>
+
+            <p
+                    th:if="${#lists.isEmpty(tasks)}"
+                    class="empty-message"
+            >
+                Пока нет заданий.
+            </p>
+
+        </div>
+
+    </section>
+
+</div>
+
+<script>
+    function toggleTaskEdit(id) {
+        const form = document.getElementById('task-edit-' + id);
+
+        if (form.style.display === 'none' || form.style.display === '') {
+            form.style.display = 'block';
+        } else {
+            form.style.display = 'none';
+        }
+    }
+</script>
+
+</body>
+
+</html>
