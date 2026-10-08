@@ -26,6 +26,9 @@ public interface ActivityCompletionRepository
             String source
     );
 
+    List<Long> findActivityIdsByUserAndSource(User user, String source);
+    List<ActivityCompletion> findByUserAndSource(User user, String source);
+
 
     boolean existsByUserAndActivityId(User user, Long activityId);
 
@@ -121,8 +124,6 @@ public interface ActivityCompletionRepository
     WHERE ac.user = :user
 """)
     long countTotalCompletedMinutes(User user);
-
-
 
 
 }

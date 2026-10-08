@@ -280,7 +280,7 @@ form {
 }
 
 label {
-    font-weight: bold;
+    font-weight: 700;
     color: #444;
 }
 
@@ -3102,7 +3102,7 @@ body.page-with-header > .container {
 .activity-mini-game p {
     margin: 0 auto 20px;
     max-width: 500px;
-    color: #777;
+    color: black;
 }
 
 .activity-mini-game-button {
@@ -3124,6 +3124,760 @@ body.page-with-header > .container {
     cursor: wait;
 }
 
+/* =========================
+   MEMORY GAME
+   ========================= */
+
+.memory-game {
+    margin-top: 20px;
+}
+
+.memory-game-board {
+    display: grid;
+    grid-template-columns: repeat(3, 120px);
+    gap: 12px;
+
+    justify-content: center;
+
+    margin: 20px auto;
+
+    perspective: 1000px;
+}
+
+.memory-card {
+    width: 120px;
+    height: 120px;
+
+    cursor: pointer;
+
+    perspective: 1000px;
+}
+
+.memory-card-inner {
+    position: relative;
+
+    width: 100%;
+    height: 100%;
+
+    transform-style: preserve-3d;
+
+    transition: transform 0.5s ease;
+}
+
+.memory-card.flipped .memory-card-inner,
+.memory-card.matched .memory-card-inner {
+    transform: rotateY(180deg);
+}
+
+.memory-card-front,
+.memory-card-back {
+    position: absolute;
+
+    width: 100%;
+    height: 100%;
+
+    top: 0;
+    left: 0;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    border-radius: 14px;
+
+    backface-visibility: hidden;
+    -webkit-backface-visibility: hidden;
+
+    overflow: hidden;
+}
+
+.memory-card-front {
+    background: #667eea;
+
+    color: white;
+
+    font-size: 36px;
+    font-weight: bold;
+
+    transform: rotateY(0deg);
+}
+
+.memory-card-back {
+    background: white;
+
+    transform: rotateY(180deg);
+}
+
+.memory-card-back img {
+    display: block;
+
+    width: 100%;
+    height: 100%;
+
+    object-fit: cover;
+}
+
+.memory-card.matched {
+    cursor: default;
+}
+
+.memory-card.matched .memory-card-inner {
+    box-shadow: 0 0 0 3px #4caf50;
+}
+
+.memory-game-result {
+    margin-top: 15px;
+
+    text-align: center;
+
+    font-weight: bold;
+}
+
+.memory-game-result.success {
+    color: #2e7d32;
+}
+
+.memory-game-result.error {
+    color: #c62828;
+}
+
+/* =========================================================
+   🐊 КРОКОДИЛ
+   ========================================================= */
+
+.crocodile-game {
+    width: 100%;
+    max-width: 650px;
+    margin: 0 auto;
+}
+
+
+/* ---------- Настройка игры ---------- */
+
+.crocodile-setup,
+.crocodile-players-setup {
+    animation: crocodileFadeIn 0.45s ease;
+}
+
+.crocodile-setup-title {
+    font-size: 28px;
+    font-weight: 800;
+    margin-bottom: 24px;
+    text-align: center;
+}
+
+.crocodile-setup-group {
+    margin-bottom: 20px;
+}
+
+.crocodile-setup-group label {
+    display: block;
+    font-weight: 700;
+    margin-bottom: 8px;
+}
+
+.crocodile-setup select {
+    width: 100%;
+    padding: 14px 16px;
+    border: 2px solid #e4e7f5;
+    border-radius: 16px;
+    background: #fff;
+    font-size: 16px;
+    cursor: pointer;
+    margin: 9px;
+}
+
+
+/* ---------- Имена игроков ---------- */
+
+.crocodile-player-input {
+    margin-bottom: 14px;
+}
+
+.crocodile-player-input label {
+    display: block;
+    font-weight: 700;
+    margin-bottom: 6px;
+}
+
+.crocodile-player-name-input {
+    width: 100%;
+    box-sizing: border-box;
+    padding: 13px 16px;
+    border: 2px solid #e4e7f5;
+    border-radius: 14px;
+    font-size: 16px;
+    outline: none;
+    transition: 0.2s;
+}
+
+.crocodile-player-name-input:focus {
+    border-color: #667eea;
+    box-shadow: 0 0 0 4px rgba(102, 126, 234, 0.12);
+}
+
+
+/* ---------- Игровое поле ---------- */
+
+.crocodile-play {
+    animation: crocodileFadeIn 0.45s ease;
+}
+
+.crocodile-round-type {
+    text-align: center;
+    font-size: 22px;
+    font-weight: 800;
+    color: #667eea;
+    margin-bottom: 8px;
+}
+
+.crocodile-player-name {
+    text-align: center;
+    font-size: 18px;
+    font-weight: 700;
+    margin-bottom: 18px;
+}
+
+
+/* ---------- Таймер ---------- */
+
+.crocodile-timer {
+    width: fit-content;
+    min-width: 110px;
+    margin: 0 auto 24px;
+    padding: 10px 20px;
+    border-radius: 999px;
+    background: #f1f3ff;
+    color: #667eea;
+    font-size: 30px;
+    font-weight: 900;
+    text-align: center;
+    font-variant-numeric: tabular-nums;
+    box-shadow: 0 8px 25px rgba(70, 75, 150, 0.12);
+}
+
+
+/* ---------- Передача устройства ---------- */
+
+.crocodile-task-hidden {
+    text-align: center;
+    color: #777;
+    font-size: 16px;
+    margin-bottom: 20px;
+}
+
+
+/* ---------- Кнопка показать ---------- */
+
+.crocodile-show-task-button {
+    display: block;
+    margin: 0 auto;
+}
+
+
+/* ---------- Карточка задания ---------- */
+
+.crocodile-task {
+    min-height: 190px;
+    padding: 30px;
+    box-sizing: border-box;
+
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+
+    border-radius: 28px;
+
+    background:
+            radial-gradient(
+                    circle at top left,
+                    rgba(255, 255, 255, 0.95),
+                    rgba(238, 240, 255, 0.95)
+            );
+
+    border: 3px solid rgba(102, 126, 234, 0.15);
+
+    box-shadow:
+            0 20px 50px rgba(74, 78, 150, 0.16),
+            inset 0 1px 0 rgba(255, 255, 255, 0.8);
+
+    color: #25264a;
+
+    font-weight: 900;
+
+    animation:
+            crocodileTaskAppear 0.45s cubic-bezier(.2,.8,.2,1);
+}
+
+
+/* Одно слово */
+
+.crocodile-task-short {
+    font-size: 48px;
+    letter-spacing: 1px;
+}
+
+
+/* Словосочетание */
+
+.crocodile-task-medium {
+    font-size: 34px;
+    line-height: 1.25;
+}
+
+
+/* Длинное предложение */
+
+.crocodile-task-long {
+    font-size: 25px;
+    line-height: 1.4;
+}
+
+
+/* ---------- Игровые кнопки ---------- */
+
+.crocodile-game-actions {
+    display: flex;
+    gap: 14px;
+    margin-top: 22px;
+}
+
+.crocodile-game-actions button {
+    flex: 1;
+    min-height: 58px;
+    border: none;
+    border-radius: 18px;
+
+    font-size: 17px;
+    font-weight: 800;
+
+    cursor: pointer;
+
+    transition:
+            transform 0.15s ease,
+            box-shadow 0.15s ease;
+}
+
+.crocodile-game-actions button:hover {
+    transform: translateY(-2px);
+}
+
+.crocodile-game-actions button:active {
+    transform: translateY(1px);
+}
+
+.crocodile-guessed-button {
+    background: linear-gradient(135deg, #43d17b, #27ae60);
+    color: white;
+
+    box-shadow:
+            0 10px 25px rgba(39, 174, 96, 0.25);
+}
+
+.crocodile-skip-button {
+    background: #f0f1f7;
+    color: #555;
+
+    box-shadow:
+            0 8px 20px rgba(50, 50, 80, 0.08);
+}
+
+
+/* ---------- Финал ---------- */
+
+.crocodile-results {
+    animation: crocodileFadeIn 0.6s ease;
+}
+
+.crocodile-winner {
+    position: relative;
+    overflow: hidden;
+
+    margin-bottom: 28px;
+    padding: 35px 25px;
+
+    text-align: center;
+
+    border-radius: 30px;
+
+    background:
+            linear-gradient(
+                    135deg,
+                    #fff8d8,
+                    #fff1a8
+            );
+
+    border: 3px solid #f4d35e;
+
+    box-shadow:
+            0 20px 50px rgba(180, 145, 30, 0.22);
+}
+
+.crocodile-winner-title {
+    font-size: 20px;
+    font-weight: 800;
+    color: #8b6b00;
+    margin-bottom: 10px;
+}
+
+.crocodile-winner-name {
+    font-size: 38px;
+    font-weight: 900;
+    color: #5d4700;
+}
+
+.crocodile-winner-score {
+    margin-top: 8px;
+    font-size: 22px;
+    font-weight: 800;
+    color: #806500;
+}
+
+
+/* ---------- Заголовок результатов ---------- */
+
+.crocodile-scoreboard-title {
+    margin: 10px 0 14px;
+
+    font-size: 20px;
+    font-weight: 800;
+}
+
+
+/* ---------- Строки игроков ---------- */
+
+.crocodile-score-row {
+    display: grid;
+    grid-template-columns: 42px 1fr auto;
+    align-items: center;
+
+    gap: 12px;
+
+    margin-bottom: 10px;
+    padding: 16px 18px;
+
+    border-radius: 18px;
+
+    background: #f7f8ff;
+
+    box-shadow:
+            0 5px 15px rgba(60, 65, 120, 0.06);
+
+    animation: crocodileScoreAppear 0.35s ease both;
+}
+
+.crocodile-score-place {
+    font-weight: 900;
+    color: #667eea;
+}
+
+.crocodile-score-name {
+    font-weight: 750;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.crocodile-score-value {
+    font-weight: 900;
+    color: #667eea;
+}
+
+
+/* ---------- Сообщение сохранения ---------- */
+
+.crocodile-save-message {
+    margin-top: 18px;
+    text-align: center;
+
+    font-weight: 700;
+    color: #667eea;
+}
+
+
+/* ---------- Анимации ---------- */
+
+@keyframes crocodileFadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(12px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+
+@keyframes crocodileTaskAppear {
+    from {
+        opacity: 0;
+        transform: scale(0.88) rotate(-1deg);
+    }
+
+    to {
+        opacity: 1;
+        transform: scale(1) rotate(0);
+    }
+}
+
+
+@keyframes crocodileScoreAppear {
+    from {
+        opacity: 0;
+        transform: translateX(-15px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+
+/* ---------- Телефон ---------- */
+
+@media (max-width: 600px) {
+
+    .crocodile-task {
+        min-height: 160px;
+        padding: 22px;
+    }
+
+    .crocodile-task-short {
+        font-size: 38px;
+    }
+
+    .crocodile-task-medium {
+        font-size: 27px;
+    }
+
+    .crocodile-task-long {
+        font-size: 21px;
+    }
+
+    .crocodile-game-actions {
+        flex-direction: column;
+    }
+
+    .crocodile-winner-name {
+        font-size: 30px;
+    }
+}
+
+/* =========================================================
+   🎉 САЛЮТ КРОКОДИЛА
+   ========================================================= */
+
+.crocodile-confetti {
+    position: fixed;
+
+    top: -20px;
+
+    width: 10px;
+    height: 18px;
+
+    z-index: 99999;
+
+    pointer-events: none;
+
+    border-radius: 2px;
+
+    animation-name: crocodileConfettiFall;
+    animation-timing-function: linear;
+    animation-fill-mode: forwards;
+}
+
+
+@keyframes crocodileConfettiFall {
+
+    0% {
+        opacity: 1;
+        transform:
+                translateY(0)
+                rotate(0deg);
+    }
+
+    25% {
+        transform:
+                translateY(25vh)
+                translateX(20px)
+                rotate(180deg);
+    }
+
+    60% {
+        transform:
+                translateY(65vh)
+                translateX(-30px)
+                rotate(420deg);
+    }
+
+    100% {
+        opacity: 0;
+        transform:
+                translateY(110vh)
+                translateX(40px)
+                rotate(720deg);
+    }
+}
+
+/* =========================================================
+   🐊 КРОКОДИЛ — стартовая кнопка
+   ========================================================= */
+
+.crocodile-setup {
+    min-height: 280px;
+
+    display: flex;
+    flex-direction: column;
+
+    align-items: center;
+    justify-content: center;
+
+    text-align: center;
+}
+
+
+/* Иконка игры */
+
+.crocodile-setup > div:first-child {
+    font-size: 54px;
+    margin-bottom: 14px;
+}
+
+
+/* Большая кнопка */
+
+.crocodile-start-button {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    min-width: 250px;
+    min-height: 72px;
+
+    padding: 16px 34px;
+
+    margin: 20px auto 0;
+
+    border: none;
+    border-radius: 22px;
+
+    background: linear-gradient(
+            135deg,
+            #667eea,
+            #764ba2
+    );
+
+    color: white;
+
+    font-size: 21px;
+    font-weight: 800;
+
+    cursor: pointer;
+
+    box-shadow:
+            0 12px 28px rgba(102, 126, 234, 0.30);
+
+    transition:
+            transform 0.18s ease,
+            box-shadow 0.18s ease;
+}
+
+
+.crocodile-start-button:hover {
+    transform: translateY(-3px);
+
+    box-shadow:
+            0 16px 34px rgba(102, 126, 234, 0.38);
+}
+
+
+.crocodile-start-button:active {
+    transform: translateY(1px);
+}
+
+
+
+/* Телефон */
+
+/* =========================
+   MEMORY GAME — MOBILE
+   ========================= */
+
+@media (max-width: 600px) {
+
+    .memory-game {
+        width: 100%;
+        margin-top: 15px;
+    }
+
+    .memory-game-board {
+        width: 100%;
+        max-width: 360px;
+
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+
+        gap: 8px;
+
+        padding: 0 10px;
+        box-sizing: border-box;
+    }
+
+    .memory-card {
+        width: 100%;
+        aspect-ratio: 1 / 1;
+        height: auto;
+
+        min-width: 0;
+    }
+
+    .memory-card-front {
+        font-size: 28px;
+    }
+
+    .memory-card-front,
+    .memory-card-back {
+        border-radius: 10px;
+    }
+
+    .memory-game-result {
+        padding: 0 15px;
+        font-size: 16px;
+    }
+}
+
+@media (max-width: 380px) {
+
+    .memory-game-board {
+        max-width: 320px;
+        gap: 6px;
+        padding: 0 6px;
+    }
+
+    .memory-card-front {
+        font-size: 24px;
+    }
+
+    .memory-card-front,
+    .memory-card-back {
+        border-radius: 8px;
+    }
+}
+
+@media (max-width: 600px) {
+
+    .crocodile-setup {
+        min-height: 240px;
+    }
+
+    .crocodile-start-button {
+        min-width: 220px;
+        min-height: 64px;
+
+        font-size: 19px;
+    }
+}
 
 @media (max-width: 480px) {
     .challenge-meta {

@@ -1,0 +1,152 @@
+<div class="mini-game-inline crocodile-game"
+     data-crocodile-game
+     th:attr="data-activity-id=${activityId}">
+
+    <input type="hidden"
+           class="crocodile-csrf-token"
+           th:name="${_csrf.parameterName}"
+           th:value="${_csrf.token}">
+
+    <!-- Этап 1. Настройка игры -->
+    <div class="crocodile-setup">
+
+        <p class="crocodile-description">
+            Передавайте устройство игрокам по очереди
+            и показывайте слово или ситуацию без слов
+        </p>
+
+        <div class="crocodile-setup-block">
+
+            <label for="crocodile-player-count">
+                👥 Количество игроков
+            </label>
+
+            <select id="crocodile-player-count"
+                    class="crocodile-player-count">
+                <option value="2">2 игрока</option>
+                <option value="3">3 игрока</option>
+                <option value="4">4 игрока</option>
+                <option value="5">5 игроков</option>
+                <option value="6">6 игроков</option>
+                <option value="7">7 игроков</option>
+                <option value="8">8 игроков</option>
+            </select>
+
+        </div>
+
+        <div class="crocodile-setup-block">
+
+            <label for="crocodile-difficulty">
+                🎯 Сложность
+            </label>
+
+            <select id="crocodile-difficulty"
+                    class="crocodile-difficulty">
+
+                <option value="EASY">🟢 Легко</option>
+                <option value="MEDIUM" selected>🟡 Средне</option>
+                <option value="HARD">🔴 Сложно</option>
+
+            </select>
+
+        </div>
+
+        <button type="button"
+                class="button crocodile-next-button">
+            Далее →
+        </button>
+
+    </div>
+
+
+    <!-- Этап 2. Имена игроков -->
+    <div class="crocodile-players-setup"
+         style="display: none;">
+
+        <h3>👥 Игроки</h3>
+
+        <p>
+            Введите имена игроков
+        </p>
+
+        <div class="crocodile-player-inputs"></div>
+
+        <button type="button"
+                class="button crocodile-start-button">
+            🐊 В игру
+        </button>
+
+    </div>
+
+
+    <!-- Этап 3. Игра -->
+    <div class="crocodile-play"
+         style="display: none;">
+
+        <div class="crocodile-round-info">
+
+            <div class="crocodile-round-type"></div>
+
+            <div class="crocodile-player-name"></div>
+
+            <div class="crocodile-timer">
+                01:00
+            </div>
+
+        </div>
+
+        <div class="crocodile-task-area">
+
+            <div class="crocodile-task-hidden">
+                Передай устройство игроку
+            </div>
+
+            <button type="button"
+                    class="button crocodile-show-task-button">
+                👀 Показать задание
+            </button>
+
+            <div class="crocodile-task"
+                 style="display: none;">
+            </div>
+
+        </div>
+
+        <div class="crocodile-game-actions"
+             style="display: none;">
+
+            <button type="button"
+                    class="button crocodile-guessed-button">
+                ✅ Угадано
+            </button>
+
+            <button type="button"
+                    class="button secondary-button crocodile-skip-button">
+                ⏭️ Пропустить
+            </button>
+
+        </div>
+
+    </div>
+
+
+    <!-- Этап 4. Результаты -->
+    <div class="crocodile-results"
+         style="display: none;">
+
+        <h3>🏆 Результаты</h3>
+
+        <div class="crocodile-scoreboard"></div>
+
+        <button type="button"
+                class="button crocodile-restart-button">
+            🔄 Играть ещё раз
+        </button>
+
+    </div>
+
+
+    <!-- Сообщение о сохранении результата -->
+    <div class="crocodile-save-message"></div>
+
+</div>

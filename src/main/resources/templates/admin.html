@@ -251,6 +251,7 @@
                     <option value="REACTION">⚡ Реакция</option>
                     <option value="WORD">🔤 Слова</option>
                     <option value="QUIZ">🧩 Викторина</option>
+                    <option value="CROCODILE">🐊 Крокодил</option>
                 </select>
 
                 <select name="category" required>
@@ -315,6 +316,10 @@
                                 <span th:if="${game.gameType == 'QUIZ'}">
                         🧩 Викторина
                     </span>
+                                <span th:if="${game.gameType == 'CROCODILE'}">
+                         🐊 Крокодил
+                    </span>
+
 
                                 <span>·</span>
 
@@ -450,6 +455,10 @@
                                     th:selected="${game.gameType == 'QUIZ'}"
                             >
                                 🧩 Викторина
+                            </option>
+
+                            <option value="CROCODILE" th:selected="${game.gameType == 'CROCODILE'}">
+                                🐊 Крокодил
                             </option>
 
                         </select>

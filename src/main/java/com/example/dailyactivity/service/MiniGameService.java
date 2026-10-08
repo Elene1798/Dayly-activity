@@ -48,12 +48,18 @@ public class MiniGameService {
 
         if (newGame) {
 
+            String location = "anywhere";
+
+            if ("CROCODILE".equalsIgnoreCase(savedGame.getGameType())) {
+                location = "friends";
+            }
+
             Activity activity = new Activity(
                     savedGame.getTitle(),
                     savedGame.getDescription(),
                     savedGame.getCategory(),
                     savedGame.getDuration(),
-                    "anywhere",
+                    location,
                     savedGame.getInstructions(),
                     null,
                     null,

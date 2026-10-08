@@ -191,16 +191,24 @@ public class AdminController {
     public String addMiniGameTask(
             @PathVariable Long id,
             @RequestParam String content,
-            @RequestParam String answer
+            @RequestParam(required = false) String answer,
+            @RequestParam(required = false) String difficulty,
+            @RequestParam(required = false) String taskType,
+            @RequestParam(required = false) String imageUrl
     ) {
         MiniGame miniGame = miniGameService.findById(id);
 
         if (miniGame != null) {
-            MiniGameTask task = new MiniGameTask(
-                    miniGame,
-                    content,
-                    answer
-            );
+
+            if ("CROCODILE".equalsIgnoreCase(miniGame.getGameType())) {
+                answer = content;
+            }
+
+            MiniGameTask task = new MiniGameTask(miniGame, content, answer);
+
+            task.setDifficulty(difficulty);
+            task.setTaskType(taskType);
+            task.setImageUrl(imageUrl);
 
             miniGameTaskService.save(task);
         }
@@ -231,24 +239,35 @@ public class AdminController {
     public String editMiniGameTask(
             @PathVariable Long id,
             @RequestParam String content,
-            @RequestParam String answer,
+            @RequestParam(required = false) String answer,
+            @RequestParam(required = false) String difficulty,
+            @RequestParam(required = false) String taskType,
+            @RequestParam(required = false) String imageUrl,
             @RequestParam(defaultValue = "false") boolean active
     ) {
         MiniGameTask task = miniGameTaskService.findById(id);
 
-        if (task == null) {
-            return "redirect:/admin";
+        if (task != null) {
+
+            if ("CROCODILE".equalsIgnoreCase(task.getMiniGame().getGameType())) {
+                answer = content;
+            }
+
+            task.setContent(content);
+            task.setAnswer(answer);
+            task.setDifficulty(difficulty);
+            task.setTaskType(taskType);
+            task.setImageUrl(imageUrl);
+            task.setActive(active);
+
+            miniGameTaskService.save(task);
+
+            return "redirect:/admin/mini-game/"
+                    + task.getMiniGame().getId()
+                    + "/tasks";
         }
 
-        Long miniGameId = task.getMiniGame().getId();
-
-        task.setContent(content);
-        task.setAnswer(answer);
-        task.setActive(active);
-
-        miniGameTaskService.save(task);
-
-        return "redirect:/admin/mini-game/" + miniGameId + "/tasks";
+        return "redirect:/admin";
     }
 
 

@@ -1,6 +1,8 @@
 document.addEventListener("DOMContentLoaded", () => {
 
-    const gameCards = document.querySelectorAll(".activity-mini-game");
+    const gameCards =
+        document.querySelectorAll(".activity-mini-game");
+
 
     gameCards.forEach(card => {
 
@@ -16,14 +18,17 @@ document.addEventListener("DOMContentLoaded", () => {
         const activityId =
             card.dataset.activityId;
 
+
         if (!button || !content || !gameId || !activityId) {
             return;
         }
+
 
         button.addEventListener("click", async () => {
 
             button.disabled = true;
             button.textContent = "Загрузка...";
+
 
             try {
 
@@ -31,40 +36,93 @@ document.addEventListener("DOMContentLoaded", () => {
                     `/mini-game/${gameId}/content?activityId=${activityId}`
                 );
 
+
                 if (!response.ok) {
                     throw new Error("Не удалось загрузить игру");
                 }
 
-                const html = await response.text();
+
+                const html =
+                    await response.text();
+
+
+                /*
+                 * Вставляем игру внутрь
+                 * существующей карточки активности.
+                 */
 
                 content.innerHTML = html;
 
+
+                /*
+                 * =========================
+                 * WORD
+                 * =========================
+                 */
+
+                const wordGame =
+                    content.querySelector("[data-word-game]");
+                if (wordGame) {
+                    initializeWordGame(content);
+                }
+
+
+                /*
+                 * =========================
+                 * MEMORY
+                 * =========================
+                 */
+
+                const memoryGame =
+                    content.querySelector("[data-memory-game]");
+                if (memoryGame) {
+                    initializeMemoryGame(memoryGame);
+                }
+
+                const crocodileGame = content.querySelector("[data-crocodile-game]");
+                if (crocodileGame) initializeCrocodileGame(crocodileGame);
+                /*
+                 * После загрузки игры
+                 * кнопка больше не нужна.
+                 */
+
                 button.style.display = "none";
 
-                initializeWordGame(content);
 
             } catch (error) {
 
                 console.error(error);
 
+
                 button.disabled = false;
                 button.textContent = "🎮 Начать игру";
+
 
                 content.innerHTML =
                     "<p>Не удалось загрузить игру. Попробуй ещё раз.</p>";
             }
+
         });
+
     });
 
+
+    /*
+     * =====================================================
+     * WORD GAME
+     * =====================================================
+     */
 
     function initializeWordGame(container) {
 
         const game =
             container.querySelector("[data-word-game]");
 
+
         if (!game) {
             return;
         }
+
 
         const lettersContainer =
             game.querySelector(".word-game-letters");
@@ -84,142 +142,295 @@ document.addEventListener("DOMContentLoaded", () => {
         const submittedAnswer =
             game.querySelector(".word-game-submitted-answer");
 
+
         const word =
             game.dataset.answer;
+
 
         let selectedLetters = [];
 
 
+        const letters = shuffle(
+            word.split("").map((letter, index) => ({
+                letter: letter,
+                index: index
+            }))
+        );
+
+
         function shuffle(array) {
+
             return [...array]
                 .sort(() => Math.random() - 0.5);
+
         }
 
+
+        /*
+         * Отрисовка доступных букв.
+         */
 
         function renderLetters() {
 
             lettersContainer.innerHTML = "";
 
-            shuffle(word.split(""))
-                .forEach((letter, index) => {
 
-                    const button =
-                        document.createElement("button");
+            letters.forEach(item => {
 
-                    button.type = "button";
-                    button.className = "word-game-letter";
-                    button.textContent = letter;
+                const button =
+                    document.createElement("button");
 
-                    button.addEventListener("click", () => {
 
-                        if (selectedLetters.length >= word.length) {
-                            return;
-                        }
+                button.type = "button";
 
-                        selectedLetters.push({
-                            letter: letter,
-                            index: index
-                        });
+                button.className =
+                    "word-game-letter";
 
-                        button.disabled = true;
+                button.textContent =
+                    item.letter;
 
-                        renderAnswer();
-                    });
 
-                    lettersContainer.appendChild(button);
+                const isSelected =
+                    selectedLetters.some(
+                        selected =>
+                            selected.index === item.index
+                    );
+
+
+                button.disabled =
+                    isSelected;
+
+
+                button.addEventListener("click", () => {
+
+                    if (
+                        selectedLetters.length >=
+                        word.length
+                    ) {
+                        return;
+                    }
+
+
+                    if (
+                        selectedLetters.some(
+                            selected =>
+                                selected.index === item.index
+                        )
+                    ) {
+                        return;
+                    }
+
+
+                    selectedLetters.push(item);
+
+
+                    renderLetters();
+                    renderAnswer();
+
                 });
+
+
+                lettersContainer.appendChild(button);
+
+            });
+
         }
 
+
+        /*
+         * Отрисовка собранного слова.
+         */
 
         function renderAnswer() {
 
             answerContainer.innerHTML = "";
 
-            selectedLetters.forEach((item, position) => {
 
-                const button =
-                    document.createElement("button");
+            selectedLetters.forEach(
+                (item, position) => {
 
-                button.type = "button";
-                button.className =
-                    "word-game-selected-letter";
+                    const button =
+                        document.createElement("button");
 
-                button.textContent = item.letter;
 
-                button.addEventListener("click", () => {
+                    button.type = "button";
 
-                    selectedLetters.splice(position, 1);
+                    button.className =
+                        "word-game-selected-letter";
 
-                    renderLetters();
-                    renderAnswer();
-                });
+                    button.textContent =
+                        item.letter;
 
-                answerContainer.appendChild(button);
-            });
+
+                    button.addEventListener(
+                        "click",
+                        () => {
+
+                            selectedLetters.splice(
+                                position,
+                                1
+                            );
+
+
+                            renderLetters();
+                            renderAnswer();
+
+                        }
+                    );
+
+
+                    answerContainer.appendChild(
+                        button
+                    );
+
+                }
+            );
+
         }
 
 
-        checkButton.addEventListener("click", () => {
+        /*
+         * Проверка слова.
+         */
 
-            const answer =
-                selectedLetters
-                    .map(item => item.letter)
-                    .join("");
+        checkButton.addEventListener(
+            "click",
+            () => {
 
-            if (answer.toLowerCase() === word.toLowerCase()) {
-                result.textContent = "🎉 Правильно!";
-                result.className = "word-game-result success";
-                checkButton.disabled = true;
+                const answer =
+                    selectedLetters
+                        .map(item => item.letter)
+                        .join("");
 
-                submittedAnswer.value = answer;
 
-                setTimeout(async () => {
-                    try {
-                        const formData = new FormData(completeForm);
+                if (
+                    answer.toLowerCase() ===
+                    word.toLowerCase()
+                ) {
 
-                        const response = await fetch("/mini-game/complete-inline", {
-                            method: "POST",
-                            body: formData
-                        });
+                    result.textContent =
+                        "🎉 Правильно!";
 
-                        const status = await response.text();
+                    result.className =
+                        "word-game-result success";
 
-                        if (status === "SUCCESS") {
-                            result.textContent = "🎉 Задание выполнено!";
-                            result.className = "word-game-result success";
+                    checkButton.disabled =
+                        true;
 
-                            completeForm.remove();
-                        } else if (status === "AUTH_REQUIRED") {
-                            result.textContent = "Войди в аккаунт, чтобы сохранить результат";
-                            result.className = "word-game-result error";
-                            checkButton.disabled = false;
-                        } else {
-                            result.textContent = "Не удалось сохранить результат";
-                            result.className = "word-game-result error";
-                            checkButton.disabled = false;
-                        }
 
-                    } catch (error) {
-                        console.error(error);
+                    submittedAnswer.value =
+                        answer;
 
-                        result.textContent = "Не удалось сохранить результат";
-                        result.className = "word-game-result error";
-                        checkButton.disabled = false;
-                    }
-                }, 700);
+
+                    setTimeout(
+                        async () => {
+
+                            try {
+
+                                const formData =
+                                    new FormData(
+                                        completeForm
+                                    );
+
+
+                                const response =
+                                    await fetch(
+                                        "/mini-game/complete-inline",
+                                        {
+                                            method: "POST",
+                                            body: formData
+                                        }
+                                    );
+
+
+                                const status =
+                                    await response.text();
+
+
+                                if (
+                                    status ===
+                                    "SUCCESS"
+                                ) {
+
+                                    result.textContent =
+                                        "🎉 Задание выполнено!";
+
+                                    result.className =
+                                        "word-game-result success";
+
+
+                                    completeForm.remove();
+
+
+                                } else if (
+                                    status ===
+                                    "AUTH_REQUIRED"
+                                ) {
+
+                                    result.textContent =
+                                        "Войди в аккаунт, чтобы сохранить результат";
+
+                                    result.className =
+                                        "word-game-result error";
+
+
+                                    checkButton.disabled =
+                                        false;
+
+
+                                } else {
+
+                                    result.textContent =
+                                        "Не удалось сохранить результат";
+
+                                    result.className =
+                                        "word-game-result error";
+
+
+                                    checkButton.disabled =
+                                        false;
+
+                                }
+
+
+                            } catch (error) {
+
+                                console.error(error);
+
+
+                                result.textContent =
+                                    "Не удалось сохранить результат";
+
+                                result.className =
+                                    "word-game-result error";
+
+
+                                checkButton.disabled =
+                                    false;
+
+                            }
+
+                        },
+                        700
+                    );
+
+
+                } else {
+
+                    result.textContent =
+                        "Попробуй ещё раз";
+
+                    result.className =
+                        "word-game-result error";
+
+                }
+
             }
-
-            else {
-
-                result.textContent =
-                    "Попробуй ещё раз";
-
-                result.className =
-                    "word-game-result error";
-            }
-        });
+        );
 
 
         renderLetters();
+
     }
+
 });

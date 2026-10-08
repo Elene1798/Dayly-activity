@@ -39,30 +39,117 @@
     </p>
 
 
-    <!-- Добавление задания -->
+    <!-- =========================
+         ДОБАВЛЕНИЕ ЗАДАНИЯ
+         ========================= -->
 
     <section class="admin-section">
 
         <h2>➕ Добавить задание</h2>
 
+
+        <!-- =========================
+             WORD / CROCODILE
+             ========================= -->
+
         <form
+                th:if="${miniGame.gameType != 'MEMORY'}"
                 th:action="@{'/admin/mini-game/' + ${miniGame.id} + '/tasks/add'}"
                 method="post"
         >
 
-            <input
-                    type="text"
-                    name="content"
-                    placeholder="Задание / слово"
-                    required
+            <!-- WORD -->
+
+            <div th:if="${miniGame.gameType == 'WORD'}">
+
+                <input
+                        type="text"
+                        name="content"
+                        placeholder="Задание / слово"
+                        required
+                >
+
+                <input
+                        type="text"
+                        name="answer"
+                        placeholder="Правильный ответ"
+                        required
+                >
+
+            </div>
+
+
+            <!-- CROCODILE -->
+
+            <div th:if="${miniGame.gameType == 'CROCODILE'}">
+
+                <input
+                        type="text"
+                        name="content"
+                        placeholder="Слово или задание"
+                        required
+                >
+
+                <!-- Для Крокодила answer автоматически
+                     будет равен content в AdminController -->
+
+                <input
+                        type="hidden"
+                        name="answer"
+                        value=""
+                >
+
+            </div>
+
+
+            <!-- Настройки Крокодила -->
+
+            <div
+                    th:if="${miniGame.gameType == 'CROCODILE'}"
+                    class="crocodile-task-options"
             >
 
-            <input
-                    type="text"
-                    name="answer"
-                    placeholder="Правильный ответ"
-                    required
-            >
+                <label>
+                    Сложность
+
+                    <select name="difficulty">
+
+                        <option value="EASY">
+                            🟢 Легко
+                        </option>
+
+                        <option value="MEDIUM">
+                            🟡 Средне
+                        </option>
+
+                        <option value="HARD">
+                            🔴 Сложно
+                        </option>
+
+                    </select>
+
+                </label>
+
+
+                <label>
+                    Тип задания
+
+                    <select name="taskType">
+
+                        <option value="WORD">
+                            🗣️ Слово или словосочетание
+                        </option>
+
+                        <option value="SITUATION">
+                            🎭 Ситуация
+                        </option>
+
+                    </select>
+
+                </label>
+
+            </div>
+
 
             <button
                     type="submit"
@@ -73,10 +160,86 @@
 
         </form>
 
+
+        <!-- =========================
+             MEMORY
+             ========================= -->
+
+        <form
+                th:if="${miniGame.gameType == 'MEMORY'}"
+                th:action="@{'/admin/mini-game/' + ${miniGame.id} + '/tasks/add'}"
+                method="post"
+        >
+
+            <input
+                    type="hidden"
+                    name="content"
+                    value="memory"
+            >
+
+            <input
+                    type="hidden"
+                    name="answer"
+                    value="memory"
+            >
+
+
+            <label>
+                🖼️ Выбери картинку
+            </label>
+
+
+            <select
+                    name="imageUrl"
+                    required
+            >
+
+                <option value="">
+                    -- Выбери картинку --
+                </option>
+
+                <option value="/images/games/memory/apple.png">
+                    🍎 Яблоко
+                </option>
+
+                <option value="/images/games/memory/cat.png">
+                    🐱 Кот
+                </option>
+
+                <option value="/images/games/memory/bicycle.png">
+                    🚲 Велосипед
+                </option>
+
+                <option value="/images/games/memory/rocket.png">
+                    🚀 Ракета
+                </option>
+
+                <option value="/images/games/memory/guitar.png">
+                    🎸 Гитара
+                </option>
+
+                <option value="/images/games/memory/pizza.png">
+                    🍕 Пицца
+                </option>
+
+            </select>
+
+
+            <button
+                    type="submit"
+                    class="button"
+            >
+                🧩 Добавить пару
+            </button>
+
+        </form>
+
     </section>
 
 
-    <!-- Список заданий -->
+    <!-- =========================
+         СПИСОК ЗАДАНИЙ
+         ========================= -->
 
     <section class="admin-section">
 
@@ -84,51 +247,101 @@
             📋 Все задания
         </h2>
 
+
         <div class="mini-game-tasks-list">
+
 
             <div
                     class="mini-game-task-card"
                     th:each="task : ${tasks}"
             >
 
+
+                <!-- =========================
+                     ОСНОВНАЯ ИНФОРМАЦИЯ
+                     ========================= -->
+
                 <div class="mini-game-task-main">
+
 
                     <div class="mini-game-task-content">
 
-                        <strong th:text="${task.content}">
-                            Задание
-                        </strong>
 
-                        <span>→</span>
+                        <!-- MEMORY -->
 
-                        <strong th:text="${task.answer}">
-                            Ответ
-                        </strong>
+                        <div
+                                th:if="${miniGame.gameType == 'MEMORY'}"
+                        >
+
+                            <img
+                                    th:src="${task.imageUrl}"
+                                    alt="Картинка пары"
+                                    class="memory-admin-image"
+                            >
+
+                            <span>
+                                🖼️ Пара
+                            </span>
+
+                        </div>
+
+
+                        <!-- WORD / CROCODILE -->
+
+                        <div
+                                th:unless="${miniGame.gameType == 'MEMORY'}"
+                        >
+
+                            <strong
+                                    th:text="${task.content}"
+                            >
+                                Задание
+                            </strong>
+
+                            <span>
+                                →
+                            </span>
+
+                            <strong
+                                    th:text="${task.answer}"
+                            >
+                                Ответ
+                            </strong>
+
+                        </div>
 
                     </div>
 
+
+                    <!-- Статус -->
+
                     <div class="mini-game-task-status">
 
-            <span
-                    th:if="${task.active}"
-                    class="mini-game-active"
-            >
-                🟢 Активно
-            </span>
+                        <span
+                                th:if="${task.active}"
+                                class="mini-game-active"
+                        >
+                            🟢 Активно
+                        </span>
 
                         <span
                                 th:unless="${task.active}"
                                 class="mini-game-inactive"
                         >
-                ⚪ Выключено
-            </span>
+                            ⚪ Выключено
+                        </span>
 
                     </div>
 
                 </div>
 
 
+                <!-- =========================
+                     КНОПКИ
+                     ========================= -->
+
                 <div class="mini-game-task-actions">
+
 
                     <button
                             type="button"
@@ -157,7 +370,9 @@
                 </div>
 
 
-                <!-- Редактирование -->
+                <!-- =========================
+                     РЕДАКТИРОВАНИЕ
+                     ========================= -->
 
                 <form
                         th:id="'task-edit-' + ${task.id}"
@@ -167,21 +382,192 @@
                         style="display: none;"
                 >
 
-                    <input
-                            type="text"
-                            name="content"
-                            th:value="${task.content}"
-                            placeholder="Задание / слово"
-                            required
+
+                    <!-- =========================
+                         WORD
+                         ========================= -->
+
+                    <div
+                            th:if="${miniGame.gameType == 'WORD'}"
                     >
 
-                    <input
-                            type="text"
-                            name="answer"
-                            th:value="${task.answer}"
-                            placeholder="Правильный ответ"
-                            required
+                        <input
+                                type="text"
+                                name="content"
+                                th:value="${task.content}"
+                                placeholder="Задание / слово"
+                                required
+                        >
+
+                        <input
+                                type="text"
+                                name="answer"
+                                th:value="${task.answer}"
+                                placeholder="Правильный ответ"
+                                required
+                        >
+
+                    </div>
+
+
+                    <!-- =========================
+                         CROCODILE
+                         ========================= -->
+
+                    <div
+                            th:if="${miniGame.gameType == 'CROCODILE'}"
                     >
+
+                        <input
+                                type="text"
+                                name="content"
+                                th:value="${task.content}"
+                                placeholder="Слово или задание"
+                                required
+                        >
+
+                        <!-- Для Крокодила answer
+                             автоматически берётся из content -->
+
+                        <input
+                                type="hidden"
+                                name="answer"
+                                value=""
+                        >
+
+                    </div>
+
+
+                    <!-- Настройки Крокодила -->
+
+                    <div
+                            th:if="${miniGame.gameType == 'CROCODILE'}"
+                            class="crocodile-task-options"
+                    >
+
+                        <label>
+                            Сложность
+
+                            <select name="difficulty">
+
+                                <option
+                                        value="EASY"
+                                        th:selected="${task.difficulty == 'EASY'}"
+                                >
+                                    🟢 Легко
+                                </option>
+
+                                <option
+                                        value="MEDIUM"
+                                        th:selected="${task.difficulty == 'MEDIUM'}"
+                                >
+                                    🟡 Средне
+                                </option>
+
+                                <option
+                                        value="HARD"
+                                        th:selected="${task.difficulty == 'HARD'}"
+                                >
+                                    🔴 Сложно
+                                </option>
+
+                            </select>
+
+                        </label>
+
+
+                        <label>
+                            Тип задания
+
+                            <select name="taskType">
+
+                                <option
+                                        value="WORD"
+                                        th:selected="${task.taskType == 'WORD'}"
+                                >
+                                    🗣️ Слово или словосочетание
+                                </option>
+
+                                <option
+                                        value="SITUATION"
+                                        th:selected="${task.taskType == 'SITUATION'}"
+                                >
+                                    🎭 Ситуация
+                                </option>
+
+                            </select>
+
+                        </label>
+
+                    </div>
+
+
+                    <!-- =========================
+                         MEMORY
+                         ========================= -->
+
+                    <div
+                            th:if="${miniGame.gameType == 'MEMORY'}"
+                    >
+
+                        <label>
+                            🖼️ Картинка
+                        </label>
+
+
+                        <select
+                                name="imageUrl"
+                                required
+                        >
+
+                            <option
+                                    value="/images/games/memory/apple.png"
+                                    th:selected="${task.imageUrl == '/images/games/memory/apple.png'}"
+                            >
+                                🍎 Яблоко
+                            </option>
+
+                            <option
+                                    value="/images/games/memory/cat.png"
+                                    th:selected="${task.imageUrl == '/images/games/memory/cat.png'}"
+                            >
+                                🐱 Кот
+                            </option>
+
+                            <option
+                                    value="/images/games/memory/bicycle.png"
+                                    th:selected="${task.imageUrl == '/images/games/memory/bicycle.png'}"
+                            >
+                                🚲 Велосипед
+                            </option>
+
+                            <option
+                                    value="/images/games/memory/rocket.png"
+                                    th:selected="${task.imageUrl == '/images/games/memory/rocket.png'}"
+                            >
+                                🚀 Ракета
+                            </option>
+
+                            <option
+                                    value="/images/games/memory/guitar.png"
+                                    th:selected="${task.imageUrl == '/images/games/memory/guitar.png'}"
+                            >
+                                🎸 Гитара
+                            </option>
+
+                            <option
+                                    value="/images/games/memory/pizza.png"
+                                    th:selected="${task.imageUrl == '/images/games/memory/pizza.png'}"
+                            >
+                                🍕 Пицца
+                            </option>
+
+                        </select>
+
+                    </div>
+
+
+                    <!-- Активность задания -->
 
                     <label class="admin-checkbox">
 
@@ -196,6 +582,9 @@
 
                     </label>
 
+
+                    <!-- Кнопки -->
+
                     <div class="admin-edit-actions">
 
                         <button
@@ -204,6 +593,7 @@
                         >
                             💾 Сохранить
                         </button>
+
 
                         <button
                                 type="button"
@@ -219,6 +609,9 @@
 
             </div>
 
+
+            <!-- Нет заданий -->
+
             <p
                     th:if="${#lists.isEmpty(tasks)}"
                     class="empty-message"
@@ -232,16 +625,28 @@
 
 </div>
 
-<script>
-    function toggleTaskEdit(id) {
-        const form = document.getElementById('task-edit-' + id);
 
-        if (form.style.display === 'none' || form.style.display === '') {
+<script>
+
+    function toggleTaskEdit(id) {
+
+        const form =
+            document.getElementById('task-edit-' + id);
+
+        if (
+            form.style.display === 'none'
+            || form.style.display === ''
+        ) {
+
             form.style.display = 'block';
+
         } else {
+
             form.style.display = 'none';
+
         }
     }
+
 </script>
 
 </body>

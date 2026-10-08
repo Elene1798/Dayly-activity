@@ -76,6 +76,14 @@ public class SecurityConfig {
 
                     String username = authentication.getName();
 
+                    // Администратор не хранится в таблице users.
+                    // Поэтому отправляем его сразу в админ-панель.
+                    if (username.equals(adminUsername)) {
+                        response.sendRedirect("/admin");
+                        return;
+                    }
+
+                    // Обычный пользователь хранится в PostgreSQL.
                     userRepository.findByUsername(username)
                             .ifPresent(user -> {
 

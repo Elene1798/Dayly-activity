@@ -20,6 +20,15 @@ public class MiniGameTask {
     @Column(nullable = false, length = 500)
     private String answer;
 
+    @Column(length = 20)
+    private String difficulty;
+
+    @Column(length = 20)
+    private String taskType;
+
+    @Column(length = 500)
+    private String imageUrl;
+
     @Column(nullable = false)
     private boolean active = true;
 
@@ -34,6 +43,19 @@ public class MiniGameTask {
         this.miniGame = miniGame;
         this.content = content;
         this.answer = answer;
+        this.active = true;
+    }
+
+    public MiniGameTask(
+            MiniGame miniGame,
+            String content,
+            String answer,
+            String imageUrl
+    ) {
+        this.miniGame = miniGame;
+        this.content = content;
+        this.answer = answer;
+        this.imageUrl = imageUrl;
         this.active = true;
     }
 
@@ -65,11 +87,35 @@ public class MiniGameTask {
         this.answer = answer;
     }
 
+    public String getImageUrl() {
+        return imageUrl;
+    }
+
+    public void setImageUrl(String imageUrl) {
+        this.imageUrl = imageUrl;
+    }
+
     public boolean isActive() {
         return active;
     }
 
     public void setActive(boolean active) {
         this.active = active;
+    }
+
+    public String getDifficulty() {
+        return difficulty;
+    }
+
+    public void setDifficulty(String difficulty) {
+        this.difficulty = difficulty;
+    }
+
+    public String getTaskType() {
+        return taskType;
+    }
+
+    public void setTaskType(String taskType) {
+        this.taskType = taskType;
     }
 }

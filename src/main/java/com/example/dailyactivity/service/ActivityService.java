@@ -23,7 +23,8 @@ public class ActivityService {
             String category,
             Integer maxDuration,
             String location,
-            Set<Long> usedIds) {
+            Set<Long> usedIds,
+            Set<Long> completedMiniGameActivityIds) {
 
         List<Activity> activities =
                 activityRepository.findByCategory(category);
@@ -44,6 +45,20 @@ public class ActivityService {
                 // Не показываем уже использованные занятия
                 .filter(activity ->
                         !usedIds.contains(activity.getId()))
+
+                .filter(activity ->
+                        activity.getMiniGame() == null
+                                || "MEMORY".equalsIgnoreCase(
+                                activity.getMiniGame().getGameType()
+                        )
+                                || "CROCODILE".equalsIgnoreCase(
+                                activity.getMiniGame().getGameType()
+                        )
+                                || !completedMiniGameActivityIds.contains(
+                                activity.getId()
+                        )
+                )
+
                 .toList();
 
         if (availableActivities.isEmpty()) {

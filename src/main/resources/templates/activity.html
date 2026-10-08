@@ -151,12 +151,6 @@
         data-mini-game-id=${activity.miniGame.id},
         data-activity-id=${activity.id}">
 
-            <div class="activity-mini-game-icon">🎮</div>
-
-            <h3 th:text="${activity.miniGame.title}">
-                Мини-игра
-            </h3>
-
             <p th:if="${activity.miniGame.description != null
               and !#strings.isEmpty(activity.miniGame.description)}"
                th:text="${activity.miniGame.description}">
@@ -606,7 +600,11 @@
 
     </script>
 
+    <script th:src="@{/js/games/mini-game-crocodile.js}"></script>
+
     <script th:src="@{/js/games/mini-game-inline.js}"></script>
+
+    <script th:src="@{/js/games/mini-game-memory.js}"></script>
 
 </body>
 

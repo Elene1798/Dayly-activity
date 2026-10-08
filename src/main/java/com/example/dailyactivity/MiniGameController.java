@@ -14,7 +14,10 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @Controller
 @RequestMapping("/mini-game")
@@ -91,21 +94,18 @@ public class MiniGameController {
             @RequestParam Long activityId,
             Model model
     ) {
-
         MiniGame miniGame = miniGameService.findById(id);
 
         if (miniGame == null || !miniGame.isActive()) {
             return "fragments/mini-game-empty";
         }
 
-        Activity activity = activityRepository
-                .findById(activityId)
-                .orElse(null);
+        Activity activity =
+                activityRepository.findById(activityId).orElse(null);
 
         if (activity == null
                 || activity.getMiniGame() == null
                 || !activity.getMiniGame().getId().equals(miniGame.getId())) {
-
             return "fragments/mini-game-empty";
         }
 
@@ -116,15 +116,99 @@ public class MiniGameController {
             return "fragments/mini-game-empty";
         }
 
-        MiniGameTask task = tasks.get(
-                (int) (Math.random() * tasks.size())
-        );
-
         model.addAttribute("miniGame", miniGame);
-        model.addAttribute("task", task);
         model.addAttribute("activityId", activityId);
 
-        return "fragments/mini-game-word";
+        if ("WORD".equalsIgnoreCase(miniGame.getGameType())) {
+
+            MiniGameTask task =
+                    tasks.get((int) (Math.random() * tasks.size()));
+
+            model.addAttribute("task", task);
+
+            return "fragments/mini-game-word";
+        }
+
+        if ("MEMORY".equalsIgnoreCase(miniGame.getGameType())) {
+
+            model.addAttribute("tasks", tasks);
+
+            return "fragments/mini-game-memory";
+        }
+
+        if ("CROCODILE".equalsIgnoreCase(miniGame.getGameType())) {
+
+            model.addAttribute("tasks", tasks);
+
+            return "fragments/mini-game-crocodile";
+        }
+
+        return "fragments/mini-game-empty";
+    }
+
+    @GetMapping("/{id}/crocodile-tasks")
+    @ResponseBody
+    public List<Map<String, Object>> crocodileTasks(
+            @PathVariable Long id,
+            @RequestParam Long activityId,
+            @RequestParam String difficulty,
+            @RequestParam String roundType
+    ) {
+        MiniGame miniGame = miniGameService.findById(id);
+
+        if (miniGame == null
+                || !miniGame.isActive()
+                || !"CROCODILE".equalsIgnoreCase(miniGame.getGameType())) {
+            return List.of();
+        }
+
+        Activity activity =
+                activityRepository.findById(activityId).orElse(null);
+
+        if (activity == null
+                || activity.getMiniGame() == null
+                || !activity.getMiniGame().getId().equals(id)) {
+            return List.of();
+        }
+
+        List<MiniGameTask> tasks =
+                miniGameTaskService.findActiveByGame(miniGame);
+
+        List<Map<String, Object>> result = new ArrayList<>();
+
+        for (MiniGameTask task : tasks) {
+
+            boolean difficultyMatches =
+                    task.getDifficulty() == null
+                            || task.getDifficulty().isBlank()
+                            || task.getDifficulty().equalsIgnoreCase(difficulty);
+
+            if (!difficultyMatches) {
+                continue;
+            }
+
+            boolean typeMatches;
+
+            if ("SITUATION".equalsIgnoreCase(roundType)) {
+                typeMatches =
+                        "SITUATION".equalsIgnoreCase(task.getTaskType());
+            } else {
+                typeMatches =
+                        !"SITUATION".equalsIgnoreCase(task.getTaskType());
+            }
+
+            if (!typeMatches) {
+                continue;
+            }
+
+            Map<String, Object> item = new HashMap<>();
+            item.put("id", task.getId());
+            item.put("content", task.getContent());
+
+            result.add(item);
+        }
+
+        return result;
     }
 
     @PostMapping("/complete")
@@ -310,6 +394,144 @@ public class MiniGameController {
                 achievementCheckerService.checkCompletionAchievements(user);
             } catch (DataIntegrityViolationException ignored) {
                 // Уже завершено другим запросом
+            }
+        }
+
+        return "SUCCESS";
+    }
+
+    @PostMapping("/complete-crocodile-inline")
+    @ResponseBody
+    public String completeCrocodileInline(
+            @RequestParam Long activityId,
+            Authentication authentication
+    ) {
+        if (authentication == null
+                || !authentication.isAuthenticated()
+                || "anonymousUser".equals(authentication.getPrincipal())) {
+            return "AUTH_REQUIRED";
+        }
+
+        User user =
+                userRepository.findByUsername(authentication.getName())
+                        .orElse(null);
+
+        if (user == null) {
+            return "AUTH_REQUIRED";
+        }
+
+        Activity activity =
+                activityRepository.findById(activityId).orElse(null);
+
+        if (activity == null
+                || activity.getMiniGame() == null
+                || !"CROCODILE".equalsIgnoreCase(
+                activity.getMiniGame().getGameType()
+        )) {
+            return "ERROR";
+        }
+
+        boolean alreadyCompleted =
+                activityCompletionRepository
+                        .findFirstByUserAndActivityIdAndSourceOrderByCompletedAtDesc(
+                                user,
+                                activityId,
+                                "CARD"
+                        )
+                        .isPresent();
+
+        if (!alreadyCompleted) {
+
+            ActivityCompletion completion =
+                    new ActivityCompletion(
+                            user,
+                            activity,
+                            LocalDateTime.now(),
+                            "CARD",
+                            null
+                    );
+
+            try {
+                activityCompletionRepository.save(completion);
+
+                achievementCheckerService
+                        .checkCompletionAchievements(user);
+
+            } catch (DataIntegrityViolationException ignored) {
+                // Защита от повторного сохранения
+            }
+        }
+
+        return "SUCCESS";
+    }
+
+    @PostMapping("/complete-memory-inline")
+    @ResponseBody
+    public String completeMemoryGameInline(
+            @RequestParam Long activityId,
+            Authentication authentication
+    ) {
+
+        if (authentication == null
+                || !authentication.isAuthenticated()
+                || "anonymousUser".equals(authentication.getPrincipal())) {
+
+            return "AUTH_REQUIRED";
+        }
+
+        User user = userRepository
+                .findByUsername(authentication.getName())
+                .orElse(null);
+
+        if (user == null) {
+            return "AUTH_REQUIRED";
+        }
+
+        Activity activity = activityRepository
+                .findById(activityId)
+                .orElse(null);
+
+        if (activity == null
+                || activity.getMiniGame() == null) {
+
+            return "ERROR";
+        }
+
+        MiniGame miniGame = activity.getMiniGame();
+
+        if (!"MEMORY".equalsIgnoreCase(miniGame.getGameType())) {
+            return "ERROR";
+        }
+
+        boolean alreadyCompleted =
+                activityCompletionRepository
+                        .findFirstByUserAndActivityIdAndSourceOrderByCompletedAtDesc(
+                                user,
+                                activityId,
+                                "CARD"
+                        )
+                        .isPresent();
+
+        if (!alreadyCompleted) {
+
+            ActivityCompletion completion =
+                    new ActivityCompletion(
+                            user,
+                            activity,
+                            LocalDateTime.now(),
+                            "CARD",
+                            null
+                    );
+
+            try {
+
+                activityCompletionRepository.save(completion);
+
+                achievementCheckerService
+                        .checkCompletionAchievements(user);
+
+            } catch (DataIntegrityViolationException ignored) {
+                // Игра уже была сохранена другим запросом
             }
         }
 

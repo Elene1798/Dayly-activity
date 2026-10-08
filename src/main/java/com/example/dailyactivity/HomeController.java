@@ -1,5 +1,6 @@
 package com.example.dailyactivity;
 
+import com.example.dailyactivity.model.ActivityCompletion;
 import com.example.dailyactivity.model.User;
 import com.example.dailyactivity.repository.*;
 import com.example.dailyactivity.service.RecommendationService;
@@ -15,10 +16,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import jakarta.servlet.http.HttpSession;
 
 import java.time.LocalDate;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 @Controller
 public class HomeController {
@@ -51,6 +49,7 @@ public class HomeController {
 
     @GetMapping("/")
     public String home(HttpSession session) {
+
         // Возвращение на главную означает новый выбор.
         // Старый список "Другое занятие" больше не должен влиять
         // на следующий вход в категорию.
@@ -218,7 +217,10 @@ public class HomeController {
                 model.addAttribute(
                         "completed",
                         activityCompletionRepository
-                                .existsByUserAndActivityId(user, activity.getId())
+                                .existsByUserAndActivityId(
+                                        user,
+                                        activity.getId()
+                                )
                 );
 
             } else {
@@ -247,13 +249,21 @@ public class HomeController {
             Authentication authentication) {
 
         String durationKey =
-                duration == null ? "any" : String.valueOf(duration);
+                duration == null
+                        ? "any"
+                        : String.valueOf(duration);
 
         String locationKey =
-                location == null ? "any" : location;
+                location == null
+                        ? "any"
+                        : location;
 
         String historyKey =
-                category + "|" + durationKey + "|" + locationKey;
+                category
+                        + "|"
+                        + durationKey
+                        + "|"
+                        + locationKey;
 
         Map<String, Set<Long>> history =
                 (Map<String, Set<Long>>) session.getAttribute(
@@ -274,6 +284,84 @@ public class HomeController {
                 key -> new HashSet<>()
         );
 
+        /*
+         * Определяем, авторизован ли пользователь.
+         */
+        boolean loggedIn =
+                authentication != null
+                        && authentication.isAuthenticated()
+                        && !"anonymousUser".equals(
+                        authentication.getPrincipal()
+                );
+
+        /*
+         * Получаем текущего пользователя один раз.
+         */
+        User currentUser = null;
+
+        if (loggedIn) {
+            currentUser = userRepository
+                    .findByUsername(authentication.getName())
+                    .orElse(null);
+        }
+
+        /*
+         * ID карточек-мини-игр, которые пользователь уже
+         * успешно выполнил.
+         *
+         * Для гостя список остаётся пустым.
+         */
+        Set<Long> completedMiniGameActivityIds =
+                new HashSet<>();
+
+        if (currentUser != null) {
+
+            List<ActivityCompletion> completions =
+                    activityCompletionRepository
+                            .findByUserAndSource(
+                                    currentUser,
+                                    "CARD"
+                            );
+
+            for (ActivityCompletion completion : completions) {
+
+                Long completedActivityId =
+                        completion.getActivityId();
+
+                if (completedActivityId == null) {
+                    continue;
+                }
+
+                Activity completedActivity =
+                        activityService
+                                .getActivityById(
+                                        completedActivityId
+                                )
+                                .orElse(null);
+
+                if (completedActivity != null
+                        && completedActivity.getMiniGame() != null) {
+
+                    String gameType =
+                            completedActivity.getMiniGame().getGameType();
+
+                    /*
+                     * WORD-игры после прохождения скрываем.
+                     *
+                     * MEMORY и CROCODILE остаются доступными
+                     * для повторной игры.
+                     */
+                    if (!"MEMORY".equalsIgnoreCase(gameType)
+                            && !"CROCODILE".equalsIgnoreCase(gameType)) {
+
+                        completedMiniGameActivityIds.add(
+                                completedActivityId
+                        );
+                    }
+                }
+            }
+        }
+
         Activity activity;
 
         /*
@@ -289,11 +377,20 @@ public class HomeController {
 
         } else {
 
+            /*
+             * При случайном выборе передаём ActivityService
+             * список уже выполненных мини-игр.
+             *
+             * Обычные занятия по-прежнему могут появляться.
+             * Выполненные мини-игры авторизованного пользователя
+             * будут исключены.
+             */
             activity = activityService.getRandomActivity(
                     category,
                     duration,
                     location,
-                    usedIds
+                    usedIds,
+                    completedMiniGameActivityIds
             );
 
             if (activity != null) {
@@ -328,54 +425,63 @@ public class HomeController {
 
         model.addAttribute(
                 "randomActivity",
-                activityId == null);
-
-        boolean loggedIn =
-                authentication != null
-                        && authentication.isAuthenticated()
-                        && !"anonymousUser".equals(
-                        authentication.getPrincipal()
-                );
+                activityId == null
+        );
 
         model.addAttribute(
                 "loggedIn",
                 loggedIn
         );
 
-        if (loggedIn && activity != null) {
+        if (loggedIn
+                && activity != null
+                && currentUser != null) {
 
-            User user = userRepository
-                    .findByUsername(authentication.getName())
-                    .orElse(null);
+            model.addAttribute(
+                    "liked",
+                    likeRepository
+                            .findByUserAndActivity(
+                                    currentUser,
+                                    activity
+                            )
+                            .isPresent()
+            );
 
-            if (user != null) {
+            model.addAttribute(
+                    "favorite",
+                    favoriteRepository
+                            .findByUserAndActivity(
+                                    currentUser,
+                                    activity
+                            )
+                            .isPresent()
+            );
 
-                model.addAttribute(
-                        "liked",
-                        likeRepository.findByUserAndActivity(user, activity).isPresent()
-                );
-
-                model.addAttribute(
-                        "favorite",
-                        favoriteRepository.findByUserAndActivity(user, activity).isPresent()
-                );
-
-                model.addAttribute(
-                        "completed",
-                        activityCompletionRepository
-                                .existsByUserAndActivityId(user, activity.getId())
-                );
-
-            } else {
-                model.addAttribute("liked", false);
-                model.addAttribute("favorite", false);
-                model.addAttribute("completed", false);
-            }
+            model.addAttribute(
+                    "completed",
+                    activityCompletionRepository
+                            .existsByUserAndActivityId(
+                                    currentUser,
+                                    activity.getId()
+                            )
+            );
 
         } else {
-            model.addAttribute("liked", false);
-            model.addAttribute("favorite", false);
-            model.addAttribute("completed", false);
+
+            model.addAttribute(
+                    "liked",
+                    false
+            );
+
+            model.addAttribute(
+                    "favorite",
+                    false
+            );
+
+            model.addAttribute(
+                    "completed",
+                    false
+            );
         }
 
         return "activity";

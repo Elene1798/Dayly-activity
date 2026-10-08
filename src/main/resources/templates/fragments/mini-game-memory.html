@@ -1,0 +1,77 @@
+<div class="mini-game-inline memory-game"
+     data-memory-game
+     th:attr="data-activity-id=${activityId}">
+
+    <input
+            type="hidden"
+            class="memory-csrf-token"
+            th:name="${_csrf.parameterName}"
+            th:value="${_csrf.token}"
+    >
+
+
+    <div class="memory-game-board">
+
+        <th:block th:each="task : ${tasks}">
+
+            <!-- Первая карточка пары -->
+
+            <div class="memory-card"
+                 th:attr="
+                    data-task-id=${task.id},
+                    data-image=${task.imageUrl}">
+
+                <div class="memory-card-inner">
+
+                    <div class="memory-card-front">
+                        ?
+                    </div>
+
+                    <div class="memory-card-back">
+
+                        <img
+                                th:src="${task.imageUrl}"
+                                alt="Карточка"
+                        >
+
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <!-- Вторая карточка пары -->
+
+            <div class="memory-card"
+                 th:attr="
+                    data-task-id=${task.id},
+                    data-image=${task.imageUrl}">
+
+                <div class="memory-card-inner">
+
+                    <div class="memory-card-front">
+                        ?
+                    </div>
+
+                    <div class="memory-card-back">
+
+                        <img
+                                th:src="${task.imageUrl}"
+                                alt="Карточка"
+                        >
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </th:block>
+
+    </div>
+
+
+    <div class="memory-game-result"></div>
+
+</div>
