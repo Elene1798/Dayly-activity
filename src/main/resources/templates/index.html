@@ -19,9 +19,22 @@
 
     <header class="site-header">
 
-        <a th:href="@{/}" class="site-header-brand">
-            <span class="hero-badge">✨ Daily Activity</span>
-        </a>
+        <div class="site-header-brand-group">
+
+            <a th:href="@{/}" class="site-header-brand">
+                <span class="hero-badge">✨ Daily Activity</span>
+            </a>
+
+            <a th:href="@{/mini-games}"
+               class="mini-games-header-link"
+               title="Мини-игры"
+               aria-label="Мини-игры">
+                <img src="/images/mini-console.png"
+                     alt=""
+                     class="pixel-console">
+            </a>
+
+        </div>
 
         <nav class="site-header-actions">
 
@@ -398,6 +411,67 @@
     </form>
 
 </div>
+
+    <!-- ===== COOKIE BANNER ===== -->
+    <div id="cookieBanner" class="cookie-banner" hidden>
+        <div class="cookie-banner__content">
+            <p class="cookie-banner__text">
+                🍪 Мы используем cookie, чтобы сайт работал корректно
+                и запоминал ваши предпочтения.
+                <a th:href="@{/privacy}" class="cookie-banner__link">
+                    Подробнее
+                </a>
+            </p>
+
+            <div class="cookie-banner__actions">
+                <button type="button"
+                        id="cookieAccept"
+                        class="cookie-banner__button cookie-banner__button--accept">
+                    Принять
+                </button>
+
+                <button type="button"
+                        id="cookieDecline"
+                        class="cookie-banner__button cookie-banner__button--decline">
+                    Только необходимые
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        (function () {
+            const STORAGE_KEY = "cookieConsent";
+
+            const banner = document.getElementById("cookieBanner");
+            const acceptBtn = document.getElementById("cookieAccept");
+            const declineBtn = document.getElementById("cookieDecline");
+
+            if (!banner) return;
+
+            // Показываем, если согласие ещё не сохранено
+            if (!localStorage.getItem(STORAGE_KEY)) {
+                banner.hidden = false;
+
+                // Небольшая задержка для плавного появления
+                requestAnimationFrame(() => {
+                    banner.classList.add("cookie-banner--visible");
+                });
+            }
+
+            function hideBanner(value) {
+                localStorage.setItem(STORAGE_KEY, value);
+                banner.classList.remove("cookie-banner--visible");
+
+                setTimeout(() => {
+                    banner.hidden = true;
+                }, 300);
+            }
+
+            acceptBtn?.addEventListener("click", () => hideBanner("accepted"));
+            declineBtn?.addEventListener("click", () => hideBanner("declined"));
+        })();
+    </script>
 
 </body>
 

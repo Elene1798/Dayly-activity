@@ -194,6 +194,14 @@ function initializeMemoryGame(game) {
         const activityId =
             game.dataset.activityId;
 
+        // Самостоятельная игра не связана с карточкой активности.
+        if (!activityId) {
+            result.textContent = "🎉 Игра завершена! Все пары найдены!";
+            result.className = "memory-game-result success";
+            showPlayAgainButton();
+            return;
+        }
+
 
         const formData = new FormData();
 
@@ -239,26 +247,15 @@ function initializeMemoryGame(game) {
 
 
             if (status === "SUCCESS") {
-
-                result.textContent =
-                    "🎉 Игра завершена!";
-
-                result.className =
-                    "memory-game-result success";
-
-                returnToStartButton();
-
+                result.textContent = "🎉 Игра завершена!";
+                result.className = "memory-game-result success";
+                showPlayAgainButton();
 
             } else if (status === "AUTH_REQUIRED") {
-
                 result.textContent =
-                    "🎉 Все пары найдены! " +
-                    "Войди в аккаунт, чтобы сохранить результат";
-
-                result.className =
-                    "memory-game-result success";
-
-                returnToStartButton();
+                    "🎉 Все пары найдены! Войди в аккаунт, чтобы сохранить результат";
+                result.className = "memory-game-result success";
+                showPlayAgainButton();
 
 
             } else {
@@ -286,29 +283,64 @@ function initializeMemoryGame(game) {
         }
     }
 
-    function returnToStartButton() {
 
-        setTimeout(() => {
 
-            const content =
-                activityCard?.querySelector(
-                    ".activity-mini-game-content"
+    function showPlayAgainButton() {
+        if (game.querySelector(".memory-play-again")) {
+            return;
+        }
+
+        const button = document.createElement("button");
+        button.type = "button";
+        button.className = "button memory-play-again";
+        button.textContent = "Играть ещё";
+
+        result.insertAdjacentElement("afterend", button);
+
+        button.addEventListener("click", async () => {
+            button.disabled = true;
+            button.textContent = "Загрузка...";
+
+            try {
+                const currentGameId = game.dataset.gameId;
+
+                if (!currentGameId) {
+                    throw new Error("Не удалось определить текущую игру");
+                }
+
+                const response = await fetch(
+                    `/mini-game/type/MEMORY/next?currentGameId=${encodeURIComponent(currentGameId)}`,
+                    { credentials: "same-origin" }
                 );
 
-            if (content) {
-                content.innerHTML = "";
+                if (!response.ok) {
+                    throw new Error("Не удалось загрузить следующую игру");
+                }
+
+                const html = await response.text();
+                const container = game.closest(".standalone-mini-game-content");
+
+                if (!container) {
+                    throw new Error("Не найден блок игры");
+                }
+
+                container.innerHTML = html;
+
+                const nextGame = container.querySelector("[data-memory-game]");
+
+                if (nextGame) {
+                    initializeMemoryGame(nextGame);
+                } else {
+                    container.innerHTML =
+                        '<p class="mini-games-completed">Пока нет доступных заданий</p>';
+                }
+            } catch (error) {
+                console.error(error);
+                button.disabled = false;
+                button.textContent = "Играть ещё";
+                result.textContent =
+                    "Не удалось загрузить игру. Попробуй ещё раз";
             }
-
-            if (startButton) {
-
-                startButton.style.display = "inline-block";
-
-                startButton.disabled = false;
-
-                startButton.textContent =
-                    "🎮 Начать игру";
-            }
-
-        }, 1500);
+        });
     }
 }

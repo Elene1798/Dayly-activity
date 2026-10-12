@@ -486,4 +486,9 @@ public class HomeController {
 
         return "activity";
     }
+
+    @GetMapping("/privacy")
+    public String privacy() {
+        return "privacy";
+    }
 }

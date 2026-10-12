@@ -138,8 +138,6 @@
                    required>
 
 
-            <hr>
-
             <h3>Дополнительная информация</h3>
 
 
@@ -231,19 +229,16 @@
                 Добавляй интерактивные игры для пользователей
             </p>
 
-            <form th:action="@{/admin/mini-game/add}" method="post">
+            <form th:action="@{/admin/mini-game/add}" method="post"
+                  class="mini-game-admin-form">
 
-                <input
-                        type="text"
-                        name="title"
-                        placeholder="Название игры"
-                        required
-                >
+                <input type="text"
+                       name="title"
+                       placeholder="Название игры"
+                       required>
 
-                <textarea
-                        name="description"
-                        placeholder="Описание"
-                ></textarea>
+                <textarea name="description"
+                          placeholder="Описание игры"></textarea>
 
                 <select name="gameType" required>
                     <option value="">Тип игры</option>
@@ -254,32 +249,65 @@
                     <option value="CROCODILE">🐊 Крокодил</option>
                 </select>
 
-                <select name="category" required>
-                    <option value="">Категория</option>
-                    <option value="active">🏃 Активность</option>
-                    <option value="creative">🎨 Творчество</option>
-                    <option value="learning">📚 Обучение</option>
-                    <option value="entertainment">🎮 Развлечения</option>
-                </select>
+                <label class="admin-checkbox">
+                    <input type="checkbox"
+                           name="addToActivityCard"
+                           value="true"
+                           checked
+                           onchange="toggleActivityFields(this)">
+                    🎯 Добавить в карточку активности
+                </label>
 
-                <input
-                        type="number"
-                        name="duration"
-                        min="1"
-                        placeholder="Длительность, минут"
-                        required
-                >
+                <div class="mini-game-activity-fields"
+                     id="mini-game-activity-fields">
 
-                <textarea
-                        name="instructions"
-                        placeholder="Инструкция для пользователя"
-                ></textarea>
+                    <label>Категория активности:</label>
+                    <select name="category">
+                        <option value="active">🏃 Активность</option>
+                        <option value="creative">🎨 Творчество</option>
+                        <option value="learning">📚 Обучение</option>
+                        <option value="entertainment" selected>🎮 Развлечения</option>
+                        <option value="couple">💕 Для двоих</option>
+                    </select>
+
+                    <label>Длительность, минут:</label>
+                    <input type="number"
+                           name="duration"
+                           min="1"
+                           value="5"
+                           placeholder="Например, 5">
+
+                </div>
+
+                <textarea name="instructions"
+                          placeholder="Инструкция для пользователя"></textarea>
 
                 <button type="submit" class="button">
                     🎮 Добавить мини-игру
                 </button>
 
             </form>
+
+            <script>
+                function toggleActivityFields(checkbox) {
+                    const fields = document.getElementById(
+                        'mini-game-activity-fields'
+                    );
+
+                    fields.style.display = checkbox.checked ? 'block' : 'none';
+                }
+
+                document.addEventListener('DOMContentLoaded', function () {
+                    const checkbox = document.querySelector(
+                        'input[name="addToActivityCard"]'
+                    );
+
+                    if (checkbox) {
+                        toggleActivityFields(checkbox);
+                    }
+                });
+            </script>
+
 
             <div class="mini-games-list">
 
@@ -463,46 +491,36 @@
 
                         </select>
 
-                        <select name="category" required>
-
-                            <option
-                                    value="active"
-                                    th:selected="${game.category == 'active'}"
-                            >
+                        <label>Категория активности:</label>
+                        <select name="category">
+                            <option value="active"
+                                    th:selected="${game.category == 'active'}">
                                 🏃 Активность
                             </option>
-
-                            <option
-                                    value="creative"
-                                    th:selected="${game.category == 'creative'}"
-                            >
+                            <option value="creative"
+                                    th:selected="${game.category == 'creative'}">
                                 🎨 Творчество
                             </option>
-
-                            <option
-                                    value="learning"
-                                    th:selected="${game.category == 'learning'}"
-                            >
+                            <option value="learning"
+                                    th:selected="${game.category == 'learning'}">
                                 📚 Обучение
                             </option>
-
-                            <option
-                                    value="entertainment"
-                                    th:selected="${game.category == 'entertainment'}"
-                            >
+                            <option value="entertainment"
+                                    th:selected="${game.category == 'entertainment'}">
                                 🎮 Развлечения
                             </option>
-
+                            <option value="couple"
+                                    th:selected="${game.category == 'couple'}">
+                                💕 Для двоих
+                            </option>
                         </select>
 
-                        <input
-                                type="number"
-                                name="duration"
-                                min="1"
-                                th:value="${game.duration}"
-                                placeholder="Длительность, минут"
-                                required
-                        >
+                        <label>Длительность, минут:</label>
+                        <input type="number"
+                               name="duration"
+                               min="1"
+                               th:value="${game.duration}">
+                        ```
 
                         <textarea
                                 name="instructions"

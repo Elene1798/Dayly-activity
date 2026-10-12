@@ -384,11 +384,16 @@ function initializeCrocodileGame(gameElement) {
         const roundType =
             rounds[currentRoundIndex].id;
 
-        const url =
-            `/mini-game/${miniGameId}/crocodile-tasks`
-            + `?activityId=${encodeURIComponent(activityId)}`
-            + `&difficulty=${encodeURIComponent(difficulty)}`
-            + `&roundType=${encodeURIComponent(roundType)}`;
+
+        const params = new URLSearchParams({
+    difficulty: difficulty,
+    roundType: roundType
+});
+        if (activityId) {
+    params.set("activityId", activityId);
+}
+        const url = `/mini-game/${miniGameId}/crocodile-tasks?${params.toString()}`;
+
 
         console.log("КРОКОДИЛ: отправляем запрос:", url);
 
@@ -474,20 +479,10 @@ function initializeCrocodileGame(gameElement) {
         return task;
     }
 
-
-    /*
-     * Получаем ID мини-игры.
-     */
     function getMiniGameId() {
-
-        const activity =
-            gameElement.closest(".activity-mini-game");
-
-        if (!activity) {
-            return null;
-        }
-
-        return activity.dataset.miniGameId;
+        return gameElement.dataset.miniGameId
+            || gameElement.closest(".activity-mini-game")?.dataset.miniGameId
+            || null;
     }
 
 
@@ -760,10 +755,9 @@ function initializeCrocodileGame(gameElement) {
      */
     async function saveCompletion() {
 
-        const csrfInput =
-            gameElement.querySelector(
-                ".crocodile-csrf-token"
-            );
+        if (!activityId) { saveMessage.textContent = "🎉 Игра завершена! Результаты сохранены на экране";
+            return; }
+        const csrfInput = gameElement.querySelector( ".crocodile-csrf-token" );
 
         const formData =
             new FormData();

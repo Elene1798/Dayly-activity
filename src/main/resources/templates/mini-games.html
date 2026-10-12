@@ -1,0 +1,358 @@
+<!DOCTYPE html>
+<html lang="ru" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Мини-игры — Daily Activity</title>
+
+    <link rel="stylesheet" href="/css/style.css">
+</head>
+
+<body class="page-with-header">
+
+<header class="site-header">
+
+    <div class="site-header-brand-group">
+        <a th:href="@{/}" class="site-header-brand">
+            <span class="hero-badge">✨ Daily Activity</span>
+        </a>
+
+        <a th:href="@{/mini-games}"
+           class="mini-games-header-link"
+           title="Мини-игры"
+           aria-label="Мини-игры">
+            <img src="/images/mini-console.png"
+                 alt=""
+                 class="pixel-console">
+        </a>
+    </div>
+
+    <nav class="site-header-actions">
+
+        <th:block th:if="${#authorization.expression('isAuthenticated()')}">
+
+            <a th:href="@{/section}" class="site-header-username">
+                👤 <span th:text="${#authentication.name}">Пользователь</span>
+            </a>
+
+            <form th:action="@{/logout}"
+                  method="post"
+                  class="site-header-logout-form">
+
+                <input type="hidden"
+                       th:name="${_csrf.parameterName}"
+                       th:value="${_csrf.token}">
+
+                <button type="submit" class="site-header-link">
+                    Выйти
+                </button>
+            </form>
+
+        </th:block>
+
+        <th:block th:unless="${#authorization.expression('isAuthenticated()')}">
+
+            <a th:href="@{/login}" class="site-header-link">Вход</a>
+
+            <a th:href="@{/register}"
+               class="site-header-link site-header-register">
+                Регистрация
+            </a>
+
+        </th:block>
+
+    </nav>
+
+</header>
+
+<main class="mini-games-page">
+
+
+    <div class="mini-games-decorations" aria-hidden="true">
+        <span class="game-decor decor-star decor-star-left">★</span>
+        <span class="game-decor decor-coin decor-coin-left">$</span>
+        <span class="game-decor decor-spark decor-spark-left">✦</span>
+
+        <span class="game-decor decor-star decor-star-right">★</span>
+        <span class="game-decor decor-coin decor-coin-right-top">$</span>
+        <span class="game-decor decor-coin decor-coin-right-bottom">$</span>
+        <span class="game-decor decor-heart decor-heart-right">♥</span>
+        <span class="game-decor decor-spark decor-spark-right">✧</span>
+
+        <span class="game-decor decor-heart decor-heart-left-top">♥</span>
+        <span class="game-decor decor-star decor-star-left-bottom">★</span>
+        <span class="game-decor decor-heart decor-heart-left-bottom">♥</span>
+        <span class="game-decor decor-spark decor-spark-left-bottom">✦</span>
+    </div>
+
+
+    <section class="mini-games-hero">
+        <div class="mini-games-hero-console" aria-hidden="true">
+            <img src="/images/mini-console.png" alt="">
+        </div>
+
+        <div class="mini-games-hero-sparkles" aria-hidden="true">
+            <span class="pixel-star pixel-star-one">✦</span>
+            <span class="pixel-star pixel-star-two">✧</span>
+            <span class="pixel-star pixel-star-three">✦</span>
+        </div>
+
+        <h1>Мини-игровая</h1>
+        <p>Загляни в мир маленьких игр и больших побед!</p>
+    </section>
+
+    <section class="mini-games-grid">
+
+
+        <article class="mini-game-card"
+                 th:each="game : ${miniGames}"
+                 th:attr="data-mini-game-id=${game.id},
+                  data-game-type=${game.gameType},
+                  data-game-ids=${game.gameType == 'WORD' ? wordGameIds
+                      : (game.gameType == 'MEMORY' ? memoryGameIds : game.id)}">
+
+            <div class="mini-game-card-content">
+
+                <div class="mini-game-art" aria-hidden="true">
+                    <th:block th:switch="${game.gameType}">
+        <span th:case="'WORD'" class="mini-game-art-word">
+            <span>А</span><span>Б</span><span>В</span>
+        </span>
+
+                        <span th:case="'MEMORY'" class="mini-game-art-memory">
+            <span>♥</span><span>★</span>
+        </span>
+
+                        <span th:case="'CROCODILE'" class="mini-game-art-crocodile">
+            🐊
+        </span>
+
+                        <span th:case="*" class="mini-game-art-default">
+            🎮
+        </span>
+                    </th:block>
+                </div>
+
+                <h2 th:text="${game.title}">Название игры</h2>
+
+                <p class="mini-game-description"
+                   th:if="${game.description != null
+                   and !game.description.isBlank()}"
+                   th:text="${game.description}">
+                    Описание игры
+                </p>
+
+                <button type="button"
+                        class="button mini-game-toggle"
+                        onclick="toggleMiniGame(this)">
+                    Играть
+                </button>
+
+                <div class="mini-game-details" hidden>
+
+                    <button type="button"
+                            class="mini-game-collapse"
+                            onclick="collapseMiniGame(this)"
+                            aria-label="Свернуть игру"
+                            title="Свернуть">
+                        ⌃
+                    </button>
+
+                    <p th:if="${game.instructions != null
+                       and !game.instructions.isBlank()}"
+                       th:text="${game.instructions}">
+                        Инструкция к игре
+                    </p>
+
+                    <div class="standalone-mini-game-content"></div>
+
+                </div>
+
+            </div>
+
+        </article>
+
+
+        <div class="mini-games-empty"
+             th:if="${#lists.isEmpty(miniGames)}">
+            <span class="mini-games-empty-icon">🕹️</span>
+            <h2>Пока игр нет</h2>
+            <p>Загляни сюда позже — здесь появятся мини-игры</p>
+        </div>
+
+    </section>
+
+</main>
+
+<script>
+
+    function toggleMiniGame(button) {
+        const card = button.closest('.mini-game-card');
+        const grid = card.closest('.mini-games-grid');
+        const details = card.querySelector('.mini-game-details');
+
+        const isOpening = details.hidden;
+
+        grid.querySelectorAll('.mini-game-card').forEach(otherCard => {
+            otherCard.classList.remove('is-expanded');
+
+            const otherDetails = otherCard.querySelector('.mini-game-details');
+            if (otherDetails) {
+                otherDetails.hidden = true;
+            }
+
+            const otherButton = otherCard.querySelector('.mini-game-toggle');
+            if (otherButton) {
+                otherButton.hidden = false;
+                otherButton.disabled = false;
+                otherButton.textContent = 'Играть';
+            }
+        });
+
+        if (isOpening) {
+            details.hidden = false;
+            card.classList.add('is-expanded');
+            grid.classList.add('mini-game-open');
+            button.hidden = true;
+
+            // Сразу загружаем игру — дополнительная кнопка не нужна.
+            startStandaloneMiniGame(button);
+        } else {
+            grid.classList.remove('mini-game-open');
+        }
+    }
+
+    function collapseMiniGame(button) {
+        const card = button.closest('.mini-game-card');
+        const grid = card.closest('.mini-games-grid');
+        const details = card.querySelector('.mini-game-details');
+
+        details.hidden = true;
+        card.classList.remove('is-expanded');
+        grid.classList.remove('mini-game-open');
+
+        const toggleButton = card.querySelector('.mini-game-toggle');
+        toggleButton.hidden = false;
+        toggleButton.disabled = false;
+        toggleButton.textContent = 'Играть';
+    }
+
+
+    async function startStandaloneMiniGame(button) {
+    const card = button.closest('.mini-game-card');
+    const gameId = card.dataset.miniGameId;
+    card.dataset.currentGameId = gameId;
+    const content = card.querySelector('.standalone-mini-game-content');
+
+    button.disabled = true;
+    button.hidden = true;
+
+    try {
+        const response = await fetch(
+            `/mini-game/${gameId}/content`,
+    {
+        method: 'GET',
+            credentials: 'same-origin'
+    }
+    );
+
+    if (!response.ok) {
+        throw new Error('Не удалось загрузить игру');
+    }
+
+    const html = await response.text();
+    content.innerHTML = html;
+
+    const memoryGame = content.querySelector('[data-memory-game]');
+    const crocodileGame = content.querySelector('[data-crocodile-game]');
+    const wordGame = content.querySelector('[data-word-game]');
+
+    if (memoryGame && typeof initializeMemoryGame === 'function') {
+        initializeMemoryGame(memoryGame);
+    } else if (crocodileGame && typeof initializeCrocodileGame === 'function') {
+        initializeCrocodileGame(crocodileGame);
+    } else if (wordGame && typeof initializeWordGame === 'function') {
+        initializeWordGame(wordGame);
+    } else if (card.dataset.gameType?.toUpperCase() === 'WORD') {
+        content.innerHTML =
+            '<p class="mini-games-completed">Все игры пройдены</p>';
+    } else {
+        content.textContent = 'Не удалось запустить эту игру';
+    }
+
+        button.hidden = true;
+        card.querySelector('.mini-game-next')?.remove();
+
+    } catch (error) {
+        console.error(error);
+        content.textContent = 'Не удалось загрузить игру. Попробуй ещё раз';
+
+        button.textContent = 'Играть';
+        button.disabled = false;
+    }
+    }
+
+    async function playNextMiniGame(button) {
+        const card = button.closest('.mini-game-card');
+        if (!card) return;
+
+        const ids = (card.dataset.gameIds || '')
+            .split(',')
+            .map(id => id.trim())
+            .filter(Boolean);
+
+        if (ids.length === 0) {
+            button.textContent = 'Нет других игр';
+            button.disabled = true;
+            button.hidden = false;
+            return;
+        }
+
+        const currentId = String(
+            card.dataset.currentGameId || card.dataset.miniGameId
+        );
+
+        const currentIndex = ids.indexOf(currentId);
+        const nextIndex = currentIndex + 1;
+
+        if (nextIndex >= ids.length) {
+            button.textContent = 'Все игры пройдены!';
+            button.disabled = true;
+            button.hidden = false;
+            return;
+        }
+
+        card.dataset.miniGameId = ids[nextIndex];
+        card.dataset.currentGameId = ids[nextIndex];
+
+        const startButton = card.querySelector('.mini-game-toggle');
+        const content = card.querySelector('.standalone-mini-game-content');
+
+        if (content) {
+            content.innerHTML = '';
+        }
+
+        button.hidden = true;
+
+        if (startButton) {
+            startButton.hidden = false;
+            startButton.disabled = false;
+            startButton.textContent = 'Начать игру';
+            await startStandaloneMiniGame(startButton);
+        } else {
+            button.hidden = false;
+            button.disabled = true;
+            button.textContent = 'Не удалось запустить следующую игру';
+        }
+    }
+</script>
+
+<script th:src="@{/js/games/mini-game-crocodile.js}"></script>
+<script th:src="@{/js/games/mini-game-inline.js}"></script>
+<script th:src="@{/js/games/mini-game-memory.js}"></script>
+
+</body>
+</html>
+

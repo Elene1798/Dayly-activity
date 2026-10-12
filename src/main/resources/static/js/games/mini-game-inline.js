@@ -99,7 +99,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
 
                 content.innerHTML =
-                    "<p>Не удалось загрузить игру. Попробуй ещё раз.</p>";
+                    "<p>Не удалось загрузить игру. Попробуй ещё раз</p>";
             }
 
         });
@@ -113,13 +113,20 @@ document.addEventListener("DOMContentLoaded", () => {
      * =====================================================
      */
 
-    function initializeWordGame(container) {
 
-        const game =
-            container.querySelector("[data-word-game]");
+    window.initializeWordGame = function(container) {
 
+        if (!container) {
+            console.error("Не передан контейнер игры «Собери слово»");
+            return;
+        }
+
+        const game = container.matches("[data-word-game]")
+            ? container
+            : container.querySelector("[data-word-game]");
 
         if (!game) {
+            console.error("Не найден элемент [data-word-game]");
             return;
         }
 
@@ -288,10 +295,69 @@ document.addEventListener("DOMContentLoaded", () => {
 
         }
 
+        // Хранилище пройденных taskId для гостя (в рамках страницы)
+        window.__guestPassedWordTaskIds = window.__guestPassedWordTaskIds || [];
 
-        /*
-         * Проверка слова.
-         */
+        function showNextWordButton() {
+            checkButton.textContent = "Играть ещё";
+            checkButton.disabled = false;
+
+            const nextButton = checkButton.cloneNode(true);
+            checkButton.replaceWith(nextButton);
+
+            nextButton.addEventListener("click", async () => {
+                const host = game.closest(".standalone-mini-game-content");
+                const card = game.closest(".mini-game-card");
+
+                if (!host || !card) return;
+
+                const gameId = card.dataset.currentGameId
+                    || card.dataset.miniGameId;
+
+                nextButton.disabled = true;
+                nextButton.textContent = "Загрузка...";
+
+                try {
+                    // Передаём список уже пройденных слов, чтобы гость не получал их снова
+                    const excludeParam = window.__guestPassedWordTaskIds.length
+                        ? "?excludeTaskIds=" + window.__guestPassedWordTaskIds.join(",")
+                        : "";
+
+                    const response = await fetch(
+                        `/mini-game/${gameId}/content${excludeParam}`,
+                        { credentials: "same-origin" }
+                    );
+
+                    if (!response.ok) {
+                        throw new Error("Не удалось загрузить игру");
+                    }
+
+                    const html = await response.text();
+
+                    // Если сервер вернул пустой фрагмент — все слова пройдены
+                    if (!html.includes("data-word-game")) {
+                        host.innerHTML =
+                            '<p class="mini-games-completed">Все игры пройдены!</p>';
+                        return;
+                    }
+
+                    host.innerHTML = html;
+
+                    const nextGame = host.querySelector("[data-word-game]");
+
+                    if (nextGame) {
+                        window.initializeWordGame(nextGame);
+                    } else {
+                        host.innerHTML =
+                            '<p class="mini-games-completed">Все игры пройдены!</p>';
+                    }
+                } catch (error) {
+                    console.error(error);
+                    nextButton.disabled = false;
+                    nextButton.textContent = "Повторить";
+                }
+            });
+        }
 
         checkButton.addEventListener(
             "click",
@@ -332,36 +398,76 @@ document.addEventListener("DOMContentLoaded", () => {
                                         completeForm
                                     );
 
+                                const gameElement = container.matches("[data-word-game]")
+                                    ? container
+                                    : container.querySelector("[data-word-game]");
 
-                                const response =
-                                    await fetch(
-                                        "/mini-game/complete-inline",
-                                        {
-                                            method: "POST",
-                                            body: formData
-                                        }
-                                    );
+                                const isStandaloneWordGame =
+                                    gameElement?.dataset.standalone === "true";
+
+                                const endpoint = isStandaloneWordGame
+                                    ? "/mini-game/complete-word-standalone"
+                                    : "/mini-game/complete-inline";
+
+                                console.log("Игра отдельно:", isStandaloneWordGame);
+                                console.log("Адрес сохранения:", endpoint);
+
+                                const response = await fetch(endpoint, {
+                                    method: "POST",
+                                    body: formData
+                                });
 
 
                                 const status =
                                     await response.text();
 
-
-                                if (
-                                    status ===
-                                    "SUCCESS"
-                                ) {
-
-                                    result.textContent =
-                                        "🎉 Задание выполнено!";
-
-                                    result.className =
-                                        "word-game-result success";
+                                console.log("Статус HTTP:", response.status);
+                                console.log("Ответ сервера:", status);
+                                console.log("Отправленный taskId:", formData.get("taskId"));
+                                console.log("Отправленный answer:", formData.get("answer"));
 
 
+                                if (status === "SUCCESS") {
+                                    result.textContent = "🎉 Задание выполнено!";
+                                    result.className = "word-game-result success";
                                     completeForm.remove();
 
+                                    if (isStandaloneWordGame) {
+                                        const currentTaskId = formData.get("taskId");
+                                        if (currentTaskId
+                                            && !window.__guestPassedWordTaskIds.includes(currentTaskId)) {
+                                            window.__guestPassedWordTaskIds.push(currentTaskId);
+                                        }
+                                        showNextWordButton();
+                                    } else {
+                                        checkButton.disabled = true;
+                                    }
+                                } else if (status === "AUTH_REQUIRED") {
+                                    // Гость тоже должен иметь возможность играть дальше
+                                    result.textContent = "🎉 Правильно!";
+                                    result.className = "word-game-result success";
+                                    completeForm.remove();
 
+                                    if (isStandaloneWordGame) {
+                                        const currentTaskId = formData.get("taskId");
+                                        if (currentTaskId
+                                            && !window.__guestPassedWordTaskIds.includes(currentTaskId)) {
+                                            window.__guestPassedWordTaskIds.push(currentTaskId);
+                                        }
+                                        showNextWordButton();
+                                    } else {
+                                        checkButton.disabled = true;
+                                    }
+                                } else if (status === "ALREADY_COMPLETED") {
+                                    result.textContent = "Это слово уже пройдено. Попробуй следующее!";
+                                    result.className = "word-game-result success";
+                                    completeForm.remove();
+
+                                    if (isStandaloneWordGame) {
+                                        showNextWordButton();
+                                    } else {
+                                        checkButton.disabled = true;
+                                    }
                                 } else if (
                                     status ===
                                     "AUTH_REQUIRED"

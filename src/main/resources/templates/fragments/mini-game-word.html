@@ -1,6 +1,7 @@
 <div class="mini-game-inline"
      data-word-game
      th:attr="
+        data-standalone=${activityId == null},
         data-answer=${task.answer},
         data-activity-id=${activityId},
         data-task-id=${task.id}">

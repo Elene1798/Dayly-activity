@@ -20,9 +20,20 @@
 
     <header class="site-header">
 
-        <a th:href="@{/}" class="site-header-brand">
-            <span class="hero-badge">✨ Daily Activity</span>
-        </a>
+        <div class="site-header-brand-group">
+            <a th:href="@{/}" class="site-header-brand">
+                <span class="hero-badge">✨ Daily Activity</span>
+            </a>
+
+            <a th:href="@{/mini-games}"
+               class="mini-games-header-link"
+               title="Мини-игры"
+               aria-label="Мини-игры">
+                <img src="/images/mini-console.png"
+                     alt=""
+                     class="pixel-console">
+            </a>
+        </div>
 
         <nav class="site-header-actions">
 

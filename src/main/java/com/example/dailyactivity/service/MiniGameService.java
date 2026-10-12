@@ -2,6 +2,7 @@ package com.example.dailyactivity.service;
 
 import com.example.dailyactivity.model.Activity;
 import com.example.dailyactivity.model.MiniGame;
+import com.example.dailyactivity.model.MiniGameTask;
 import com.example.dailyactivity.repository.ActivityRepository;
 import com.example.dailyactivity.repository.MiniGameRepository;
 import com.example.dailyactivity.repository.MiniGameTaskRepository;
@@ -35,6 +36,44 @@ public class MiniGameService {
         return miniGameRepository.findByActiveTrue();
     }
 
+    /**
+     * Игры для отдельной страницы «Мини-игры».
+     */
+    public List<MiniGame> findActiveStandaloneGames() {
+        List<MiniGame> games = miniGameRepository.findByActiveTrue()
+                .stream()
+                .filter(game -> !game.isAddToActivityCard())
+                .toList();
+
+        List<MiniGame> result = new java.util.ArrayList<>();
+        java.util.Set<String> addedTypes = new java.util.HashSet<>();
+
+        for (MiniGame game : games) {
+            String type = game.getGameType();
+
+            if (type != null
+                    && ("WORD".equalsIgnoreCase(type)
+                    || "MEMORY".equalsIgnoreCase(type))) {
+
+                if (addedTypes.add(type.toUpperCase(java.util.Locale.ROOT))) {
+                    result.add(game);
+                }
+            } else {
+                result.add(game);
+            }
+        }
+
+        return result;
+    }
+
+    public List<MiniGame> findActiveGamesByType(String gameType) {
+        return miniGameRepository
+                .findByGameTypeAndActiveTrueOrderByIdAsc(gameType)
+                .stream()
+                .filter(game -> !game.isAddToActivityCard())
+                .toList();
+    }
+
     public MiniGame findById(Long id) {
         return miniGameRepository.findById(id).orElse(null);
     }
@@ -44,9 +83,25 @@ public class MiniGameService {
 
         boolean newGame = miniGame.getId() == null;
 
+        // Значения по умолчанию для необязательных полей.
+        if (miniGame.getCategory() == null
+                || miniGame.getCategory().isBlank()) {
+            miniGame.setCategory("entertainment");
+        }
+
+        if (miniGame.getDuration() <= 0) {
+            miniGame.setDuration(5);
+        }
+
         MiniGame savedGame = miniGameRepository.save(miniGame);
 
-        if (newGame) {
+        /*
+         * Создаём карточку активности только для новой игры,
+         * если пользователь включил соответствующий чекбокс.
+         *
+         * При редактировании игры новые карточки не создаются.
+         */
+        if (newGame && savedGame.isAddToActivityCard()) {
 
             String location = "anywhere";
 
@@ -85,26 +140,31 @@ public class MiniGameService {
             return;
         }
 
-        // 1. Удаляем карточку занятия,
-        // которая связана с этой мини-игрой
-        Activity activity = activityRepository
-                .findAll()
+        /*
+         * Не удаляем связанные Activity.
+         * Отсоединяем игру, чтобы сохранить карточку и её историю,
+         * а также не нарушить внешний ключ в базе данных.
+         */
+        List<Activity> linkedActivities = activityRepository.findAll()
                 .stream()
-                .filter(a -> a.getMiniGame() != null)
-                .filter(a -> a.getMiniGame().getId().equals(id))
-                .findFirst()
-                .orElse(null);
+                .filter(activity -> activity.getMiniGame() != null)
+                .filter(activity ->
+                        activity.getMiniGame().getId().equals(id))
+                .toList();
 
-        if (activity != null) {
-            activityRepository.delete(activity);
+        for (Activity activity : linkedActivities) {
+            activity.setMiniGame(null);
+            activityRepository.save(activity);
         }
 
-        // 2. Удаляем задания мини-игры
-        miniGameTaskRepository.deleteAll(
-                miniGameTaskRepository.findByMiniGameOrderByIdAsc(miniGame)
-        );
+        // Удаляем задания игры.
+        List<MiniGameTask> tasks =
+                miniGameTaskRepository.findByMiniGameOrderByIdAsc(miniGame);
 
-        // 3. Теперь можно удалить саму мини-игру
+        miniGameTaskRepository.deleteAll(tasks);
+
+        // Удаляем саму игру.
         miniGameRepository.delete(miniGame);
     }
 }
+

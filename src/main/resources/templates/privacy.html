@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="ru" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Политика cookie — Daily Activity</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+</head>
+<body class="page-with-header">
+
+<header class="site-header">
+    <a th:href="@{/}" class="site-header-brand">
+        <span class="hero-badge">✨ Daily Activity</span>
+    </a>
+</header>
+
+<main class="container" style="max-width: 720px; text-align: left;">
+    <h1 style="text-align: center;">🍪 Использование cookie</h1>
+
+    <p>Мы используем cookie для того, чтобы сайт работал корректно:
+        вы оставались авторизованы, форма не теряла данные,
+        защита от CSRF работала</p>
+
+    <h2>Какие cookie мы используем</h2>
+    <ul>
+        <li><b>JSESSIONID</b> — техническая сессия, удаляется при закрытии браузера</li>
+        <li><b>XSRF-TOKEN</b> — защита форм от подделки запросов</li>
+        <li><b>remember-me</b> — только если вы поставили галочку «Запомнить меня»</li>
+    </ul>
+
+    <h2>Как отказаться</h2>
+    <p>Вы можете отключить cookie в настройках браузера,
+        но тогда авторизация и часть функций перестанут работать</p>
+
+    <p style="text-align: center; margin-top: 40px;">
+        <a class="button" th:href="@{/}">← На главную</a>
+    </p>
+</main>
+
+</body>
+</html>

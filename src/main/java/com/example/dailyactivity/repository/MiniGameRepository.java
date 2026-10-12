@@ -10,4 +10,6 @@ public interface MiniGameRepository extends JpaRepository<MiniGame, Long> {
     List<MiniGame> findByActiveTrue();
 
     List<MiniGame> findByCategoryAndActiveTrue(String category);
+
+    List<MiniGame> findByGameTypeAndActiveTrueOrderByIdAsc(String gameType);
 }

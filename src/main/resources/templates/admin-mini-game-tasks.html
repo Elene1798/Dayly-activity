@@ -222,6 +222,42 @@
                     🍕 Пицца
                 </option>
 
+                <option
+                        value="/images/games/memory/frog.png"
+                >
+                    Лягушка
+                </option>
+
+                <option
+                        value="/images/games/memory/memcat.png"
+                >
+                    Мемная кошка 1
+                </option>
+
+                <option
+                        value="/images/games/memory/memcattwo.png"
+                >
+                    Мемная кошка 2
+                </option>
+
+                <option
+                        value="/images/games/memory/memcatthree.png"
+                >
+                    Мемная кошка 3
+                </option>
+
+                <option
+                        value="/images/games/memory/memcatfour.png"
+                >
+                    Мемная кошка 4
+                </option>
+
+                <option
+                        value="/images/games/memory/pikachu.png"
+                >
+                    Пикачу
+                </option>
+
             </select>
 
 
@@ -522,45 +558,88 @@
 
                             <option
                                     value="/images/games/memory/apple.png"
-                                    th:selected="${task.imageUrl == '/images/games/memory/apple.png'}"
+                                    th:selected="${task != null and task.imageUrl != null and task.imageUrl == '/images/games/memory/apple.png'}"
                             >
                                 🍎 Яблоко
                             </option>
 
                             <option
                                     value="/images/games/memory/cat.png"
-                                    th:selected="${task.imageUrl == '/images/games/memory/cat.png'}"
+                                    th:selected="${task != null and task.imageUrl != null and task.imageUrl == '/images/games/memory/cat.png'}"
                             >
                                 🐱 Кот
                             </option>
 
                             <option
                                     value="/images/games/memory/bicycle.png"
-                                    th:selected="${task.imageUrl == '/images/games/memory/bicycle.png'}"
+                                    th:selected="${task != null and task.imageUrl != null and task.imageUrl == '/images/games/memory/bicycle.png'}"
                             >
                                 🚲 Велосипед
                             </option>
 
                             <option
                                     value="/images/games/memory/rocket.png"
-                                    th:selected="${task.imageUrl == '/images/games/memory/rocket.png'}"
+                                    th:selected="${task != null and task.imageUrl != null and task.imageUrl == '/images/games/memory/rocket.png'}"
                             >
                                 🚀 Ракета
                             </option>
 
                             <option
                                     value="/images/games/memory/guitar.png"
-                                    th:selected="${task.imageUrl == '/images/games/memory/guitar.png'}"
+                                    th:selected="${task != null and task.imageUrl != null and task.imageUrl == '/images/games/memory/guitar.png'}"
                             >
                                 🎸 Гитара
                             </option>
 
                             <option
                                     value="/images/games/memory/pizza.png"
-                                    th:selected="${task.imageUrl == '/images/games/memory/pizza.png'}"
+                                    th:selected="${task != null and task.imageUrl != null and task.imageUrl == '/images/games/memory/pizza.png'}"
                             >
                                 🍕 Пицца
                             </option>
+
+                            <option
+                                    value="/images/games/memory/frog.png"
+                                    th:selected="${task != null and task.imageUrl != null and task.imageUrl == '/images/games/memory/frog.png'}"
+                            >
+                                Лягушка
+                            </option>
+
+                            <option
+                                    value="/images/games/memory/memcat.png"
+                                    th:selected="${task != null and task.imageUrl != null and task.imageUrl == '/images/games/memory/memcat.png'}"
+                            >
+                                Мемная кошка 1
+                            </option>
+
+                            <option
+                                    value="/images/games/memory/memcattwo.png"
+                                    th:selected="${task != null and task.imageUrl != null and task.imageUrl == '/images/games/memory/memcattwo.png'}"
+                            >
+                                Мемная кошка 2
+                            </option>
+
+                            <option
+                                    value="/images/games/memory/memcatthree.png"
+                                    th:selected="${task != null and task.imageUrl != null and task.imageUrl == '/images/games/memory/memcatthree.png'}"
+                            >
+                                Мемная кошка 3
+                            </option>
+
+                            <option
+                                    value="/images/games/memory/memcatfour.png"
+                                    th:selected="${task != null and task.imageUrl != null and task.imageUrl == '/images/games/memory/memcatfour.png'}"
+                            >
+                                Мемная кошка 4
+                            </option>
+
+                            <option
+                                    value="/images/games/memory/pikachu.png"
+                                    th:selected="${task != null and task.imageUrl != null and task.imageUrl == '/images/games/memory/pikachu.png'}"
+                            >
+                                Пикачу
+                            </option>
+
 
                         </select>
 
@@ -575,7 +654,7 @@
                                 type="checkbox"
                                 name="active"
                                 value="true"
-                                th:checked="${task.active}"
+                                th:checked="${task != null and task.active}"
                         >
 
                         🟢 Задание активно

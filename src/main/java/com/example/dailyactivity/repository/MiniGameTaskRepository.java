@@ -12,4 +12,9 @@ public interface MiniGameTaskRepository
     List<MiniGameTask> findByMiniGameAndActiveTrue(MiniGame miniGame);
 
     List<MiniGameTask> findByMiniGameOrderByIdAsc(MiniGame miniGame);
+
+
+    List<MiniGameTask> findByMiniGame_GameTypeIgnoreCaseAndMiniGame_ActiveTrueAndActiveTrueOrderByIdAsc(
+            String gameType
+    );
 }

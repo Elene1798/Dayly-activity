@@ -3,6 +3,7 @@ package com.example.dailyactivity.controller;
 import com.example.dailyactivity.model.*;
 import com.example.dailyactivity.repository.ActivityCompletionRepository;
 import com.example.dailyactivity.repository.ActivityRepository;
+import com.example.dailyactivity.repository.MiniGameTaskCompletionRepository;
 import com.example.dailyactivity.repository.UserRepository;
 import com.example.dailyactivity.service.AchievementCheckerService;
 import com.example.dailyactivity.service.MiniGameService;
@@ -12,6 +13,9 @@ import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.http.ResponseEntity;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -29,6 +33,7 @@ public class MiniGameController {
     private final ActivityCompletionRepository activityCompletionRepository;
     private final UserRepository userRepository;
     private final AchievementCheckerService achievementCheckerService;
+    private final MiniGameTaskCompletionRepository miniGameTaskCompletionRepository;
 
     public MiniGameController(
             MiniGameService miniGameService,
@@ -36,7 +41,8 @@ public class MiniGameController {
             ActivityRepository activityRepository,
             ActivityCompletionRepository activityCompletionRepository,
             UserRepository userRepository,
-            AchievementCheckerService achievementCheckerService
+            AchievementCheckerService achievementCheckerService,
+            MiniGameTaskCompletionRepository miniGameTaskCompletionRepository
     ) {
         this.miniGameService = miniGameService;
         this.miniGameTaskService = miniGameTaskService;
@@ -44,6 +50,7 @@ public class MiniGameController {
         this.activityCompletionRepository = activityCompletionRepository;
         this.userRepository = userRepository;
         this.achievementCheckerService = achievementCheckerService;
+        this.miniGameTaskCompletionRepository = miniGameTaskCompletionRepository;
     }
 
     @GetMapping("/{id}")
@@ -88,38 +95,94 @@ public class MiniGameController {
         return "mini-game-word";
     }
 
+
+
     @GetMapping("/{id}/content")
     public String gameContent(
             @PathVariable Long id,
-            @RequestParam Long activityId,
-            Model model
+            @RequestParam(required = false) Long activityId,
+            @RequestParam(required = false) String excludeTaskIds,
+            Model model,
+            Authentication authentication
     ) {
         MiniGame miniGame = miniGameService.findById(id);
 
         if (miniGame == null || !miniGame.isActive()) {
-            return "fragments/mini-game-empty";
+            return "fragments/mini-game-word";
         }
 
-        Activity activity =
-                activityRepository.findById(activityId).orElse(null);
+        if (activityId != null) {
+            Activity activity =
+                    activityRepository.findById(activityId).orElse(null);
 
-        if (activity == null
-                || activity.getMiniGame() == null
-                || !activity.getMiniGame().getId().equals(miniGame.getId())) {
-            return "fragments/mini-game-empty";
+            if (activity == null
+                    || activity.getMiniGame() == null
+                    || !activity.getMiniGame().getId().equals(miniGame.getId())) {
+                return "fragments/mini-game-word";
+            }
         }
 
-        List<MiniGameTask> tasks =
-                miniGameTaskService.findActiveByGame(miniGame);
+        boolean standalone = activityId == null
+                && !miniGame.isAddToActivityCard();
+
+        List<MiniGameTask> tasks;
+
+        if (standalone && "WORD".equalsIgnoreCase(miniGame.getGameType())) {
+            tasks = miniGameTaskService.findActiveByGameType("WORD");
+        } else {
+            tasks = miniGameTaskService.findActiveByGame(miniGame);
+        }
 
         if (tasks.isEmpty()) {
-            return "fragments/mini-game-empty";
+            model.addAttribute("noTasksAvailable", true);
+            return "fragments/mini-game-completed";
         }
 
         model.addAttribute("miniGame", miniGame);
         model.addAttribute("activityId", activityId);
 
         if ("WORD".equalsIgnoreCase(miniGame.getGameType())) {
+
+            // Фильтр для гостя: исключаем уже пройденные в этой сессии слова
+            if (standalone && excludeTaskIds != null && !excludeTaskIds.isBlank()) {
+                List<Long> excluded = new ArrayList<>();
+                for (String part : excludeTaskIds.split(",")) {
+                    try {
+                        excluded.add(Long.parseLong(part.trim()));
+                    } catch (NumberFormatException ignored) {
+                    }
+                }
+                tasks = tasks.stream()
+                        .filter(task -> !excluded.contains(task.getId()))
+                        .toList();
+            }
+
+            // Фильтр для авторизованного: исключаем уже пройденные
+            if (standalone
+                    && authentication != null
+                    && authentication.isAuthenticated()
+                    && !"anonymousUser".equals(authentication.getPrincipal())) {
+
+                User user = userRepository
+                        .findByUsername(authentication.getName())
+                        .orElse(null);
+
+                if (user != null) {
+                    tasks = tasks.stream()
+                            .filter(task ->
+                                    !miniGameTaskCompletionRepository
+                                            .existsByUserAndTask_Id(
+                                                    user,
+                                                    task.getId()
+                                            ))
+                            .toList();
+                }
+            }
+
+            if (tasks.isEmpty()) {
+                model.addAttribute("noTasksAvailable", true);
+                return "fragments/mini-game-completed";
+            }
 
             MiniGameTask task =
                     tasks.get((int) (Math.random() * tasks.size()));
@@ -130,27 +193,68 @@ public class MiniGameController {
         }
 
         if ("MEMORY".equalsIgnoreCase(miniGame.getGameType())) {
-
             model.addAttribute("tasks", tasks);
-
             return "fragments/mini-game-memory";
         }
 
         if ("CROCODILE".equalsIgnoreCase(miniGame.getGameType())) {
-
             model.addAttribute("tasks", tasks);
-
             return "fragments/mini-game-crocodile";
         }
 
-        return "fragments/mini-game-empty";
+        return "fragments/mini-game-word";
+    }
+
+
+    @GetMapping("/type/{gameType}/next")
+    public String nextGameByType(
+            @PathVariable String gameType,
+            @RequestParam(required = false) Long currentGameId,
+            Model model
+    ) {
+        if (!"MEMORY".equalsIgnoreCase(gameType)) {
+            return "fragments/mini-game-completed";
+        }
+
+        List<MiniGame> games = miniGameService.findActiveGamesByType("MEMORY");
+
+        games = games.stream()
+                .filter(game -> !game.isAddToActivityCard())
+                .filter(game -> !miniGameTaskService.findActiveByGame(game).isEmpty())
+                .sorted(java.util.Comparator.comparing(MiniGame::getId))
+                .toList();
+
+        if (games.isEmpty()) {
+            model.addAttribute("noTasksAvailable", true);
+            return "fragments/mini-game-completed";
+        }
+
+        int nextIndex = 0;
+
+        if (currentGameId != null) {
+            for (int i = 0; i < games.size(); i++) {
+                if (games.get(i).getId().equals(currentGameId)) {
+                    nextIndex = (i + 1) % games.size();
+                    break;
+                }
+            }
+        }
+
+        MiniGame nextGame = games.get(nextIndex);
+        List<MiniGameTask> tasks = miniGameTaskService.findActiveByGame(nextGame);
+
+        model.addAttribute("miniGame", nextGame);
+        model.addAttribute("activityId", null);
+        model.addAttribute("tasks", tasks);
+
+        return "fragments/mini-game-memory";
     }
 
     @GetMapping("/{id}/crocodile-tasks")
     @ResponseBody
     public List<Map<String, Object>> crocodileTasks(
             @PathVariable Long id,
-            @RequestParam Long activityId,
+            @RequestParam(required = false) Long activityId,
             @RequestParam String difficulty,
             @RequestParam String roundType
     ) {
@@ -162,13 +266,17 @@ public class MiniGameController {
             return List.of();
         }
 
-        Activity activity =
-                activityRepository.findById(activityId).orElse(null);
+        // Если игра запущена из карточки активности,
+        // проверяем, что она действительно связана с этой активностью.
+        if (activityId != null) {
+            Activity activity =
+                    activityRepository.findById(activityId).orElse(null);
 
-        if (activity == null
-                || activity.getMiniGame() == null
-                || !activity.getMiniGame().getId().equals(id)) {
-            return List.of();
+            if (activity == null
+                    || activity.getMiniGame() == null
+                    || !activity.getMiniGame().getId().equals(id)) {
+                return List.of();
+            }
         }
 
         List<MiniGameTask> tasks =
@@ -177,7 +285,6 @@ public class MiniGameController {
         List<Map<String, Object>> result = new ArrayList<>();
 
         for (MiniGameTask task : tasks) {
-
             boolean difficultyMatches =
                     task.getDifficulty() == null
                             || task.getDifficulty().isBlank()
@@ -395,6 +502,61 @@ public class MiniGameController {
             } catch (DataIntegrityViolationException ignored) {
                 // Уже завершено другим запросом
             }
+        }
+
+        return "SUCCESS";
+    }
+
+
+    @PostMapping("/complete-word-standalone")
+    @ResponseBody
+    public String completeWordStandalone(
+            @RequestParam Long taskId,
+            @RequestParam String answer,
+            Authentication authentication
+    ) {
+        if (authentication == null
+                || !authentication.isAuthenticated()
+                || "anonymousUser".equals(authentication.getPrincipal())) {
+            return "AUTH_REQUIRED";
+        }
+
+        User user = userRepository
+                .findByUsername(authentication.getName())
+                .orElse(null);
+
+        if (user == null) {
+            return "AUTH_REQUIRED";
+        }
+
+        MiniGameTask task = miniGameTaskService.findById(taskId);
+
+        if (task == null
+                || !task.isActive()
+                || task.getMiniGame() == null
+                || !task.getMiniGame().isActive()
+                || !"WORD".equalsIgnoreCase(task.getMiniGame().getGameType())
+                || task.getMiniGame().isAddToActivityCard()) {
+            return "ERROR";
+        }
+
+        if (task.getAnswer() == null
+                || !task.getAnswer().trim().equalsIgnoreCase(answer.trim())) {
+            return "WRONG";
+        }
+
+        if (miniGameTaskCompletionRepository
+                .existsByUserAndTask_Id(user, taskId)) {
+            return "ALREADY_COMPLETED";
+        }
+
+        MiniGameTaskCompletion completion =
+                new MiniGameTaskCompletion(user, task, LocalDateTime.now());
+
+        try {
+            miniGameTaskCompletionRepository.save(completion);
+        } catch (DataIntegrityViolationException ignored) {
+            return "ALREADY_COMPLETED";
         }
 
         return "SUCCESS";

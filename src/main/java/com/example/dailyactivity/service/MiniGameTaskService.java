@@ -24,6 +24,15 @@ public class MiniGameTaskService {
         return taskRepository.findByMiniGameAndActiveTrue(miniGame);
     }
 
+
+    public List<MiniGameTask> findActiveByGameType(String gameType) {
+        return taskRepository
+                .findByMiniGame_GameTypeIgnoreCaseAndMiniGame_ActiveTrueAndActiveTrueOrderByIdAsc(gameType)
+                .stream()
+                .filter(task -> !task.getMiniGame().isAddToActivityCard())
+                .toList();
+    }
+
     public MiniGameTask findById(Long id) {
         return taskRepository.findById(id).orElse(null);
     }

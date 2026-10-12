@@ -115,8 +115,9 @@ public class AdminController {
             @RequestParam(required = false) String description,
             @RequestParam String gameType,
             @RequestParam String category,
-            @RequestParam int duration,
-            @RequestParam(required = false) String instructions
+            @RequestParam(required = false) Integer duration,
+            @RequestParam(required = false) String instructions,
+            @RequestParam(defaultValue = "false") boolean addToActivityCard
     ) {
         MiniGame miniGame = new MiniGame(
                 title,
@@ -126,6 +127,18 @@ public class AdminController {
                 duration,
                 instructions
         );
+
+        String actualCategory =
+                category == null || category.isBlank()
+                        ? "entertainment"
+                        : category;
+
+        int actualDuration =
+                duration == null || duration < 1
+                        ? 5
+                        : duration;
+
+        miniGame.setAddToActivityCard(addToActivityCard);
 
         miniGameService.save(miniGame);
 
@@ -145,10 +158,11 @@ public class AdminController {
             @RequestParam String title,
             @RequestParam(required = false) String description,
             @RequestParam String gameType,
-            @RequestParam String category,
-            @RequestParam int duration,
+            @RequestParam(required = false) String category,
+            @RequestParam(required = false) Integer duration,
             @RequestParam(required = false) String instructions,
-            @RequestParam(defaultValue = "false") boolean active
+            @RequestParam(defaultValue = "false") boolean active,
+            @RequestParam(defaultValue = "false") boolean addToActivityCard
     ) {
         MiniGame miniGame = miniGameService.findById(id);
 
@@ -156,8 +170,15 @@ public class AdminController {
             miniGame.setTitle(title);
             miniGame.setDescription(description);
             miniGame.setGameType(gameType);
-            miniGame.setCategory(category);
-            miniGame.setDuration(duration);
+
+            if (category != null && !category.isBlank()) {
+                miniGame.setCategory(category);
+            }
+
+            if (duration != null && duration > 0) {
+                miniGame.setDuration(duration);
+            }
+
             miniGame.setInstructions(instructions);
             miniGame.setActive(active);
 
@@ -166,6 +187,7 @@ public class AdminController {
 
         return "redirect:/admin";
     }
+
 
     @GetMapping("/mini-game/{id}/tasks")
     public String miniGameTasks(

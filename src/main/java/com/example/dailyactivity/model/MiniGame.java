@@ -20,16 +20,26 @@ public class MiniGame {
     private String gameType;
 
     @Column(nullable = false, length = 50)
-    private String category;
+    private String category = "entertainment";
 
     @Column(nullable = false)
-    private int duration;
+    private int duration = 5;
 
     @Column(nullable = false)
     private boolean active = true;
 
     @Column(length = 2000)
     private String instructions;
+
+    @Column(name = "add_to_activity_card", nullable = false)
+    private boolean addToActivityCard = true;
+    public boolean isAddToActivityCard() {
+        return addToActivityCard;
+    }
+
+    public void setAddToActivityCard(boolean addToActivityCard) {
+        this.addToActivityCard = addToActivityCard;
+    }
 
     public MiniGame() {
     }
@@ -49,6 +59,7 @@ public class MiniGame {
         this.duration = duration;
         this.instructions = instructions;
         this.active = true;
+        this.addToActivityCard = true;
     }
 
     public Long getId() {
@@ -110,4 +121,6 @@ public class MiniGame {
     public void setInstructions(String instructions) {
         this.instructions = instructions;
     }
+
 }
+

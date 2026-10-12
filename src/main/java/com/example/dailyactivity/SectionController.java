@@ -6,6 +6,7 @@ import com.example.dailyactivity.repository.PersonalActivityRepository;
 import com.example.dailyactivity.repository.UserRepository;
 import com.example.dailyactivity.service.AchievementService;
 import com.example.dailyactivity.service.ChallengeService;
+import com.example.dailyactivity.service.MiniGameService;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -28,19 +29,22 @@ public class SectionController {
     private final ActivityCompletionRepository activityCompletionRepository;
     private final PersonalActivityRepository personalActivityRepository;
     private final AchievementService achievementService;
+    private final MiniGameService miniGameService;
 
     public SectionController(
             UserRepository userRepository,
             ChallengeService challengeService,
             ActivityCompletionRepository activityCompletionRepository,
             PersonalActivityRepository personalActivityRepository,
-            AchievementService achievementService) {
+            AchievementService achievementService,
+            MiniGameService miniGameService) {
 
         this.userRepository = userRepository;
         this.challengeService = challengeService;
         this.activityCompletionRepository = activityCompletionRepository;
         this.personalActivityRepository = personalActivityRepository;
         this.achievementService = achievementService;
+        this.miniGameService = miniGameService;
     }
 
     @GetMapping("/section")
@@ -145,6 +149,31 @@ public class SectionController {
                 + activityDate.getMonthValue()
                 + "&date="
                 + activityDate;
+    }
+
+    @GetMapping("/mini-games")
+    public String miniGames(Model model) {
+        List<MiniGame> miniGames =
+                miniGameService.findActiveStandaloneGames();
+
+        List<MiniGame> wordGames =
+                miniGameService.findActiveGamesByType("WORD");
+        List<MiniGame> memoryGames =
+                miniGameService.findActiveGamesByType("MEMORY");
+
+        String wordGameIds = wordGames.stream()
+                .map(g -> String.valueOf(g.getId()))
+                .collect(java.util.stream.Collectors.joining(","));
+
+        String memoryGameIds = memoryGames.stream()
+                .map(g -> String.valueOf(g.getId()))
+                .collect(java.util.stream.Collectors.joining(","));
+
+        model.addAttribute("miniGames", miniGames);
+        model.addAttribute("wordGameIds", wordGameIds);
+        model.addAttribute("memoryGameIds", memoryGameIds);
+
+        return "mini-games";
     }
 
     @GetMapping("/my-activity")
