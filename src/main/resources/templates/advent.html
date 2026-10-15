@@ -1,0 +1,340 @@
+<!DOCTYPE html>
+<html lang="ru" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Адвент-активность — Daily Activity</title>
+
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+</head>
+
+<body class="page-with-header advent-page"
+      th:classappend="${adventActive and season != null ? 'season-' + #strings.toLowerCase(season.name()) : ''}">
+
+<header class="site-header">
+
+    <div class="site-header-brand-group">
+        <a th:href="@{/}" class="site-header-brand">
+            <span class="hero-badge">✨ Daily Activity</span>
+        </a>
+
+        <!-- Иконка-консоль (мини-игры) -->
+        <a th:href="@{/mini-games}"
+           class="mini-games-header-link"
+           title="Мини-игры"
+           aria-label="Мини-игры">
+            <img src="/images/mini-console.png"
+                 alt=""
+                 class="pixel-console">
+        </a>
+
+        <!-- Иконка-календарик (ведёт на /advent) -->
+        <a th:href="@{/advent}"
+           class="advent-header-link"
+           title="Адвент-активность"
+           aria-label="Адвент-активность">
+
+    <span class="advent-header-link__month"
+          th:if="${monthLabel != null and !monthLabel.isEmpty()}"
+          th:text="${monthLabel}">
+        Дек
+    </span>
+
+            <span class="advent-header-link__divider"
+                  th:if="${monthLabel != null and !monthLabel.isEmpty()}">
+    </span>
+
+            <span class="advent-header-link__day"
+                  th:text="${dayNumber}">
+        15
+    </span>
+
+        </a>
+    </div>
+
+    <nav class="site-header-actions">
+
+        <th:block th:if="${#authorization.expression('isAuthenticated()')}">
+
+            <a th:href="@{/section}" class="site-header-username">
+                👤 <span th:text="${#authentication.name}">Пользователь</span>
+            </a>
+
+            <form th:action="@{/logout}"
+                  method="post"
+                  class="site-header-logout-form">
+
+                <input type="hidden"
+                       th:name="${_csrf.parameterName}"
+                       th:value="${_csrf.token}">
+
+                <button type="submit" class="site-header-link">
+                    Выйти
+                </button>
+            </form>
+
+        </th:block>
+
+        <th:block th:unless="${#authorization.expression('isAuthenticated()')}">
+
+            <a th:href="@{/login}" class="site-header-link">Вход</a>
+
+            <a th:href="@{/register}"
+               class="site-header-link site-header-register">
+                Регистрация
+            </a>
+
+        </th:block>
+
+    </nav>
+
+</header>
+
+<!-- =========================================================
+     ОСНОВНОЙ КОНТЕНТ
+     ========================================================= -->
+
+<main class="advent-main">
+
+    <!-- ============ СЕЗОН НЕ АКТИВЕН ============ -->
+    <section class="advent-inactive"
+             th:if="${!adventActive}">
+
+        <div class="advent-inactive-icon">🎄</div>
+
+        <h1>Адвент-активность завершена</h1>
+
+        <p>
+            В этом сезоне адвент завершён.
+            Ждём Вас в новом адвенте!
+        </p>
+
+        <div class="advent-inactive-seasons">
+            <span class="advent-inactive-season">🌸 Март</span>
+            <span class="advent-inactive-season">☀️ Июль</span>
+            <span class="advent-inactive-season">🍂 Октябрь</span>
+            <span class="advent-inactive-season">❄️ Декабрь</span>
+        </div>
+
+        <a class="button" th:href="@{/}">
+            ← На главную
+        </a>
+
+    </section>
+
+
+    <!-- ============ АДВЕНТ АКТИВЕН ============ -->
+    <section class="advent-content"
+             th:if="${adventActive}">
+
+        <!-- ЗАГОЛОВОК -->
+        <div class="advent-heading">
+
+            <div class="advent-heading-icon"
+                 th:text="${seasonIcon}">
+                ❄️
+            </div>
+
+            <h1 class="advent-heading-title">
+                Адвент-активность —
+                <span th:text="${seasonLabel}">Зима</span>
+            </h1>
+
+            <p class="advent-heading-subtitle">
+                Открывай по одному окошку каждый день
+            </p>
+
+        </div>
+
+
+        <!-- ПРОГРЕСС (только для авторизованного) -->
+        <div class="advent-progress"
+             th:if="${loggedIn}">
+
+            <div class="advent-progress-bar">
+
+                <div class="advent-progress-fill"
+                     th:style="|width: ${openedCount * 100 / daysInMonth}%|">
+                </div>
+
+            </div>
+
+            <div class="advent-progress-text">
+                Открыто
+                <strong th:text="${openedCount}">0</strong>
+                из
+                <strong th:text="${daysInMonth}">31</strong>
+                ·
+                Выполнено
+                <strong th:text="${completedCount}">0</strong>
+            </div>
+
+        </div>
+
+
+        <!-- ЗАГЛУШКА ДЛЯ ГОСТЯ -->
+        <div class="advent-guest-overlay"
+             th:if="${!loggedIn}">
+
+            <div class="advent-guest-card">
+
+                <div class="advent-guest-icon">🔒</div>
+
+                <h2>Только для авторизованных</h2>
+
+                <p>
+                    Войдите, чтобы открывать задания каждый день
+                    и собирать свою коллекцию выполненных активностей.
+                </p>
+
+                <div class="advent-guest-actions">
+                    <a th:href="@{/login}" class="button">
+                        Войти
+                    </a>
+
+                    <a th:href="@{/register}"
+                       class="button secondary-button">
+                        Регистрация
+                    </a>
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <!-- СЕТКА КАЛЕНДАРЯ -->
+        <div class="advent-calendar-wrap"
+             th:classappend="${!loggedIn} ? ' is-blurred' : ''">
+
+            <div class="advent-calendar">
+
+                <!-- Заголовки дней недели -->
+                <div class="advent-weekdays">
+                    <span>Пн</span>
+                    <span>Вт</span>
+                    <span>Ср</span>
+                    <span>Чт</span>
+                    <span>Пт</span>
+                    <span>Сб</span>
+                    <span>Вс</span>
+                </div>
+
+                <!-- Ячейки -->
+                <div class="advent-days">
+
+                    <!-- Пустые ячейки до первого числа -->
+                    <th:block th:if="${firstDayOfWeek > 1}">
+                        <div class="advent-day advent-day--empty"
+                             th:each="i : ${#numbers.sequence(1, firstDayOfWeek - 1)}">
+                        </div>
+                    </th:block>
+
+                    <!-- Авторизованный: показываем с заданиями -->
+                    <th:block th:if="${loggedIn and days != null}">
+
+                        <button type="button"
+                                class="advent-day"
+                                th:each="day : ${days}"
+                                th:classappend="${day.adventDate.isAfter(today) ? 'advent-day--future' : (day.adventDate.isEqual(today) ? 'advent-day--today' : '')}"
+                                th:attr="data-advent-date=${day.adventDate},
+                                         data-opened=${day.opened},
+                                         data-completed=${day.completed},
+                                         data-day-number=${#temporals.day(day.adventDate)}">
+
+                            <span class="advent-day__number"
+                                  th:text="${#temporals.day(day.adventDate)}">
+                                1
+                            </span>
+
+                            <span class="advent-day__icon"
+                                  th:if="${day.opened}"
+                                  th:text="${day.activity.icon != null
+                                             ? day.activity.icon
+                                             : '🎁'}">
+                                🎁
+                            </span>
+
+                            <span class="advent-day__icon"
+                                  th:unless="${day.opened}"
+                                  th:text="${seasonIcon}">
+                                ❄️
+                            </span>
+
+                            <span class="advent-day__check"
+                                  th:if="${day.completed}">
+                                ✓
+                            </span>
+
+                        </button>
+
+                    </th:block>
+
+                    <!-- Гость: пустые ячейки для визуала -->
+                    <th:block th:unless="${loggedIn}">
+                        <div class="advent-day advent-day--ghost"
+                             th:each="i : ${#numbers.sequence(1, daysInMonth)}">
+                            <span class="advent-day__number"
+                                  th:text="${i}">
+                                1
+                            </span>
+                            <span class="advent-day__icon"
+                                  th:text="${seasonIcon}">
+                                ❄️
+                            </span>
+                        </div>
+                    </th:block>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </section>
+
+</main>
+
+
+<!-- =========================================================
+     МОДАЛЬНОЕ ОКНО
+     ========================================================= -->
+
+<div class="advent-modal"
+     id="adventModal"
+     hidden>
+
+    <div class="advent-modal-backdrop"
+         id="adventModalBackdrop">
+    </div>
+
+    <div class="advent-modal-window">
+
+        <button type="button"
+                class="advent-modal-close"
+                id="adventModalClose"
+                aria-label="Закрыть">
+            ✕
+        </button>
+
+        <div class="advent-modal-body" id="adventModalBody">
+            <!-- Сюда подставляется фрагмент через AJAX -->
+        </div>
+
+    </div>
+
+</div>
+
+
+<!-- CSRF-токен для AJAX-запросов -->
+<meta name="_csrf" th:content="${_csrf.token}"/>
+<meta name="_csrf_header" th:content="${_csrf.headerName}"/>
+
+
+<script th:src="@{/js/games/advent.js}"></script>
+
+</body>
+
+</html>

@@ -27,6 +27,28 @@
                  alt=""
                  class="pixel-console">
         </a>
+
+        <a th:href="@{/advent}"
+           class="advent-header-link"
+           title="Адвент-активность"
+           aria-label="Адвент-активность">
+
+    <span class="advent-header-link__month"
+          th:if="${monthLabel != null and !monthLabel.isEmpty()}"
+          th:text="${monthLabel}">
+        Дек
+    </span>
+
+            <span class="advent-header-link__divider"
+                  th:if="${monthLabel != null and !monthLabel.isEmpty()}">
+    </span>
+
+            <span class="advent-header-link__day"
+                  th:text="${dayNumber}">
+        15
+    </span>
+
+        </a>
     </div>
 
     <nav class="site-header-actions">
@@ -127,6 +149,9 @@
 
                         <span th:case="'CROCODILE'" class="mini-game-art-crocodile">
             🐊
+        </span>
+                        <span th:case="'SNAKE'" class="mini-game-art-snake">
+            🐍
         </span>
 
                         <span th:case="*" class="mini-game-art-default">
@@ -268,6 +293,7 @@
     const memoryGame = content.querySelector('[data-memory-game]');
     const crocodileGame = content.querySelector('[data-crocodile-game]');
     const wordGame = content.querySelector('[data-word-game]');
+    const snakeGame = content.querySelector('[data-snake-game]');
 
     if (memoryGame && typeof initializeMemoryGame === 'function') {
         initializeMemoryGame(memoryGame);
@@ -275,6 +301,8 @@
         initializeCrocodileGame(crocodileGame);
     } else if (wordGame && typeof initializeWordGame === 'function') {
         initializeWordGame(wordGame);
+    } else if (snakeGame && typeof initializeSnakeGame === 'function') {
+        initializeSnakeGame(snakeGame);
     } else if (card.dataset.gameType?.toUpperCase() === 'WORD') {
         content.innerHTML =
             '<p class="mini-games-completed">Все игры пройдены</p>';
@@ -352,6 +380,7 @@
 <script th:src="@{/js/games/mini-game-crocodile.js}"></script>
 <script th:src="@{/js/games/mini-game-inline.js}"></script>
 <script th:src="@{/js/games/mini-game-memory.js}"></script>
+<script th:src="@{/js/games/mini-game-snake.js}"></script>
 
 </body>
 </html>

@@ -118,6 +118,28 @@
                  alt=""
                  class="pixel-console">
         </a>
+
+        <a th:href="@{/advent}"
+           class="advent-header-link"
+           title="Адвент-активность"
+           aria-label="Адвент-активность">
+
+    <span class="advent-header-link__month"
+          th:if="${monthLabel != null and !monthLabel.isEmpty()}"
+          th:text="${monthLabel}">
+        Дек
+    </span>
+
+            <span class="advent-header-link__divider"
+                  th:if="${monthLabel != null and !monthLabel.isEmpty()}">
+    </span>
+
+            <span class="advent-header-link__day"
+                  th:text="${dayNumber}">
+        15
+    </span>
+
+        </a>
     </div>
 
     <nav class="site-header-actions">

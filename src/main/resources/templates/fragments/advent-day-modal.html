@@ -1,0 +1,84 @@
+<div class="advent-modal-content" th:fragment="modal">
+
+    <!-- Иконка и название -->
+    <div class="advent-modal-header">
+        <span class="advent-modal-icon"
+              th:text="${activity.icon != null ? activity.icon : '🎁'}">
+            🎁
+        </span>
+
+        <h2 class="advent-modal-title"
+            th:text="${activity.title}">
+            Название задания
+        </h2>
+    </div>
+
+    <!-- Описание -->
+    <p class="advent-modal-description"
+       th:if="${activity.description != null
+                and !activity.description.isBlank()}"
+       th:text="${activity.description}">
+        Описание
+    </p>
+
+    <!-- Картинка -->
+    <div class="advent-modal-image"
+         th:if="${activity.imageUrl != null
+                  and !activity.imageUrl.isBlank()}">
+        <img th:src="${activity.imageUrl}"
+             th:alt="${activity.title}">
+    </div>
+
+    <!-- Инструкция -->
+    <div class="advent-modal-section"
+         th:if="${activity.instructions != null
+                  and !activity.instructions.isBlank()}">
+        <h3>📝 Что нужно сделать</h3>
+        <p th:text="${activity.instructions}">
+            Инструкция
+        </p>
+    </div>
+
+    <!-- Материалы -->
+    <div class="advent-modal-materials"
+         th:if="${(activity.videoUrl != null and !activity.videoUrl.isBlank())
+                or (activity.linkUrl != null and !activity.linkUrl.isBlank())}">
+
+        <a class="material-button"
+           th:if="${activity.videoUrl != null
+                    and !activity.videoUrl.isBlank()}"
+           th:href="${activity.videoUrl}"
+           target="_blank"
+           rel="noopener noreferrer">
+            🎬 Смотреть видео
+        </a>
+
+        <a class="material-button"
+           th:if="${activity.linkUrl != null
+                    and !activity.linkUrl.isBlank()}"
+           th:href="${activity.linkUrl}"
+           target="_blank"
+           rel="noopener noreferrer">
+            🔗 Открыть материал
+        </a>
+    </div>
+
+    <!-- Кнопка «Выполнено» -->
+    <div class="advent-modal-actions"
+         th:if="${loggedIn}">
+
+        <button type="button"
+                class="advent-complete-button"
+                th:classappend="${day.completed} ? ' is-completed' : ''"
+                th:attr="data-advent-date=${day.adventDate},
+                         data-completed=${day.completed}"
+                th:disabled="${day.completed}">
+
+            <span th:if="${!day.completed}">✓ Отметить выполненным</span>
+            <span th:if="${day.completed}">✓ Выполнено</span>
+
+        </button>
+
+    </div>
+
+</div>

@@ -1,0 +1,53 @@
+<div class="mini-game-inline snake-game"
+     data-snake-game
+     th:attr="data-game-id=${miniGame.id}">
+
+    <input
+            type="hidden"
+            class="snake-csrf-token"
+            th:name="${_csrf.parameterName}"
+            th:value="${_csrf.token}"
+    >
+
+    <div class="snake-header">
+        <div class="snake-score-block">
+            <span class="snake-score-label">Длина:</span>
+            <span class="snake-score" data-snake-score>3</span>
+        </div>
+
+        <div class="snake-best-block">
+            <span class="snake-best-label">🏆 Рекорд:</span>
+            <span class="snake-best" data-snake-best>0</span>
+        </div>
+    </div>
+
+    <div class="snake-board-wrapper">
+        <canvas
+                class="snake-canvas"
+                width="400"
+                height="400"
+                data-snake-canvas
+        ></canvas>
+    </div>
+
+    <div class="snake-controls">
+        <button type="button"
+                class="snake-start-button"
+                data-snake-start>
+            🐍 Начать игру
+        </button>
+
+        <button type="button"
+                class="snake-restart-button"
+                data-snake-restart
+                hidden>
+            🔄 Заново
+        </button>
+    </div>
+
+    <div class="snake-result" data-snake-result></div>
+
+    <p class="snake-hint">
+        Управление: стрелки на клавиатуре или свайпы на телефоне
+    </p>
+</div>

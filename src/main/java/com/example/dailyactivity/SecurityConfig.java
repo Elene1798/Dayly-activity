@@ -104,7 +104,9 @@ public class SecurityConfig {
                                 "/css/**",
                                 "/login",
                                 "/register",
-                                "/register/**"
+                                "/register/**",
+                                "/advent",
+                                "/advent/**"
                         ).permitAll()
 
                         .requestMatchers("/favorites").authenticated()

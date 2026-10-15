@@ -129,7 +129,7 @@ document.addEventListener("DOMContentLoaded", () => {
         } else {
 
             result.textContent =
-                "Попробуй ещё раз";
+                "Вау, ты молодец, но, к сожалению, слово другое :с";
 
             result.className =
                 "word-game-result error";

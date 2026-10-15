@@ -1,10 +1,7 @@
 package com.example.dailyactivity.controller;
 
 import com.example.dailyactivity.model.*;
-import com.example.dailyactivity.repository.ActivityCompletionRepository;
-import com.example.dailyactivity.repository.ActivityRepository;
-import com.example.dailyactivity.repository.MiniGameTaskCompletionRepository;
-import com.example.dailyactivity.repository.UserRepository;
+import com.example.dailyactivity.repository.*;
 import com.example.dailyactivity.service.AchievementCheckerService;
 import com.example.dailyactivity.service.MiniGameService;
 import com.example.dailyactivity.service.MiniGameTaskService;
@@ -34,6 +31,7 @@ public class MiniGameController {
     private final UserRepository userRepository;
     private final AchievementCheckerService achievementCheckerService;
     private final MiniGameTaskCompletionRepository miniGameTaskCompletionRepository;
+    private final SnakeRecordRepository snakeRecordRepository;
 
     public MiniGameController(
             MiniGameService miniGameService,
@@ -42,7 +40,8 @@ public class MiniGameController {
             ActivityCompletionRepository activityCompletionRepository,
             UserRepository userRepository,
             AchievementCheckerService achievementCheckerService,
-            MiniGameTaskCompletionRepository miniGameTaskCompletionRepository
+            MiniGameTaskCompletionRepository miniGameTaskCompletionRepository,
+            SnakeRecordRepository snakeRecordRepository
     ) {
         this.miniGameService = miniGameService;
         this.miniGameTaskService = miniGameTaskService;
@@ -51,6 +50,7 @@ public class MiniGameController {
         this.userRepository = userRepository;
         this.achievementCheckerService = achievementCheckerService;
         this.miniGameTaskCompletionRepository = miniGameTaskCompletionRepository;
+        this.snakeRecordRepository = snakeRecordRepository;
     }
 
     @GetMapping("/{id}")
@@ -124,6 +124,12 @@ public class MiniGameController {
 
         boolean standalone = activityId == null
                 && !miniGame.isAddToActivityCard();
+
+        if ("SNAKE".equalsIgnoreCase(miniGame.getGameType())) {
+            model.addAttribute("miniGame", miniGame);
+            model.addAttribute("activityId", activityId);
+            return "fragments/mini-game-snake";
+        }
 
         List<MiniGameTask> tasks;
 
@@ -200,6 +206,11 @@ public class MiniGameController {
         if ("CROCODILE".equalsIgnoreCase(miniGame.getGameType())) {
             model.addAttribute("tasks", tasks);
             return "fragments/mini-game-crocodile";
+        }
+
+        if ("SNAKE".equalsIgnoreCase(miniGame.getGameType())) {
+            model.addAttribute("tasks", tasks);
+            return "fragments/mini-game-snake";
         }
 
         return "fragments/mini-game-word";
@@ -698,5 +709,66 @@ public class MiniGameController {
         }
 
         return "SUCCESS";
+    }
+
+    @PostMapping("/snake/save-record")
+    @ResponseBody
+    public String saveSnakeRecord(
+            @RequestParam int score,
+            Authentication authentication
+    ) {
+        if (authentication == null
+                || !authentication.isAuthenticated()
+                || "anonymousUser".equals(authentication.getPrincipal())) {
+            return "AUTH_REQUIRED";
+        }
+
+        User user = userRepository
+                .findByUsername(authentication.getName())
+                .orElse(null);
+
+        if (user == null) {
+            return "AUTH_REQUIRED";
+        }
+
+        SnakeRecord record = snakeRecordRepository
+                .findByUser(user)
+                .orElse(null);
+
+        if (record == null) {
+            record = new SnakeRecord(user, score, LocalDateTime.now());
+        } else if (score > record.getBestScore()) {
+            record.setBestScore(score);
+            record.setAchievedAt(LocalDateTime.now());
+        } else {
+            return "OK";
+        }
+
+        snakeRecordRepository.save(record);
+
+        return "SUCCESS";
+    }
+
+    @GetMapping("/snake/record")
+    @ResponseBody
+    public String getSnakeRecord(Authentication authentication) {
+        if (authentication == null
+                || !authentication.isAuthenticated()
+                || "anonymousUser".equals(authentication.getPrincipal())) {
+            return "0";
+        }
+
+        User user = userRepository
+                .findByUsername(authentication.getName())
+                .orElse(null);
+
+        if (user == null) {
+            return "0";
+        }
+
+        return snakeRecordRepository
+                .findByUser(user)
+                .map(r -> String.valueOf(r.getBestScore()))
+                .orElse("0");
     }
 }

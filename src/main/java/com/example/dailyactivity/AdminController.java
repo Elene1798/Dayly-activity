@@ -1,37 +1,78 @@
 package com.example.dailyactivity;
 
 import com.example.dailyactivity.model.Activity;
+import com.example.dailyactivity.model.AdventActivity;
+import com.example.dailyactivity.model.AdventSeason;
 import com.example.dailyactivity.model.MiniGame;
 import com.example.dailyactivity.model.MiniGameTask;
 import com.example.dailyactivity.repository.ActivityRepository;
+import com.example.dailyactivity.repository.DailyRecommendationRepository;
+import com.example.dailyactivity.service.AdventService;
 import com.example.dailyactivity.service.MiniGameService;
 import com.example.dailyactivity.service.MiniGameTaskService;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDate;
+import java.time.YearMonth;
+import java.util.EnumMap;
+import java.util.Map;
+
 @Controller
 @RequestMapping("/admin")
 public class AdminController {
+
     private final ActivityRepository activityRepository;
     private final MiniGameService miniGameService;
     private final MiniGameTaskService miniGameTaskService;
+    private final AdventService adventService;
+    private final DailyRecommendationRepository dailyRecommendationRepository;
 
-    public AdminController(ActivityRepository activityRepository,
-                           MiniGameService miniGameService,
-                           MiniGameTaskService miniGameTaskService)
-    {
+    public AdminController(
+            ActivityRepository activityRepository,
+            MiniGameService miniGameService,
+            MiniGameTaskService miniGameTaskService,
+            AdventService adventService,
+            DailyRecommendationRepository dailyRecommendationRepository
+    ) {
         this.activityRepository = activityRepository;
         this.miniGameService = miniGameService;
         this.miniGameTaskService = miniGameTaskService;
+        this.adventService = adventService;
+        this.dailyRecommendationRepository = dailyRecommendationRepository;
     }
+
+    // =========================================================
+    //  ГЛАВНАЯ АДМИНКИ
+    // =========================================================
 
     @GetMapping
     public String adminPage(Model model) {
         model.addAttribute("activities", activityRepository.findAll());
         model.addAttribute("miniGames", miniGameService.findAll());
+
+        // Адвент
+        model.addAttribute("adventActivities", adventService.getAllActivities());
+        model.addAttribute("adventSeasons", AdventSeason.values());
+
+        Map<AdventSeason, Long> counts = new EnumMap<>(AdventSeason.class);
+        for (AdventSeason s : AdventSeason.values()) {
+            counts.put(s, adventService.countBySeason(s));
+        }
+        model.addAttribute("adventSeasonCounts", counts);
+
+        model.addAttribute(
+                "currentSeason",
+                AdventSeason.fromMonth(LocalDate.now().getMonthValue())
+        );
+
         return "admin";
     }
+
+    // =========================================================
+    //  ОБЫЧНЫЕ ЗАНЯТИЯ (без изменений)
+    // =========================================================
 
     @PostMapping("/add")
     public String addActivity(
@@ -47,8 +88,11 @@ public class AdminController {
             @RequestParam(required = false) String linkUrl,
             @RequestParam(required = false) String videoUrl) {
 
-        Activity activity = new Activity(title, description, category, duration, location,
-                instructions, benefit, interestingFact, imageUrl, linkUrl, videoUrl);
+        Activity activity = new Activity(
+                title, description, category, duration, location,
+                instructions, benefit, interestingFact,
+                imageUrl, linkUrl, videoUrl
+        );
         activityRepository.save(activity);
         return "redirect:/admin";
     }
@@ -92,6 +136,7 @@ public class AdminController {
         activity.setImageUrl(imageUrl);
         activity.setLinkUrl(linkUrl);
         activity.setVideoUrl(videoUrl);
+
         if (miniGameId != null) {
             MiniGame miniGame = miniGameService.findById(miniGameId);
             activity.setMiniGame(miniGame);
@@ -105,9 +150,14 @@ public class AdminController {
 
     @PostMapping("/delete/{id}")
     public String deleteActivity(@PathVariable Long id) {
+        dailyRecommendationRepository.deleteByActivityId(id);
         activityRepository.deleteById(id);
         return "redirect:/admin";
     }
+
+    // =========================================================
+    //  МИНИ-ИГРЫ (без изменений)
+    // =========================================================
 
     @PostMapping("/mini-game/add")
     public String addMiniGame(
@@ -120,35 +170,16 @@ public class AdminController {
             @RequestParam(defaultValue = "false") boolean addToActivityCard
     ) {
         MiniGame miniGame = new MiniGame(
-                title,
-                description,
-                gameType,
-                category,
-                duration,
-                instructions
+                title, description, gameType, category, duration, instructions
         );
-
-        String actualCategory =
-                category == null || category.isBlank()
-                        ? "entertainment"
-                        : category;
-
-        int actualDuration =
-                duration == null || duration < 1
-                        ? 5
-                        : duration;
-
         miniGame.setAddToActivityCard(addToActivityCard);
-
         miniGameService.save(miniGame);
-
         return "redirect:/admin";
     }
 
     @PostMapping("/mini-game/delete/{id}")
     public String deleteMiniGame(@PathVariable Long id) {
         miniGameService.delete(id);
-
         return "redirect:/admin";
     }
 
@@ -181,13 +212,13 @@ public class AdminController {
 
             miniGame.setInstructions(instructions);
             miniGame.setActive(active);
+            miniGame.setAddToActivityCard(addToActivityCard);
 
             miniGameService.save(miniGame);
         }
 
         return "redirect:/admin";
     }
-
 
     @GetMapping("/mini-game/{id}/tasks")
     public String miniGameTasks(
@@ -201,10 +232,7 @@ public class AdminController {
         }
 
         model.addAttribute("miniGame", miniGame);
-        model.addAttribute(
-                "tasks",
-                miniGameTaskService.findAllByGame(miniGame)
-        );
+        model.addAttribute("tasks", miniGameTaskService.findAllByGame(miniGame));
 
         return "admin-mini-game-tasks";
     }
@@ -239,9 +267,7 @@ public class AdminController {
     }
 
     @PostMapping("/mini-game/task/delete/{id}")
-    public String deleteMiniGameTask(
-            @PathVariable Long id
-    ) {
+    public String deleteMiniGameTask(@PathVariable Long id) {
         MiniGameTask task = miniGameTaskService.findById(id);
 
         if (task == null) {
@@ -249,12 +275,9 @@ public class AdminController {
         }
 
         Long miniGameId = task.getMiniGame().getId();
-
         miniGameTaskService.delete(id);
 
-        return "redirect:/admin/mini-game/"
-                + miniGameId
-                + "/tasks";
+        return "redirect:/admin/mini-game/" + miniGameId + "/tasks";
     }
 
     @PostMapping("/mini-game/task/edit/{id}")
@@ -292,5 +315,135 @@ public class AdminController {
         return "redirect:/admin";
     }
 
+    // =========================================================
+    //  АДВЕНТ-АКТИВНОСТИ
+    // =========================================================
 
+    @PostMapping("/advent/add")
+    public String addAdventActivity(
+            @RequestParam String season,
+            @RequestParam String title,
+            @RequestParam(required = false) String description,
+            @RequestParam(required = false) String instructions,
+            @RequestParam(required = false) String icon,
+            @RequestParam(required = false) String imageUrl,
+            @RequestParam(required = false) String videoUrl,
+            @RequestParam(required = false) String linkUrl,
+            @RequestParam(defaultValue = "false") boolean special,
+            @RequestParam(required = false) Integer specialDay
+    ) {
+        AdventSeason adventSeason;
+        try {
+            adventSeason = AdventSeason.valueOf(season);
+        } catch (Exception e) {
+            return "redirect:/admin?adventError=bad-season";
+        }
+
+        AdventActivity activity = new AdventActivity(adventSeason, title);
+        activity.setDescription(blankToNull(description));
+        activity.setInstructions(blankToNull(instructions));
+        activity.setIcon(blankToNull(icon));
+        activity.setImageUrl(blankToNull(imageUrl));
+        activity.setVideoUrl(blankToNull(videoUrl));
+        activity.setLinkUrl(blankToNull(linkUrl));
+        activity.setSpecial(special);
+
+        if (special) {
+            if (specialDay == null || specialDay < 1 || specialDay > 31) {
+                return "redirect:/admin?adventError=special-day-required";
+            }
+
+            // Проверяем, что такой день существует в месяце сезона
+            int year = LocalDate.now().getYear();
+            int daysInMonth = java.time.YearMonth
+                    .of(year, adventSeason.getMonth())
+                    .lengthOfMonth();
+
+            if (specialDay > daysInMonth) {
+                return "redirect:/admin?adventError=day-outside-month";
+            }
+
+            activity.setSpecialDay(specialDay);
+        } else {
+            activity.setSpecialDay(null);
+        }
+
+        adventService.save(activity);
+
+        return "redirect:/admin?adventSuccess=added";
+    }
+
+    @PostMapping("/advent/edit/{id}")
+    public String editAdventActivity(
+            @PathVariable Long id,
+            @RequestParam String season,
+            @RequestParam String title,
+            @RequestParam(required = false) String description,
+            @RequestParam(required = false) String instructions,
+            @RequestParam(required = false) String icon,
+            @RequestParam(required = false) String imageUrl,
+            @RequestParam(required = false) String videoUrl,
+            @RequestParam(required = false) String linkUrl,
+            @RequestParam(defaultValue = "false") boolean special,
+            @RequestParam(required = false) Integer specialDay
+    ) {
+        AdventActivity activity = adventService.findById(id);
+        if (activity == null) {
+            return "redirect:/admin?adventError=not-found";
+        }
+
+        AdventSeason adventSeason;
+        try {
+            adventSeason = AdventSeason.valueOf(season);
+        } catch (Exception e) {
+            return "redirect:/admin?adventError=bad-season";
+        }
+
+        activity.setSeason(adventSeason);
+        activity.setTitle(title);
+        activity.setDescription(blankToNull(description));
+        activity.setInstructions(blankToNull(instructions));
+        activity.setIcon(blankToNull(icon));
+        activity.setImageUrl(blankToNull(imageUrl));
+        activity.setVideoUrl(blankToNull(videoUrl));
+        activity.setLinkUrl(blankToNull(linkUrl));
+        activity.setSpecial(special);
+
+        if (special) {
+            if (specialDay == null || specialDay < 1 || specialDay > 31) {
+                return "redirect:/admin?adventError=special-day-required";
+            }
+
+            int year = LocalDate.now().getYear();
+            int daysInMonth = java.time.YearMonth
+                    .of(year, adventSeason.getMonth())
+                    .lengthOfMonth();
+
+            if (specialDay > daysInMonth) {
+                return "redirect:/admin?adventError=day-outside-month";
+            }
+
+            activity.setSpecialDay(specialDay);
+        } else {
+            activity.setSpecialDay(null);
+        }
+
+        adventService.save(activity);
+
+        return "redirect:/admin?adventSuccess=edited";
+    }
+
+    @PostMapping("/advent/delete/{id}")
+    public String deleteAdventActivity(@PathVariable Long id) {
+        adventService.delete(id);
+        return "redirect:/admin?adventSuccess=deleted";
+    }
+
+    // =========================================================
+    //  ХЕЛПЕРЫ
+    // =========================================================
+
+    private String blankToNull(String value) {
+        return (value == null || value.isBlank()) ? null : value;
+    }
 }

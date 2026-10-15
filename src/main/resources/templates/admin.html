@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="ru">
+<html lang="ru" xmlns:th="http://www.thymeleaf.org">
 
 <head>
 
@@ -14,18 +14,6 @@
 
 </head>
 
-<script>
-    function toggleMiniGameEdit(id) {
-        const form = document.getElementById('mini-game-edit-' + id);
-
-        if (form.style.display === 'none' || form.style.display === '') {
-            form.style.display = 'block';
-        } else {
-            form.style.display = 'none';
-        }
-    }
-</script>
-
 <body>
 
 <div class="container">
@@ -33,197 +21,129 @@
     <h1>Управление занятиями</h1>
 
     <p class="subtitle">
-        Добавляй и удаляй занятия для пользователей
+        Добавляй и редактируй занятия, мини-игры и адвент-активности
     </p>
 
 
-    <div class="activity-card">
+    <!-- =========================================================
+         ОШИБКИ И УСПЕХИ АДВЕНТА
+         ========================================================= -->
 
-        <h2>Добавить новое занятие</h2>
+    <div class="admin-alert admin-alert--error"
+         th:if="${param.adventError != null}">
+        <span th:switch="${param.adventError[0]}">
+            <span th:case="'bad-season'">⚠️ Неверно выбран сезон</span>
+            <span th:case="'special-day-required'">⚠️ Для особого дня выберите число</span>
+            <span th:case="'day-outside-month'">⚠️ Такого дня нет в месяце выбранного сезона</span>
+            <span th:case="'not-found'">⚠️ Задание не найдено</span>
+            <span th:case="*">⚠️ Произошла ошибка</span>
+        </span>
+    </div>
 
-        <form th:action="@{/admin/add}"
-              method="post">
-
-            <p>
-                <label>
-                    Название:
-                </label>
-            </p>
-
-            <input type="text"
-                   name="title"
-                   required>
-
-
-            <p>
-                <label>
-                    Описание:
-                </label>
-            </p>
-
-            <textarea name="description"
-                      rows="5"
-                      required></textarea>
+    <div class="admin-alert admin-alert--success"
+         th:if="${param.adventSuccess != null}">
+        <span th:switch="${param.adventSuccess[0]}">
+            <span th:case="'added'">✓ Задание добавлено</span>
+            <span th:case="'edited'">✓ Задание обновлено</span>
+            <span th:case="'deleted'">✓ Задание удалено</span>
+            <span th:case="*">✓ Готово</span>
+        </span>
+    </div>
 
 
-            <p>
-                <label>
-                    Категория:
-                </label>
-            </p>
+    <!-- =========================================================
+         1. ДОБАВИТЬ НОВОЕ ЗАНЯТИЕ
+         ========================================================= -->
 
-            <select name="category"
-                    required>
+    <details class="admin-section-toggle" data-section="add-activity">
 
-                <option value="active">
-                    🏃 Активность
-                </option>
+        <summary class="admin-section-toggle__header">
+            <span class="admin-section-toggle__icon">➕</span>
+            <span class="admin-section-toggle__title">Добавить новое занятие</span>
+            <span class="admin-section-toggle__arrow">▼</span>
+        </summary>
 
-                <option value="creative">
-                    🎨 Творчество
-                </option>
+        <div class="admin-section-toggle__body">
 
-                <option value="learning">
-                    📚 Обучение
-                </option>
+            <form th:action="@{/admin/add}" method="post">
 
-                <option value="entertainment">
-                    🎮 Развлечения
-                </option>
+                <p><label>Название:</label></p>
+                <input type="text" name="title" required>
 
-                <option value="couple">
-                    💕 Для двоих
-                </option>
+                <p><label>Описание:</label></p>
+                <textarea name="description" rows="5" required></textarea>
 
-            </select>
+                <p><label>Категория:</label></p>
+                <select name="category" required>
+                    <option value="active">🏃 Активность</option>
+                    <option value="creative">🎨 Творчество</option>
+                    <option value="learning">📚 Обучение</option>
+                    <option value="entertainment">🎮 Развлечения</option>
+                    <option value="couple">💕 Для двоих</option>
+                </select>
 
+                <p><label>Место:</label></p>
+                <select name="location" required>
+                    <option value="home">🏠 Дома</option>
+                    <option value="outside">🌳 На улице</option>
+                    <option value="friends">👥 С друзьями</option>
+                    <option value="anywhere">🌎 Где угодно</option>
+                </select>
 
-            <p>
-                <label>
-                    Место:
-                </label>
-            </p>
+                <p><label>Длительность в минутах:</label></p>
+                <input type="number" name="duration" min="1" required>
 
-            <select name="location"
-                    required>
+                <h3>Дополнительная информация</h3>
 
-                <option value="home">
-                    🏠 Дома
-                </option>
+                <p><label>📝 Инструкция:</label></p>
+                <textarea name="instructions" rows="6"
+                          placeholder="Например: 1. Возьми лист... 2. Поставь таймер..."></textarea>
 
-                <option value="outside">
-                    🌳 На улице
-                </option>
+                <p><label>💡 Зачем это делать:</label></p>
+                <textarea name="benefit" rows="4"
+                          placeholder="Например: помогает отвлечься и потренировать внимание."></textarea>
 
-                <option value="friends">
-                    👥 С друзьями
-                </option>
+                <p><label>🤓 Интересный факт:</label></p>
+                <textarea name="interestingFact" rows="4"
+                          placeholder="Интересный факт, связанный с этим занятием."></textarea>
 
-                <option value="anywhere">
-                    🌎 Где угодно
-                </option>
+                <p><label>🖼️ Ссылка на картинку:</label></p>
+                <input type="url" name="imageUrl" placeholder="https://...">
 
-            </select>
+                <p><label>🔗 Ссылка на полезный материал:</label></p>
+                <input type="url" name="linkUrl" placeholder="https://...">
 
+                <p><label>🎬 Ссылка на видео:</label></p>
+                <input type="url" name="videoUrl" placeholder="https://...">
 
-            <p>
-                <label>
-                    Длительность в минутах:
-                </label>
-            </p>
+                <br>
 
-            <input type="number"
-                   name="duration"
-                   min="1"
-                   required>
+                <button class="button" type="submit">
+                    ➕ Добавить занятие
+                </button>
 
+            </form>
 
-            <h3>Дополнительная информация</h3>
+        </div>
 
-
-            <p>
-                <label>
-                    📝 Инструкция:
-                </label>
-            </p>
-
-            <textarea name="instructions"
-                      rows="6"
-                      placeholder="Например:
-1. Возьми лист бумаги.
-2. Поставь таймер на 15 минут.
-3. Попробуй нарисовать предмет одной линией."></textarea>
+    </details>
 
 
-            <p>
-                <label>
-                    💡 Зачем это делать:
-                </label>
-            </p>
+    <!-- =========================================================
+         2. МИНИ-ИГРЫ
+         ========================================================= -->
 
-            <textarea name="benefit"
-                      rows="4"
-                      placeholder="Например: помогает отвлечься и потренировать внимание."></textarea>
+    <details class="admin-section-toggle" data-section="mini-games">
 
+        <summary class="admin-section-toggle__header">
+            <span class="admin-section-toggle__icon">🎮</span>
+            <span class="admin-section-toggle__title">Мини-игры</span>
+            <span class="admin-section-toggle__count"
+                  th:text="${#lists.size(miniGames)}">0</span>
+            <span class="admin-section-toggle__arrow">▼</span>
+        </summary>
 
-            <p>
-                <label>
-                    🤓 Интересный факт:
-                </label>
-            </p>
-
-            <textarea name="interestingFact"
-                      rows="4"
-                      placeholder="Интересный факт, связанный с этим занятием."></textarea>
-
-
-            <p>
-                <label>
-                    🖼️ Ссылка на картинку:
-                </label>
-            </p>
-
-            <input type="url"
-                   name="imageUrl"
-                   placeholder="https://...">
-
-
-            <p>
-                <label>
-                    🔗 Ссылка на полезный материал:
-                </label>
-            </p>
-
-            <input type="url"
-                   name="linkUrl"
-                   placeholder="https://...">
-
-
-            <p>
-                <label>
-                    🎬 Ссылка на видео:
-                </label>
-            </p>
-
-            <input type="url"
-                   name="videoUrl"
-                   placeholder="https://...">
-
-
-            <br>
-
-            <button class="button"
-                    type="submit">
-
-                ➕ Добавить занятие
-
-            </button>
-
-        </form>
-
-        <section class="admin-section">
-
-            <h2>🎮 Мини-игры</h2>
+        <div class="admin-section-toggle__body">
 
             <p class="admin-subtitle">
                 Добавляй интерактивные игры для пользователей
@@ -232,10 +152,8 @@
             <form th:action="@{/admin/mini-game/add}" method="post"
                   class="mini-game-admin-form">
 
-                <input type="text"
-                       name="title"
-                       placeholder="Название игры"
-                       required>
+                <input type="text" name="title"
+                       placeholder="Название игры" required>
 
                 <textarea name="description"
                           placeholder="Описание игры"></textarea>
@@ -243,7 +161,7 @@
                 <select name="gameType" required>
                     <option value="">Тип игры</option>
                     <option value="MEMORY">🧠 Память</option>
-                    <option value="REACTION">⚡ Реакция</option>
+                    <option value="SNAKE">🐍 Змейка</option>
                     <option value="WORD">🔤 Слова</option>
                     <option value="QUIZ">🧩 Викторина</option>
                     <option value="CROCODILE">🐊 Крокодил</option>
@@ -271,11 +189,7 @@
                     </select>
 
                     <label>Длительность, минут:</label>
-                    <input type="number"
-                           name="duration"
-                           min="1"
-                           value="5"
-                           placeholder="Например, 5">
+                    <input type="number" name="duration" min="1" value="5">
 
                 </div>
 
@@ -290,10 +204,7 @@
 
             <script>
                 function toggleActivityFields(checkbox) {
-                    const fields = document.getElementById(
-                        'mini-game-activity-fields'
-                    );
-
+                    const fields = document.getElementById('mini-game-activity-fields');
                     fields.style.display = checkbox.checked ? 'block' : 'none';
                 }
 
@@ -301,263 +212,134 @@
                     const checkbox = document.querySelector(
                         'input[name="addToActivityCard"]'
                     );
-
-                    if (checkbox) {
-                        toggleActivityFields(checkbox);
-                    }
+                    if (checkbox) toggleActivityFields(checkbox);
                 });
             </script>
 
 
             <div class="mini-games-list">
 
-                <div
-                        class="mini-game-card"
-                        th:each="game : ${miniGames}"
-                >
+                <div class="mini-game-card" th:each="game : ${miniGames}">
 
                     <div class="mini-game-card-header">
 
                         <div class="mini-game-info">
 
                             <div class="mini-game-title">
-                                🎮
-                                <strong th:text="${game.title}">
-                                    Название игры
-                                </strong>
+                                🎮 <strong th:text="${game.title}">Название игры</strong>
                             </div>
 
                             <div class="mini-game-meta">
 
-                    <span th:if="${game.gameType == 'MEMORY'}">
-                        🧠 Память
-                    </span>
-
-                                <span th:if="${game.gameType == 'REACTION'}">
-                        ⚡ Реакция
-                    </span>
-
-                                <span th:if="${game.gameType == 'WORD'}">
-                        🔤 Слова
-                    </span>
-
-                                <span th:if="${game.gameType == 'QUIZ'}">
-                        🧩 Викторина
-                    </span>
-                                <span th:if="${game.gameType == 'CROCODILE'}">
-                         🐊 Крокодил
-                    </span>
-
+                                <span th:if="${game.gameType == 'MEMORY'}">🧠 Память</span>
+                                <span th:if="${game.gameType == 'SNAKE'}">🐍 Змейка</span>
+                                <span th:if="${game.gameType == 'WORD'}">🔤 Слова</span>
+                                <span th:if="${game.gameType == 'QUIZ'}">🧩 Викторина</span>
+                                <span th:if="${game.gameType == 'CROCODILE'}">🐊 Крокодил</span>
 
                                 <span>·</span>
 
                                 <span th:switch="${game.category}">
-                        <span th:case="'active'">🏃 Активность</span>
-                        <span th:case="'creative'">🎨 Творчество</span>
-                        <span th:case="'learning'">📚 Обучение</span>
-                        <span th:case="'entertainment'">🎮 Развлечения</span>
-                    </span>
+                                    <span th:case="'active'">🏃 Активность</span>
+                                    <span th:case="'creative'">🎨 Творчество</span>
+                                    <span th:case="'learning'">📚 Обучение</span>
+                                    <span th:case="'entertainment'">🎮 Развлечения</span>
+                                </span>
 
                                 <span>·</span>
 
-                                <span th:text="${game.duration + ' мин.'}">
-                        10 мин.
-                    </span>
+                                <span th:text="${game.duration + ' мин.'}">10 мин.</span>
 
                             </div>
 
                         </div>
 
                         <div class="mini-game-status">
-
-                <span
-                        th:if="${game.active}"
-                        class="mini-game-active"
-                >
-                    🟢 Активна
-                </span>
-
-                            <span
-                                    th:unless="${game.active}"
-                                    class="mini-game-inactive"
-                            >
-                    ⚪ Выключена
-                </span>
-
+                            <span th:if="${game.active}" class="mini-game-active">🟢 Активна</span>
+                            <span th:unless="${game.active}" class="mini-game-inactive">⚪ Выключена</span>
                         </div>
 
                     </div>
 
-
-                    <div
-                            class="mini-game-description"
-                            th:if="${game.description != null and !game.description.isEmpty()}"
-                            th:text="${game.description}"
-                    >
+                    <div class="mini-game-description"
+                         th:if="${game.description != null and !game.description.isEmpty()}"
+                         th:text="${game.description}">
                         Описание игры
                     </div>
 
-
                     <div class="mini-game-actions">
 
-                        <a
-                                th:href="@{'/admin/mini-game/' + ${game.id} + '/tasks'}"
-                                class="mini-game-tasks-button"
-                        >
+                        <a th:href="@{'/admin/mini-game/' + ${game.id} + '/tasks'}"
+                           class="mini-game-tasks-button">
                             🧩 Задания
                         </a>
 
-                        <button
-                                type="button"
+                        <button type="button"
                                 class="mini-game-edit-button"
-                                th:onclick="'toggleMiniGameEdit(' + ${game.id} + ')'"
-                        >
+                                th:onclick="'toggleMiniGameEdit(' + ${game.id} + ')'">
                             ✏️ Редактировать
                         </button>
 
-                        <form
-                                th:action="@{'/admin/mini-game/delete/' + ${game.id}}"
-                                method="post"
-                        >
-                            <button
-                                    type="submit"
+                        <form th:action="@{'/admin/mini-game/delete/' + ${game.id}}"
+                              method="post">
+                            <button type="submit"
                                     class="mini-game-delete-button"
-                                    onclick="return confirm('Удалить эту мини-игру?');"
-                            >
+                                    onclick="return confirm('Удалить эту мини-игру?');">
                                 🗑️ Удалить
                             </button>
                         </form>
 
                     </div>
 
+                    <form th:id="'mini-game-edit-' + ${game.id}"
+                          class="mini-game-edit-form"
+                          th:action="@{'/admin/mini-game/edit/' + ${game.id}}"
+                          method="post"
+                          style="display: none;">
 
-                    <!-- Форма редактирования -->
+                        <input type="text" name="title"
+                               th:value="${game.title}" required>
 
-                    <form
-                            th:id="'mini-game-edit-' + ${game.id}"
-                            class="mini-game-edit-form"
-                            th:action="@{'/admin/mini-game/edit/' + ${game.id}}"
-                            method="post"
-                            style="display: none;"
-                    >
-
-                        <input
-                                type="text"
-                                name="title"
-                                th:value="${game.title}"
-                                placeholder="Название игры"
-                                required
-                        >
-
-                        <textarea
-                                name="description"
-                                th:text="${game.description}"
-                                placeholder="Описание"
-                        ></textarea>
+                        <textarea name="description"
+                                  th:text="${game.description}"></textarea>
 
                         <select name="gameType" required>
-
-                            <option
-                                    value="MEMORY"
-                                    th:selected="${game.gameType == 'MEMORY'}"
-                            >
-                                🧠 Память
-                            </option>
-
-                            <option
-                                    value="REACTION"
-                                    th:selected="${game.gameType == 'REACTION'}"
-                            >
-                                ⚡ Реакция
-                            </option>
-
-                            <option
-                                    value="WORD"
-                                    th:selected="${game.gameType == 'WORD'}"
-                            >
-                                🔤 Слова
-                            </option>
-
-                            <option
-                                    value="QUIZ"
-                                    th:selected="${game.gameType == 'QUIZ'}"
-                            >
-                                🧩 Викторина
-                            </option>
-
-                            <option value="CROCODILE" th:selected="${game.gameType == 'CROCODILE'}">
-                                🐊 Крокодил
-                            </option>
-
+                            <option value="MEMORY" th:selected="${game.gameType == 'MEMORY'}">🧠 Память</option>
+                            <option value="SNAKE" th:selected="${game.gameType == 'SNAKE'}">🐍 Змейка</option>
+                            <option value="WORD" th:selected="${game.gameType == 'WORD'}">🔤 Слова</option>
+                            <option value="QUIZ" th:selected="${game.gameType == 'QUIZ'}">🧩 Викторина</option>
+                            <option value="CROCODILE" th:selected="${game.gameType == 'CROCODILE'}">🐊 Крокодил</option>
                         </select>
 
                         <label>Категория активности:</label>
                         <select name="category">
-                            <option value="active"
-                                    th:selected="${game.category == 'active'}">
-                                🏃 Активность
-                            </option>
-                            <option value="creative"
-                                    th:selected="${game.category == 'creative'}">
-                                🎨 Творчество
-                            </option>
-                            <option value="learning"
-                                    th:selected="${game.category == 'learning'}">
-                                📚 Обучение
-                            </option>
-                            <option value="entertainment"
-                                    th:selected="${game.category == 'entertainment'}">
-                                🎮 Развлечения
-                            </option>
-                            <option value="couple"
-                                    th:selected="${game.category == 'couple'}">
-                                💕 Для двоих
-                            </option>
+                            <option value="active" th:selected="${game.category == 'active'}">🏃 Активность</option>
+                            <option value="creative" th:selected="${game.category == 'creative'}">🎨 Творчество</option>
+                            <option value="learning" th:selected="${game.category == 'learning'}">📚 Обучение</option>
+                            <option value="entertainment" th:selected="${game.category == 'entertainment'}">🎮 Развлечения</option>
+                            <option value="couple" th:selected="${game.category == 'couple'}">💕 Для двоих</option>
                         </select>
 
                         <label>Длительность, минут:</label>
-                        <input type="number"
-                               name="duration"
-                               min="1"
+                        <input type="number" name="duration" min="1"
                                th:value="${game.duration}">
-                        ```
 
-                        <textarea
-                                name="instructions"
-                                th:text="${game.instructions}"
-                                placeholder="Инструкция для пользователя"
-                        ></textarea>
+                        <textarea name="instructions"
+                                  th:text="${game.instructions}"
+                                  placeholder="Инструкция для пользователя"></textarea>
 
                         <label class="admin-checkbox">
-
-                            <input
-                                    type="checkbox"
-                                    name="active"
-                                    value="true"
-                                    th:checked="${game.active}"
-                            >
-
+                            <input type="checkbox" name="active" value="true"
+                                   th:checked="${game.active}">
                             🟢 Игра активна
-
                         </label>
 
                         <div class="admin-edit-actions">
-
-                            <button
-                                    type="submit"
-                                    class="button"
-                            >
-                                💾 Сохранить
-                            </button>
-
-                            <button
-                                    type="button"
-                                    class="button secondary-button"
-                                    th:onclick="'toggleMiniGameEdit(' + ${game.id} + ')'"
-                            >
+                            <button type="submit" class="button">💾 Сохранить</button>
+                            <button type="button" class="button secondary-button"
+                                    th:onclick="'toggleMiniGameEdit(' + ${game.id} + ')'">
                                 Отмена
                             </button>
-
                         </div>
 
                     </form>
@@ -566,76 +348,532 @@
 
             </div>
 
-        </section>
+        </div>
 
-    </div>
-
-
-    <!-- СПИСОК ЗАНЯТИЙ -->
-
-    <div class="activity-card">
-
-        <h2>
-            Все занятия
-        </h2>
-
-        <div th:each="activity : ${activities}">
-
-            <hr>
-
-            <h3 th:text="${activity.title}">
-                Название
-            </h3>
-
-            <p th:text="${activity.description}">
-                Описание
-            </p>
-
-            <p>
-
-                Категория:
-                <strong th:text="${activity.category}">
-                    creative
-                </strong>
-
-                <br>
-
-                Время:
-                <strong th:text="${activity.duration}">
-                    30
-                </strong>
-                минут
-
-            </p>
+    </details>
 
 
-            <a class="button"
-               th:href="@{'/admin/edit/' + ${activity.id}}">
-                ✏️ Редактировать
-            </a>
+    <!-- =========================================================
+         3. АДВЕНТ-АКТИВНОСТИ
+         ========================================================= -->
 
-            <form th:action="@{'/admin/delete/' + ${activity.id}}"
-                  method="post">
+    <details class="admin-section-toggle" data-section="advent">
 
-                <button type="submit">
-                    🗑 Удалить
-                </button>
+        <summary class="admin-section-toggle__header">
+            <span class="admin-section-toggle__icon">🎄</span>
+            <span class="admin-section-toggle__title">Адвент-активности</span>
+            <span class="admin-section-toggle__count"
+                  th:text="${#lists.size(adventActivities)}">0</span>
+            <span class="admin-section-toggle__arrow">▼</span>
+        </summary>
 
-            </form>
+        <div class="admin-section-toggle__body">
+
+            <!-- СТАТИСТИКА ПО СЕЗОНАМ -->
+            <div class="advent-admin-stats">
+
+                <div class="advent-admin-stat"
+                     th:each="s : ${adventSeasons}">
+
+                    <span class="advent-admin-stat-icon"
+                          th:text="${s.icon}">🌸</span>
+
+                    <div>
+                        <div class="advent-admin-stat-label"
+                             th:text="${s.label}">Весна</div>
+                        <div class="advent-admin-stat-value">
+                            <span th:text="${adventSeasonCounts.get(s)}">0</span>
+                            заданий
+                        </div>
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <!-- ФИЛЬТР ПО СЕЗОНУ -->
+            <div class="advent-admin-filter">
+                <label for="adventSeasonFilter">Фильтр по сезону:</label>
+                <select id="adventSeasonFilter" onchange="filterAdventList()">
+                    <option value="">Все сезоны</option>
+                    <option th:each="s : ${adventSeasons}"
+                            th:value="${s.name()}"
+                            th:text="${s.icon} + ' ' + ${s.label}">
+                        🌸 Весна
+                    </option>
+                </select>
+            </div>
+
+
+            <!-- ФОРМА ДОБАВЛЕНИЯ -->
+            <details class="advent-admin-form-toggle">
+
+                <summary class="advent-admin-form-toggle__header">
+                    ➕ Добавить адвент-задание
+                </summary>
+
+                <div class="advent-admin-form-toggle__body">
+
+                    <form th:action="@{/admin/advent/add}" method="post">
+
+                        <label>Сезон *</label>
+                        <select name="season" id="adventSeason" required
+                                onchange="updateAdventDays()">
+                            <option value="">— Выберите сезон —</option>
+                            <option th:each="s : ${adventSeasons}"
+                                    th:value="${s.name()}"
+                                    th:text="${s.icon} + ' ' + ${s.label} + ' (' + ${s.month} + ')'">
+                                🌸 Весна (3)
+                            </option>
+                        </select>
+
+                        <label>Название *</label>
+                        <input type="text" name="title" required>
+
+                        <label>Описание</label>
+                        <textarea name="description" rows="3"></textarea>
+
+                        <label>Инструкция</label>
+                        <textarea name="instructions" rows="4"></textarea>
+
+                        <label>Иконка</label>
+                        <select name="icon">
+                            <option value="🎁">🎁 Подарок</option>
+                            <option value="❄️">❄️ Снежинка</option>
+                            <option value="🌸">🌸 Цветок</option>
+                            <option value="☀️">☀️ Солнце</option>
+                            <option value="🍂">🍂 Лист</option>
+                            <option value="🎄">🎄 Ёлка</option>
+                            <option value="🕯️">🕯️ Свеча</option>
+                            <option value="⭐">⭐ Звезда</option>
+                            <option value="🍎">🍎 Яблоко</option>
+                            <option value="☕">☕ Кофе</option>
+                            <option value="📖">📖 Книга</option>
+                            <option value="🎨">🎨 Творчество</option>
+                        </select>
+
+                        <label>🖼️ URL картинки</label>
+                        <input type="url" name="imageUrl" placeholder="https://...">
+
+                        <label>🎬 URL видео</label>
+                        <input type="url" name="videoUrl" placeholder="https://...">
+
+                        <label>🔗 Полезная ссылка</label>
+                        <input type="url" name="linkUrl" placeholder="https://...">
+
+                        <label class="admin-checkbox">
+                            <input type="checkbox" name="special" value="true"
+                                   id="adventSpecial"
+                                   onchange="toggleAdventSpecial()">
+                            🎯 Особый день
+                        </label>
+
+                        <div id="adventSpecialFields" style="display: none;">
+                            <label>Дата</label>
+                            <div class="advent-date-row">
+                                <select name="specialDay" id="adventDaySelect" disabled>
+                                    <option value="">— Сначала выберите сезон —</option>
+                                </select>
+
+                                <span class="advent-date-preview" id="adventDatePreview">
+                                    — выберите день —
+                                </span>
+                            </div>
+                        </div>
+
+                        <button type="submit" class="button">
+                            ➕ Добавить
+                        </button>
+
+                    </form>
+
+                </div>
+
+            </details>
+
+
+            <!-- СПИСОК ЗАДАНИЙ -->
+            <div class="advent-admin-list" id="adventAdminList">
+
+                <div class="advent-admin-card"
+                     th:each="task : ${adventActivities}"
+                     th:attr="data-season=${task.season.name()}">
+
+                    <div class="advent-admin-card__header">
+
+                        <span class="advent-admin-card__icon"
+                              th:text="${task.icon != null ? task.icon : '🎁'}">
+                            🎁
+                        </span>
+
+                        <span class="advent-admin-card__title"
+                              th:text="${task.title}">
+                            Название
+                        </span>
+
+                        <span class="advent-admin-card__season"
+                              th:switch="${task.season}">
+                            <span th:case="'SPRING'">🌸 Весна</span>
+                            <span th:case="'SUMMER'">☀️ Лето</span>
+                            <span th:case="'AUTUMN'">🍂 Осень</span>
+                            <span th:case="'WINTER'">❄️ Зима</span>
+                        </span>
+
+                        <span class="advent-admin-card__badge"
+                              th:if="${task.special}">
+                            🎯 Особый
+                            <span th:if="${task.specialDay != null}"
+                                  th:text="'· ' + ${task.specialDay}">
+                                · 1
+                            </span>
+                        </span>
+
+                    </div>
+
+                    <p class="advent-admin-card__description"
+                       th:if="${task.description != null and !task.description.isBlank()}"
+                       th:text="${task.description}">
+                        Описание
+                    </p>
+
+                    <div class="advent-admin-card__actions">
+
+                        <button type="button"
+                                class="mini-game-edit-button"
+                                th:onclick="'toggleAdventEdit(' + ${task.id} + ')'">
+                            ✏️ Редактировать
+                        </button>
+
+                        <form th:action="@{'/admin/advent/delete/' + ${task.id}}"
+                              method="post">
+                            <button type="submit"
+                                    class="mini-game-delete-button"
+                                    onclick="return confirm('Удалить это задание?');">
+                                🗑️ Удалить
+                            </button>
+                        </form>
+
+                    </div>
+
+
+                    <!-- ФОРМА РЕДАКТИРОВАНИЯ -->
+                    <form th:id="'advent-edit-' + ${task.id}"
+                          class="advent-admin-edit-form"
+                          th:action="@{'/admin/advent/edit/' + ${task.id}}"
+                          method="post"
+                          style="display: none;">
+
+                        <label>Сезон *</label>
+                        <select name="season" required>
+                            <option th:each="s : ${adventSeasons}"
+                                    th:value="${s.name()}"
+                                    th:text="${s.icon} + ' ' + ${s.label}"
+                                    th:selected="${task.season == s}">
+                                🌸 Весна
+                            </option>
+                        </select>
+
+                        <label>Название *</label>
+                        <input type="text" name="title"
+                               th:value="${task.title}" required>
+
+                        <label>Описание</label>
+                        <textarea name="description"
+                                  th:text="${task.description}"></textarea>
+
+                        <label>Инструкция</label>
+                        <textarea name="instructions"
+                                  th:text="${task.instructions}"></textarea>
+
+                        <label>Иконка</label>
+                        <select name="icon">
+                            <option value="🎁" th:selected="${task.icon == '🎁'}">🎁 Подарок</option>
+                            <option value="❄️" th:selected="${task.icon == '❄️'}">❄️ Снежинка</option>
+                            <option value="🌸" th:selected="${task.icon == '🌸'}">🌸 Цветок</option>
+                            <option value="☀️" th:selected="${task.icon == '☀️'}">☀️ Солнце</option>
+                            <option value="🍂" th:selected="${task.icon == '🍂'}">🍂 Лист</option>
+                            <option value="🎄" th:selected="${task.icon == '🎄'}">🎄 Ёлка</option>
+                            <option value="🕯️" th:selected="${task.icon == '🕯️'}">🕯️ Свеча</option>
+                            <option value="⭐" th:selected="${task.icon == '⭐'}">⭐ Звезда</option>
+                            <option value="🍎" th:selected="${task.icon == '🍎'}">🍎 Яблоко</option>
+                            <option value="☕" th:selected="${task.icon == '☕'}">☕ Кофе</option>
+                            <option value="📖" th:selected="${task.icon == '📖'}">📖 Книга</option>
+                            <option value="🎨" th:selected="${task.icon == '🎨'}">🎨 Творчество</option>
+                        </select>
+
+                        <label>🖼️ URL картинки</label>
+                        <input type="url" name="imageUrl"
+                               th:value="${task.imageUrl}">
+
+                        <label>🎬 URL видео</label>
+                        <input type="url" name="videoUrl"
+                               th:value="${task.videoUrl}">
+
+                        <label>🔗 Полезная ссылка</label>
+                        <input type="url" name="linkUrl"
+                               th:value="${task.linkUrl}">
+
+                        <label class="admin-checkbox">
+                            <input type="checkbox" name="special" value="true"
+                                   th:checked="${task.special}">
+                            🎯 Особый день
+                        </label>
+
+                        <label>Число месяца (для особого дня)</label>
+                        <input type="number" name="specialDay" min="1" max="31"
+                               th:value="${task.specialDay}">
+
+                        <div class="admin-edit-actions">
+                            <button type="submit" class="button">💾 Сохранить</button>
+                            <button type="button" class="button secondary-button"
+                                    th:onclick="'toggleAdventEdit(' + ${task.id} + ')'">
+                                Отмена
+                            </button>
+                        </div>
+
+                    </form>
+
+                </div>
+
+                <p th:if="${#lists.isEmpty(adventActivities)}"
+                   class="empty-message">
+                    Пока нет адвент-заданий. Добавьте первое!
+                </p>
+
+            </div>
 
         </div>
 
-    </div>
+    </details>
 
 
-    <a class="back-button"
-       href="/">
+    <!-- =========================================================
+         4. ВСЕ ЗАНЯТИЯ
+         ========================================================= -->
 
+    <details class="admin-section-toggle" data-section="all-activities">
+
+        <summary class="admin-section-toggle__header">
+            <span class="admin-section-toggle__icon">📋</span>
+            <span class="admin-section-toggle__title">Все занятия</span>
+            <span class="admin-section-toggle__count"
+                  th:text="${#lists.size(activities)}">0</span>
+            <span class="admin-section-toggle__arrow">▼</span>
+        </summary>
+
+        <div class="admin-section-toggle__body">
+
+            <div th:each="activity : ${activities}"
+                 class="admin-activity-row">
+
+                <h3 th:text="${activity.title}">Название</h3>
+
+                <p th:text="${activity.description}">Описание</p>
+
+                <p class="admin-activity-meta">
+                    Категория: <strong th:text="${activity.category}">creative</strong>
+                    · Время: <strong th:text="${activity.duration}">30</strong> мин
+                </p>
+
+                <div class="admin-activity-actions">
+                    <a class="mini-game-edit-button"
+                       th:href="@{'/admin/edit/' + ${activity.id}}">
+                        ✏️ Редактировать
+                    </a>
+
+                    <form th:action="@{'/admin/delete/' + ${activity.id}}"
+                          method="post">
+                        <button type="submit"
+                                class="mini-game-delete-button"
+                                onclick="return confirm('Удалить занятие?');">
+                            🗑 Удалить
+                        </button>
+                    </form>
+                </div>
+
+            </div>
+
+            <p th:if="${#lists.isEmpty(activities)}"
+               class="empty-message">
+                Пока нет занятий
+            </p>
+
+        </div>
+
+    </details>
+
+
+    <a class="back-button" href="/">
         ← Вернуться на сайт
-
     </a>
 
 </div>
+
+
+<!-- =========================================================
+     JAVASCRIPT
+     ========================================================= -->
+
+<script>
+
+    // =========================================================
+    //  АККОРДЕОНЫ — сохранение состояния
+    // =========================================================
+
+    document.addEventListener("DOMContentLoaded", function () {
+
+        const sections = document.querySelectorAll(
+            ".admin-section-toggle[data-section]"
+        );
+
+        sections.forEach(function (section) {
+
+            const key = "adminSection_" + section.dataset.section;
+
+            // Восстанавливаем состояние
+            if (localStorage.getItem(key) === "open") {
+                section.open = true;
+            }
+
+            // Сохраняем при изменении
+            section.addEventListener("toggle", function () {
+                localStorage.setItem(
+                    key,
+                    section.open ? "open" : "closed"
+                );
+            });
+        });
+    });
+
+
+    // =========================================================
+    //  МИНИ-ИГРЫ — редактирование
+    // =========================================================
+
+    function toggleMiniGameEdit(id) {
+        const form = document.getElementById("mini-game-edit-" + id);
+
+        if (!form) return;
+
+        if (form.style.display === "none" || form.style.display === "") {
+            form.style.display = "block";
+        } else {
+            form.style.display = "none";
+        }
+    }
+
+
+    // =========================================================
+    //  АДВЕНТ — редактирование
+    // =========================================================
+
+    function toggleAdventEdit(id) {
+        const form = document.getElementById("advent-edit-" + id);
+
+        if (!form) return;
+
+        if (form.style.display === "none" || form.style.display === "") {
+            form.style.display = "block";
+        } else {
+            form.style.display = "none";
+        }
+    }
+
+
+    // =========================================================
+    //  АДВЕНТ — фильтр по сезону
+    // =========================================================
+
+    function filterAdventList() {
+        const season = document.getElementById("adventSeasonFilter").value;
+        const cards = document.querySelectorAll(
+            "#adventAdminList .advent-admin-card"
+        );
+
+        cards.forEach(function (card) {
+            if (!season || card.dataset.season === season) {
+                card.style.display = "";
+            } else {
+                card.style.display = "none";
+            }
+        });
+    }
+
+
+    // =========================================================
+    //  АДВЕНТ — динамический селект даты
+    // =========================================================
+
+    const SEASON_INFO = {
+        SPRING: { month: 3, monthName: "марта", days: 31 },
+        SUMMER: { month: 7, monthName: "июля", days: 31 },
+        AUTUMN: { month: 10, monthName: "октября", days: 31 },
+        WINTER: { month: 12, monthName: "декабря", days: 31 }
+    };
+
+    function updateAdventDays() {
+        const seasonSelect = document.getElementById("adventSeason");
+        const daySelect = document.getElementById("adventDaySelect");
+        const preview = document.getElementById("adventDatePreview");
+
+        if (!seasonSelect || !daySelect || !preview) return;
+
+        const season = seasonSelect.value;
+
+        daySelect.innerHTML = "";
+
+        if (!season) {
+            daySelect.disabled = true;
+            daySelect.innerHTML =
+                '<option value="">— Сначала выберите сезон —</option>';
+            preview.textContent = "— выберите день —";
+            return;
+        }
+
+        const info = SEASON_INFO[season];
+        const year = new Date().getFullYear();
+        const realDays = new Date(year, info.month, 0).getDate();
+
+        daySelect.disabled = false;
+        daySelect.innerHTML = '<option value="">— Выберите день —</option>';
+
+        for (let d = 1; d <= realDays; d++) {
+            const opt = document.createElement("option");
+            opt.value = d;
+            opt.textContent = d;
+            daySelect.appendChild(opt);
+        }
+
+        daySelect.onchange = function () {
+            const val = daySelect.value;
+            preview.textContent = val
+                ? val + " " + info.monthName
+                : "— выберите день —";
+        };
+
+        preview.textContent = "— выберите день —";
+    }
+
+
+    function toggleAdventSpecial() {
+        const checkbox = document.getElementById("adventSpecial");
+        const fields = document.getElementById("adventSpecialFields");
+
+        if (!checkbox || !fields) return;
+
+        fields.style.display = checkbox.checked ? "block" : "none";
+
+        if (!checkbox.checked) {
+            const daySelect = document.getElementById("adventDaySelect");
+            const preview = document.getElementById("adventDatePreview");
+
+            if (daySelect) daySelect.value = "";
+            if (preview) preview.textContent = "— выберите день —";
+        }
+    }
+
+</script>
 
 </body>
 

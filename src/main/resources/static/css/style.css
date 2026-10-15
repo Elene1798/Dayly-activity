@@ -6955,3 +6955,1611 @@ body.page-with-header:has(.mini-games-page) .site-header {
         width: 100%;
     }
 }
+.mini-game-art-snake {
+    font-size: 5rem;
+    line-height: 1;
+    filter: drop-shadow(0 5px 0 rgba(111, 75, 202, 0.2));
+}
+/* =========================================================
+   🐍 ЗМЕЙКА
+   ========================================================= */
+
+.standalone-mini-game-content .snake-game {
+    width: 100%;
+    max-width: 640px;
+    margin: 0 auto;
+    padding: 22px;
+    box-sizing: border-box;
+    color: #382273;
+    background: #f8f2ff;
+    border: 3px solid #6040a8;
+    border-radius: 8px;
+    box-shadow: 6px 6px 0 #d6c5f5;
+    text-align: center;
+}
+
+.snake-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 16px;
+    padding: 10px 14px;
+    border: 3px solid #45238e;
+    border-radius: 6px;
+    background: #fff0a8;
+    color: #382273;
+    font-weight: 900;
+    box-shadow: 4px 4px 0 #c9a84b;
+}
+
+.snake-score-block,
+.snake-best-block {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 1.05rem;
+}
+
+.snake-score,
+.snake-best {
+    color: #8053e8;
+    font-size: 1.2rem;
+}
+
+.snake-board-wrapper {
+    display: flex;
+    justify-content: center;
+    margin: 16px 0;
+}
+
+.snake-canvas {
+    display: block;
+    width: 100%;
+    max-width: 400px;
+    height: auto;
+    aspect-ratio: 1 / 1;
+    border: 3px solid #6040a8;
+    border-radius: 6px;
+    background: #f8f2ff;
+    box-shadow: 4px 4px 0 #d6c5f5;
+    touch-action: none;
+}
+
+.snake-controls {
+    display: flex;
+    justify-content: center;
+    gap: 12px;
+    margin-top: 14px;
+}
+
+.snake-start-button,
+.snake-restart-button {
+    min-height: 48px;
+    padding: 12px 22px;
+    border: 3px solid #45238e;
+    border-radius: 5px;
+    background: #8053e8;
+    color: #fff;
+    font: inherit;
+    font-weight: 900;
+    box-shadow: 4px 4px 0 #45238e;
+    cursor: pointer;
+    transition: transform 150ms ease, box-shadow 150ms ease;
+}
+
+.snake-start-button:hover,
+.snake-restart-button:hover {
+    transform: translate(-2px, -2px);
+    box-shadow: 6px 6px 0 #45238e;
+}
+
+.snake-start-button:active,
+.snake-restart-button:active {
+    transform: translate(2px, 2px);
+    box-shadow: 2px 2px 0 #45238e;
+}
+
+.snake-start-button[hidden],
+.snake-restart-button[hidden] {
+    display: none;
+}
+
+.snake-result {
+    min-height: 28px;
+    margin-top: 16px;
+    padding: 12px 16px;
+    border: 3px solid transparent;
+    border-radius: 5px;
+    font-weight: 850;
+    text-align: center;
+}
+
+.snake-hint {
+    margin: 14px 0 0;
+    color: #7569a9;
+    font-size: 0.9rem;
+}
+
+@media (max-width: 600px) {
+    .snake-canvas {
+        max-width: 320px;
+    }
+
+    .snake-header {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .snake-controls {
+        flex-direction: column;
+    }
+
+    .snake-start-button,
+    .snake-restart-button {
+        width: 100%;
+    }
+}
+
+/* =========================================================
+   🎄 ADVENT — базовое
+   ========================================================= */
+
+.advent-page {
+    min-height: 100vh;
+    position: relative;
+    overflow-x: hidden;
+}
+
+.advent-main {
+    width: min(1000px, 100%);
+    margin: 0 auto;
+    padding: 40px 20px 80px;
+    position: relative;
+    z-index: 1;
+}
+
+/* =========================================================
+   СЕЗОННЫЕ ФОНЫ
+   ========================================================= */
+
+.advent-page.season-spring {
+    background:
+            radial-gradient(circle at 20% 20%, rgba(255, 200, 230, 0.35), transparent 50%),
+            radial-gradient(circle at 80% 30%, rgba(180, 240, 200, 0.35), transparent 50%),
+            linear-gradient(160deg, #a8e6cf 0%, #dcedc1 50%, #ffd3e0 100%);
+}
+
+.advent-page.season-summer {
+    background:
+            radial-gradient(circle at 25% 25%, rgba(255, 240, 150, 0.45), transparent 55%),
+            radial-gradient(circle at 75% 70%, rgba(130, 200, 250, 0.35), transparent 55%),
+            linear-gradient(160deg, #ffe28a 0%, #ffb86b 45%, #5fb3e8 100%);
+}
+
+.advent-page.season-autumn {
+    background:
+            radial-gradient(circle at 20% 30%, rgba(255, 170, 90, 0.4), transparent 55%),
+            radial-gradient(circle at 80% 70%, rgba(180, 110, 60, 0.35), transparent 55%),
+            linear-gradient(160deg, #ffb26b 0%, #d97b3c 55%, #8b4513 100%);
+}
+
+.advent-page.season-winter {
+    background:
+            radial-gradient(circle at 25% 25%, rgba(180, 220, 255, 0.4), transparent 55%),
+            radial-gradient(circle at 75% 70%, rgba(220, 240, 255, 0.35), transparent 55%),
+            linear-gradient(160deg, #6a93d1 0%, #4a6fa5 45%, #2a3d66 100%);
+}
+
+/* =========================================================
+   ЗАГОЛОВОК АДВЕНТА
+   ========================================================= */
+
+.advent-heading {
+    text-align: center;
+    color: #fff;
+    margin-bottom: 32px;
+}
+
+.advent-heading-icon {
+    display: inline-grid;
+    place-items: center;
+    width: 76px;
+    height: 76px;
+    margin-bottom: 14px;
+    border-radius: 22px;
+    background: rgba(255, 255, 255, 0.22);
+    border: 1px solid rgba(255, 255, 255, 0.4);
+    font-size: 2.4rem;
+    box-shadow: 0 10px 26px rgba(20, 20, 60, 0.2);
+    animation: adventFloat 3.2s ease-in-out infinite;
+}
+
+@keyframes adventFloat {
+    0%, 100% { transform: translateY(0); }
+    50%      { transform: translateY(-6px); }
+}
+
+.advent-heading-title {
+    margin: 0 0 8px;
+    color: #fff;
+    font-size: clamp(1.8rem, 4vw, 2.6rem);
+    font-weight: 900;
+    letter-spacing: -0.6px;
+    text-shadow: 0 4px 0 rgba(0, 0, 0, 0.18);
+}
+
+.advent-heading-subtitle {
+    margin: 0;
+    color: rgba(255, 255, 255, 0.92);
+    font-size: 1rem;
+}
+
+/* =========================================================
+   ПРОГРЕСС
+   ========================================================= */
+
+.advent-progress {
+    width: min(100%, 640px);
+    margin: 0 auto 28px;
+    padding: 16px 20px;
+    border-radius: 18px;
+    background: rgba(255, 255, 255, 0.18);
+    border: 1px solid rgba(255, 255, 255, 0.35);
+    backdrop-filter: blur(8px);
+    color: #fff;
+}
+
+.advent-progress-bar {
+    width: 100%;
+    height: 10px;
+    border-radius: 999px;
+    background: rgba(255, 255, 255, 0.25);
+    overflow: hidden;
+    margin-bottom: 10px;
+}
+
+.advent-progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, #fff2a8, #fff);
+    border-radius: 999px;
+    transition: width 0.4s ease;
+}
+
+.advent-progress-text {
+    text-align: center;
+    font-size: 0.95rem;
+}
+
+.advent-progress-text strong {
+    color: #fff8d8;
+    font-weight: 800;
+}
+
+/* =========================================================
+   ЗАГЛУШКА ДЛЯ ГОСТЯ
+   ========================================================= */
+
+.advent-guest-overlay {
+    position: relative;
+    z-index: 5;
+    display: flex;
+    justify-content: center;
+    margin-bottom: 24px;
+}
+
+.advent-guest-card {
+    width: min(100%, 460px);
+    padding: 32px 28px;
+    border-radius: 24px;
+    background: rgba(255, 255, 255, 0.97);
+    text-align: center;
+    box-shadow:
+            0 20px 50px rgba(20, 10, 60, 0.28),
+            0 0 0 2px rgba(139, 92, 246, 0.25);
+}
+
+.advent-guest-icon {
+    font-size: 2.8rem;
+    margin-bottom: 12px;
+}
+
+.advent-guest-card h2 {
+    margin: 0 0 12px;
+    color: #302071;
+    font-size: 1.4rem;
+}
+
+.advent-guest-card p {
+    margin: 0 0 20px;
+    color: #6b5a88;
+    line-height: 1.6;
+}
+
+.advent-guest-actions {
+    display: flex;
+    justify-content: center;
+    gap: 12px;
+    flex-wrap: wrap;
+}
+
+.advent-guest-actions .button {
+    margin-top: 0;
+    min-width: 130px;
+}
+
+/* =========================================================
+   СЕТКА КАЛЕНДАРЯ
+   ========================================================= */
+
+.advent-calendar-wrap {
+    position: relative;
+    z-index: 1;
+}
+
+.advent-calendar-wrap.is-blurred {
+    filter: blur(7px);
+    pointer-events: none;
+    user-select: none;
+}
+
+.advent-calendar {
+    padding: 24px;
+    border-radius: 26px;
+    background: rgba(255, 255, 255, 0.92);
+    box-shadow: 0 18px 40px rgba(20, 10, 60, 0.18);
+    backdrop-filter: blur(4px);
+}
+
+.advent-weekdays {
+    display: grid;
+    grid-template-columns: repeat(7, minmax(0, 1fr));
+    gap: 8px;
+    margin-bottom: 12px;
+    text-align: center;
+    color: #6b5a88;
+    font-size: 0.85rem;
+    font-weight: 800;
+    text-transform: uppercase;
+}
+
+.advent-weekdays span {
+    padding: 6px 0;
+}
+
+.advent-days {
+    display: grid;
+    grid-template-columns: repeat(7, minmax(0, 1fr));
+    gap: 8px;
+}
+
+/* Пустая ячейка до начала месяца */
+.advent-day--empty {
+    visibility: hidden;
+    pointer-events: none;
+}
+
+/* =========================================================
+   ЯЧЕЙКА ДНЯ
+   ========================================================= */
+
+.advent-day {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 4px;
+
+    aspect-ratio: 1 / 1;
+    padding: 8px 6px;
+
+    border: 2px solid #d6c5f5;
+    border-radius: 14px;
+
+    background: linear-gradient(145deg, #ffffff, #f4efff);
+    color: #302071;
+
+    font: inherit;
+    font-weight: 800;
+    font-size: 0.95rem;
+
+    cursor: pointer;
+    transition:
+            transform 0.15s ease,
+            box-shadow 0.15s ease,
+            border-color 0.15s ease,
+            background 0.15s ease;
+    box-shadow: 0 4px 0 #d6c5f5;
+}
+
+.advent-day:hover:not(.advent-day--future):not(.advent-day--ghost) {
+    transform: translateY(-3px);
+    box-shadow: 0 7px 0 #c0a6ed;
+    border-color: #8960e8;
+}
+
+.advent-day:active:not(.advent-day--future):not(.advent-day--ghost) {
+    transform: translateY(2px);
+    box-shadow: 0 2px 0 #c0a6ed;
+}
+
+.advent-day__number {
+    font-size: 1rem;
+    font-weight: 900;
+    line-height: 1;
+}
+
+.advent-day__icon {
+    font-size: 1.3rem;
+    line-height: 1;
+}
+
+.advent-day__check {
+    position: absolute;
+    top: 4px;
+    right: 6px;
+    font-size: 0.75rem;
+    color: #247a42;
+    font-weight: 900;
+}
+
+/* Сегодня */
+.advent-day--today {
+    border-color: #ffb900;
+    box-shadow:
+            0 4px 0 #d68a00,
+            0 0 0 3px rgba(255, 185, 0, 0.35);
+    animation: adventPulse 1.8s ease-in-out infinite;
+}
+
+@keyframes adventPulse {
+    0%, 100% { box-shadow: 0 4px 0 #d68a00, 0 0 0 3px rgba(255, 185, 0, 0.35); }
+    50%      { box-shadow: 0 4px 0 #d68a00, 0 0 0 8px rgba(255, 185, 0, 0.12); }
+}
+
+/* Будущие ячейки — не кликабельны */
+.advent-day--future {
+    background: #f0ecff;
+    color: #a99bd6;
+    box-shadow: 0 4px 0 #e0d7f5;
+    cursor: not-allowed;
+    opacity: 0.7;
+}
+
+.advent-day--future .advent-day__icon {
+    opacity: 0.55;
+}
+
+/* Открытая ячейка */
+.advent-day[data-opened="true"] {
+    background: linear-gradient(145deg, #fff9d6, #ffef9e);
+    border-color: #f0c419;
+    box-shadow: 0 4px 0 #d9a800;
+    color: #5d4700;
+}
+
+/* Выполненная ячейка */
+.advent-day[data-completed="true"] {
+    background: linear-gradient(145deg, #e8fff0, #c7f5d7);
+    border-color: #35ae7b;
+    box-shadow: 0 4px 0 #7bd3a5;
+    color: #126b4b;
+}
+
+/* Гость */
+.advent-day--ghost {
+    cursor: default;
+    pointer-events: none;
+}
+
+/* =========================================================
+   АНИМАЦИЯ ОТКРЫТИЯ
+   ========================================================= */
+
+.advent-day.is-opening {
+    animation: adventOpenPulse 0.55s ease;
+}
+
+@keyframes adventOpenPulse {
+    0%   { transform: scale(1); }
+    40%  { transform: scale(1.15); }
+    100% { transform: scale(1); }
+}
+
+/* Разлетающиеся искорки (псевдо-элементы) */
+.advent-day.is-opening::before,
+.advent-day.is-opening::after {
+    content: "✨";
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    font-size: 1.2rem;
+    pointer-events: none;
+    animation: adventSpark 0.7s ease forwards;
+}
+
+.advent-day.is-opening::before {
+    transform: translate(-50%, -50%) rotate(0deg);
+}
+
+.advent-day.is-opening::after {
+    content: "❄️";
+    animation-delay: 0.08s;
+}
+
+@keyframes adventSpark {
+    0% {
+        opacity: 0;
+        transform: translate(-50%, -50%) scale(0.5);
+    }
+    40% {
+        opacity: 1;
+    }
+    100% {
+        opacity: 0;
+        transform: translate(-50%, -200%) scale(1.4) rotate(180deg);
+    }
+}
+
+/* =========================================================
+   МОДАЛКА
+   ========================================================= */
+
+.advent-modal[hidden] {
+    display: none;
+}
+
+.advent-modal {
+    position: fixed;
+    inset: 0;
+    z-index: 9999;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+}
+
+.advent-modal-backdrop {
+    position: absolute;
+    inset: 0;
+    background: rgba(20, 10, 60, 0.7);
+    backdrop-filter: blur(6px);
+    animation: adventFadeIn 0.25s ease;
+}
+
+@keyframes adventFadeIn {
+    from { opacity: 0; }
+    to   { opacity: 1; }
+}
+
+.advent-modal-window {
+    position: relative;
+    z-index: 1;
+    width: min(560px, 100%);
+    max-height: calc(100vh - 40px);
+    overflow-y: auto;
+
+    padding: 28px 26px;
+    border-radius: 26px;
+    background: #fff;
+    box-shadow:
+            0 0 0 3px rgba(139, 92, 246, 0.35),
+            0 25px 60px rgba(20, 10, 60, 0.45);
+
+    animation: adventModalPop 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+@keyframes adventModalPop {
+    from { opacity: 0; transform: scale(0.85) translateY(20px); }
+    to   { opacity: 1; transform: scale(1) translateY(0); }
+}
+
+.advent-modal-close {
+    position: absolute;
+    top: 14px;
+    right: 14px;
+    width: 38px;
+    height: 38px;
+    border: 0;
+    border-radius: 12px;
+    background: #f0edff;
+    color: #51318f;
+    font-size: 1.1rem;
+    font-weight: 900;
+    cursor: pointer;
+    transition: background 0.15s ease, transform 0.15s ease;
+}
+
+.advent-modal-close:hover {
+    background: #e5dfff;
+    transform: scale(1.08);
+}
+
+/* =========================================================
+   СОДЕРЖИМОЕ МОДАЛКИ
+   ========================================================= */
+
+.advent-modal-header {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    margin-bottom: 14px;
+    padding-right: 44px;
+}
+
+.advent-modal-icon {
+    display: grid;
+    place-items: center;
+    flex-shrink: 0;
+    width: 54px;
+    height: 54px;
+    border-radius: 16px;
+    background: #f0edff;
+    font-size: 1.8rem;
+}
+
+.advent-modal-title {
+    margin: 0;
+    color: #302071;
+    font-size: 1.35rem;
+    font-weight: 900;
+    line-height: 1.25;
+}
+
+.advent-modal-description {
+    margin: 0 0 16px;
+    color: #6b5a88;
+    line-height: 1.6;
+}
+
+.advent-modal-image {
+    margin: 0 0 16px;
+    border-radius: 16px;
+    overflow: hidden;
+}
+
+.advent-modal-image img {
+    display: block;
+    width: 100%;
+    height: auto;
+}
+
+.advent-modal-section {
+    margin-top: 16px;
+    padding: 16px 18px;
+    border-radius: 14px;
+    background: #f7f4ff;
+}
+
+.advent-modal-section h3 {
+    margin: 0 0 8px;
+    color: #51318f;
+    font-size: 1rem;
+    font-weight: 900;
+}
+
+.advent-modal-section p {
+    margin: 0;
+    color: #4a3b70;
+    line-height: 1.6;
+    white-space: pre-line;
+}
+
+.advent-modal-materials {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-top: 18px;
+}
+
+.advent-modal-materials .material-button {
+    margin: 0;
+}
+
+/* Кнопка «Выполнено» */
+.advent-modal-actions {
+    margin-top: 22px;
+    padding-top: 18px;
+    border-top: 1px solid #eee9ff;
+    display: flex;
+    justify-content: center;
+}
+
+.advent-complete-button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+
+    min-height: 50px;
+    padding: 12px 28px;
+
+    border: 3px solid #35ae7b;
+    border-radius: 14px;
+    background: linear-gradient(135deg, #43d17b, #27ae60);
+    color: #fff;
+
+    font: inherit;
+    font-size: 1rem;
+    font-weight: 900;
+
+    cursor: pointer;
+    box-shadow: 0 5px 0 #1d8a4a;
+    transition:
+            transform 0.15s ease,
+            box-shadow 0.15s ease,
+            filter 0.15s ease;
+}
+
+.advent-complete-button:hover:not(:disabled) {
+    transform: translateY(-2px);
+    box-shadow: 0 7px 0 #1d8a4a;
+    filter: brightness(1.05);
+}
+
+.advent-complete-button:active:not(:disabled) {
+    transform: translateY(2px);
+    box-shadow: 0 2px 0 #1d8a4a;
+}
+
+.advent-complete-button:disabled,
+.advent-complete-button.is-completed {
+    background: #e0f5e9;
+    border-color: #8bd9b7;
+    color: #126b4b;
+    box-shadow: 0 5px 0 #b9e8d0;
+    cursor: default;
+}
+
+/* Заглушки внутри модалки */
+.advent-modal-auth,
+.advent-modal-future,
+.advent-modal-error {
+    text-align: center;
+    padding: 10px 0;
+}
+
+.advent-modal-auth-icon,
+.advent-modal-future-icon,
+.advent-modal-error-icon {
+    font-size: 2.8rem;
+    margin-bottom: 12px;
+}
+
+.advent-modal-auth h2,
+.advent-modal-future h2,
+.advent-modal-error h2 {
+    margin: 0 0 10px;
+    color: #302071;
+}
+
+.advent-modal-auth p,
+.advent-modal-future p,
+.advent-modal-error p {
+    margin: 0 0 18px;
+    color: #6b5a88;
+}
+
+.advent-modal-auth-actions {
+    display: flex;
+    justify-content: center;
+    gap: 12px;
+    flex-wrap: wrap;
+}
+
+.advent-modal-auth-actions .button {
+    margin-top: 0;
+    min-width: 120px;
+}
+
+/* =========================================================
+   НЕАКТИВНЫЙ СЕЗОН
+   ========================================================= */
+
+.advent-inactive {
+    max-width: 560px;
+    margin: 40px auto;
+    padding: 40px 30px;
+    border-radius: 26px;
+    background: rgba(255, 255, 255, 0.96);
+    text-align: center;
+    box-shadow: 0 18px 42px rgba(20, 10, 60, 0.2);
+}
+
+.advent-inactive-icon {
+    font-size: 3.4rem;
+    margin-bottom: 12px;
+}
+
+.advent-inactive h1 {
+    margin: 0 0 12px;
+    color: #302071;
+    font-size: 1.6rem;
+}
+
+.advent-inactive p {
+    margin: 0 0 22px;
+    color: #6b5a88;
+    line-height: 1.6;
+}
+
+.advent-inactive-seasons {
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-bottom: 26px;
+}
+
+.advent-inactive-season {
+    padding: 8px 14px;
+    border-radius: 999px;
+    background: #f0edff;
+    color: #51318f;
+    font-weight: 700;
+    font-size: 0.9rem;
+}
+
+/* =========================================================
+   ИКОНКА-КАЛЕНДАРИК В ШАПКЕ
+   ========================================================= */
+
+.advent-header-link {
+    position: relative;
+
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+
+    width: 44px;
+    height: 46px;
+    flex-shrink: 0;
+
+    border-radius: 8px;
+    background: #fff;
+    color: #51318f;
+
+    text-decoration: none;
+
+    box-shadow: 0 3px 0 #d6c5f5;
+    transition: transform 0.15s ease, box-shadow 0.15s ease;
+
+    overflow: hidden;
+}
+
+/* «Корешок» сверху — как у отрывного календаря */
+.advent-header-link::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 16px;
+    height: 4px;
+    border-radius: 0 0 3px 3px;
+    background: #d6c5f5;
+}
+
+/* Месяц */
+.advent-header-link__month {
+    margin-top: 5px;
+    padding: 0 4px;
+
+    font-size: 9px;
+    font-weight: 900;
+    letter-spacing: 0.3px;
+    text-transform: uppercase;
+
+    color: #8960e8;
+    line-height: 1;
+
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: calc(100% - 8px);
+}
+
+/* Горизонтальная черта */
+.advent-header-link__divider {
+    display: block;
+    width: 60%;
+    height: 1.5px;
+    margin: 2px 0 1px;
+
+    background: #e0d5f5;
+    border-radius: 999px;
+}
+
+/* Число */
+.advent-header-link__day {
+    font-size: 15px;
+    font-weight: 900;
+    color: #302071;
+    line-height: 1;
+}
+
+/* Если месяца нет — число центрируем чуть ниже */
+.advent-header-link:not(:has(.advent-header-link__month))
+.advent-header-link__day {
+    margin-top: 4px;
+}
+
+/* Hover */
+.advent-header-link:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 5px 0 #c4a9ff;
+}
+
+/* Сезонные цвета «корешка» */
+.season-spring .advent-header-link::before { background: #f8b8ce; }
+.season-summer .advent-header-link::before { background: #f0c419; }
+.season-autumn .advent-header-link::before { background: #d97b3c; }
+.season-winter .advent-header-link::before { background: #6a93d1; }
+
+/* Мобильные */
+@media (max-width: 600px) {
+    .advent-header-link {
+        width: 40px;
+        height: 42px;
+    }
+
+    .advent-header-link__month {
+        font-size: 8px;
+        margin-top: 4px;
+    }
+
+    .advent-header-link__day {
+        font-size: 14px;
+    }
+}
+
+/* =========================================================
+   АДАПТИВ
+   ========================================================= */
+
+@media (max-width: 700px) {
+
+    .advent-main {
+        padding: 24px 12px 60px;
+    }
+
+    .advent-calendar {
+        padding: 14px;
+        border-radius: 20px;
+    }
+
+    .advent-days,
+    .advent-weekdays {
+        gap: 5px;
+    }
+
+    .advent-day {
+        padding: 4px 3px;
+        border-radius: 10px;
+        border-width: 2px;
+    }
+
+    .advent-day__number {
+        font-size: 0.85rem;
+    }
+
+    .advent-day__icon {
+        font-size: 1rem;
+    }
+
+    .advent-day__check {
+        top: 2px;
+        right: 3px;
+        font-size: 0.65rem;
+    }
+
+    .advent-heading-icon {
+        width: 62px;
+        height: 62px;
+        font-size: 1.9rem;
+    }
+
+    .advent-modal-window {
+        padding: 22px 18px;
+        border-radius: 20px;
+    }
+
+    .advent-modal-icon {
+        width: 46px;
+        height: 46px;
+        font-size: 1.5rem;
+    }
+
+    .advent-modal-title {
+        font-size: 1.15rem;
+    }
+
+    .advent-guest-card {
+        padding: 24px 20px;
+        border-radius: 20px;
+    }
+
+    .advent-guest-actions {
+        flex-direction: column;
+    }
+
+    .advent-guest-actions .button {
+        width: 100%;
+    }
+
+    .advent-inactive {
+        margin: 20px 12px;
+        padding: 28px 20px;
+    }
+}
+
+/* Уменьшение анимации */
+@media (prefers-reduced-motion: reduce) {
+    .advent-heading-icon,
+    .advent-day--today,
+    .advent-day.is-opening::before,
+    .advent-day.is-opening::after {
+        animation: none;
+    }
+
+    .advent-modal-window {
+        animation: none;
+    }
+}
+/* =========================================================
+   🛠 ADVENT ADMIN — аккордеон и секции
+   ========================================================= */
+
+.admin-section-toggle {
+    background: #fff;
+    border-radius: 22px;
+    margin-bottom: 22px;
+    box-shadow: 0 8px 24px rgba(35, 25, 80, 0.08);
+    overflow: hidden;
+    transition: box-shadow 0.2s ease;
+}
+
+.admin-section-toggle[open] {
+    box-shadow: 0 12px 32px rgba(35, 25, 80, 0.14);
+}
+
+.admin-section-toggle__header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+
+    padding: 20px 26px;
+
+    cursor: pointer;
+    user-select: none;
+    list-style: none;
+
+    font-size: 1.15rem;
+    font-weight: 800;
+    color: #302071;
+
+    transition: background 0.2s ease;
+}
+
+.admin-section-toggle__header::-webkit-details-marker {
+    display: none;
+}
+
+.admin-section-toggle__header:hover {
+    background: #f7f5ff;
+}
+
+.admin-section-toggle__icon {
+    font-size: 1.4rem;
+    line-height: 1;
+}
+
+.admin-section-toggle__title {
+    flex: 1;
+    min-width: 0;
+}
+
+.admin-section-toggle__count {
+    flex-shrink: 0;
+
+    padding: 3px 12px;
+    border-radius: 999px;
+
+    background: #f0edff;
+    color: #51318f;
+
+    font-size: 0.85rem;
+    font-weight: 800;
+}
+
+.admin-section-toggle__arrow {
+    flex-shrink: 0;
+    margin-left: 8px;
+
+    color: #8053e8;
+    font-size: 0.85rem;
+
+    transition: transform 0.25s ease;
+}
+
+.admin-section-toggle[open] .admin-section-toggle__arrow {
+    transform: rotate(180deg);
+}
+
+.admin-section-toggle__body {
+    padding: 0 26px 26px;
+    animation: adminReveal 0.25s ease;
+}
+
+@keyframes adminReveal {
+    from { opacity: 0; transform: translateY(-6px); }
+    to   { opacity: 1; transform: translateY(0); }
+}
+
+/* =========================================================
+   ПЛАШКИ ОШИБОК / УСПЕХА
+   ========================================================= */
+
+.admin-alert {
+    max-width: 900px;
+    margin: 0 auto 20px;
+    padding: 14px 20px;
+
+    border-radius: 14px;
+
+    font-weight: 700;
+    font-size: 0.95rem;
+}
+
+.admin-alert--error {
+    background: #ffe2eb;
+    border: 2px solid #e77b9a;
+    color: #a52e52;
+    box-shadow: 0 4px 0 #f3b7ca;
+}
+
+.admin-alert--success {
+    background: #d9ffeb;
+    border: 2px solid #35ae7b;
+    color: #126b4b;
+    box-shadow: 0 4px 0 #9cddbd;
+}
+
+/* =========================================================
+   СТАТИСТИКА ПО СЕЗОНАМ
+   ========================================================= */
+
+.advent-admin-stats {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 12px;
+
+    margin-bottom: 22px;
+    padding: 16px;
+
+    border-radius: 16px;
+    background: #f7f4ff;
+}
+
+.advent-admin-stat {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+
+    padding: 12px 14px;
+
+    border-radius: 12px;
+    background: #fff;
+
+    box-shadow: 0 3px 8px rgba(80, 60, 150, 0.06);
+}
+
+.advent-admin-stat-icon {
+    font-size: 1.6rem;
+    line-height: 1;
+}
+
+.advent-admin-stat-label {
+    font-size: 0.85rem;
+    color: #6b5a88;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.advent-admin-stat-value {
+    margin-top: 2px;
+    color: #302071;
+    font-weight: 800;
+    font-size: 1.05rem;
+}
+
+/* =========================================================
+   ФИЛЬТР ПО СЕЗОНУ
+   ========================================================= */
+
+.advent-admin-filter {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+
+    margin-bottom: 22px;
+    padding: 12px 16px;
+
+    border-radius: 14px;
+    background: #f7f4ff;
+}
+
+.advent-admin-filter label {
+    font-weight: 700;
+    color: #51318f;
+    margin: 0;
+    white-space: nowrap;
+}
+
+.advent-admin-filter select {
+    flex: 1;
+    min-width: 0;
+}
+
+/* =========================================================
+   ФОРМА ДОБАВЛЕНИЯ АДВЕНТ-ЗАДАНИЯ
+   ========================================================= */
+
+.advent-admin-form-toggle {
+    margin-bottom: 22px;
+
+    border-radius: 16px;
+    background: #fbf8ff;
+    border: 2px solid #ece2ff;
+    overflow: hidden;
+}
+
+.advent-admin-form-toggle__header {
+    padding: 14px 20px;
+
+    cursor: pointer;
+    user-select: none;
+    list-style: none;
+
+    font-weight: 800;
+    color: #51318f;
+
+    background: #f0e8ff;
+
+    transition: background 0.2s ease;
+}
+
+.advent-admin-form-toggle__header::-webkit-details-marker {
+    display: none;
+}
+
+.advent-admin-form-toggle__header:hover {
+    background: #e5daff;
+}
+
+.advent-admin-form-toggle__body {
+    padding: 20px;
+}
+
+/* Общие стили для форм адвента */
+.advent-admin-form-toggle label,
+.advent-admin-edit-form label {
+    display: block;
+    margin-top: 14px;
+    margin-bottom: 6px;
+
+    color: #51318f;
+    font-weight: 700;
+    font-size: 0.9rem;
+}
+
+.advent-admin-form-toggle input,
+.advent-admin-form-toggle textarea,
+.advent-admin-form-toggle select,
+.advent-admin-edit-form input,
+.advent-admin-edit-form textarea,
+.advent-admin-edit-form select {
+    width: 100%;
+    padding: 11px 14px;
+
+    border: 2px solid #e4dcf5;
+    border-radius: 12px;
+    background: #fff;
+
+    font-size: 15px;
+    font-family: inherit;
+    color: #302071;
+
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.advent-admin-form-toggle input:focus,
+.advent-admin-form-toggle textarea:focus,
+.advent-admin-form-toggle select:focus,
+.advent-admin-edit-form input:focus,
+.advent-admin-edit-form textarea:focus,
+.advent-admin-edit-form select:focus {
+    outline: none;
+    border-color: #8960e8;
+    box-shadow: 0 0 0 3px rgba(137, 96, 232, 0.15);
+}
+
+.advent-admin-form-toggle textarea,
+.advent-admin-edit-form textarea {
+    resize: vertical;
+    min-height: 70px;
+}
+
+.advent-admin-form-toggle button[type="submit"],
+.advent-admin-edit-form button[type="submit"] {
+    margin-top: 20px;
+    width: 100%;
+}
+
+/* Строка с датой */
+.advent-date-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    flex-wrap: wrap;
+}
+
+.advent-date-row select {
+    flex: 0 0 120px;
+    width: 120px;
+}
+
+.advent-date-preview {
+    padding: 10px 16px;
+    border-radius: 10px;
+
+    background: #f0edff;
+    color: #51318f;
+
+    font-weight: 800;
+    font-size: 0.95rem;
+
+    white-space: nowrap;
+}
+
+/* =========================================================
+   КАРТОЧКИ ЗАДАНИЙ
+   ========================================================= */
+
+.advent-admin-list {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+}
+
+.advent-admin-card {
+    padding: 18px 20px;
+    border-radius: 16px;
+
+    background: #fff;
+    border-left: 4px solid #8053e8;
+    box-shadow: 0 4px 12px rgba(80, 60, 150, 0.06);
+
+    transition: box-shadow 0.2s ease;
+}
+
+.advent-admin-card:hover {
+    box-shadow: 0 8px 20px rgba(80, 60, 150, 0.1);
+}
+
+.advent-admin-card__header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    flex-wrap: wrap;
+
+    margin-bottom: 8px;
+}
+
+.advent-admin-card__icon {
+    font-size: 1.5rem;
+    line-height: 1;
+}
+
+.advent-admin-card__title {
+    flex: 1;
+    min-width: 0;
+
+    font-weight: 800;
+    color: #302071;
+    font-size: 1.05rem;
+
+    overflow-wrap: anywhere;
+}
+
+.advent-admin-card__season {
+    padding: 3px 10px;
+    border-radius: 999px;
+
+    background: #f0edff;
+    color: #51318f;
+
+    font-size: 0.8rem;
+    font-weight: 700;
+    white-space: nowrap;
+}
+
+.advent-admin-card__badge {
+    padding: 3px 10px;
+    border-radius: 999px;
+
+    background: #fff0a8;
+    color: #8b6b00;
+
+    font-size: 0.8rem;
+    font-weight: 800;
+    white-space: nowrap;
+    box-shadow: 0 2px 0 #e2d29a;
+}
+
+.advent-admin-card__description {
+    margin: 6px 0 12px;
+    color: #6b5a88;
+    font-size: 0.9rem;
+    line-height: 1.5;
+}
+
+.advent-admin-card__actions {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+    align-items: center;
+}
+
+.advent-admin-card__actions form {
+    margin: 0;
+}
+
+/* Inline-форма редактирования */
+.advent-admin-edit-form {
+    margin-top: 16px;
+    padding: 18px;
+
+    border-radius: 14px;
+    background: #f7f4ff;
+    border: 2px dashed #d6c5f5;
+    animation: adminReveal 0.25s ease;
+}
+
+/* =========================================================
+   СПИСОК ЗАНЯТИЙ В 4-Й СЕКЦИИ
+   ========================================================= */
+
+.admin-activity-row {
+    padding: 16px 18px;
+    margin-bottom: 12px;
+
+    border-radius: 14px;
+    background: #f9f7ff;
+    border-left: 4px solid #667eea;
+}
+
+.admin-activity-row h3 {
+    margin: 0 0 6px;
+    color: #302071;
+    font-size: 1.05rem;
+    overflow-wrap: anywhere;
+}
+
+.admin-activity-row p {
+    margin: 0 0 8px;
+    color: #6b5a88;
+    line-height: 1.5;
+}
+
+.admin-activity-meta {
+    font-size: 0.85rem;
+    color: #8c80b5;
+}
+
+.admin-activity-meta strong {
+    color: #51318f;
+}
+
+.admin-activity-actions {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+    align-items: center;
+    margin-top: 10px;
+}
+
+.admin-activity-actions form {
+    margin: 0;
+}
+
+/* =========================================================
+   АДАПТИВ
+   ========================================================= */
+
+@media (max-width: 700px) {
+
+    .admin-section-toggle__header {
+        padding: 16px 18px;
+        font-size: 1rem;
+        gap: 10px;
+    }
+
+    .admin-section-toggle__body {
+        padding: 0 18px 20px;
+    }
+
+    .advent-admin-stats {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 10px;
+        padding: 12px;
+    }
+
+    .advent-admin-stat {
+        padding: 10px 12px;
+    }
+
+    .advent-admin-stat-icon {
+        font-size: 1.3rem;
+    }
+
+    .advent-admin-filter {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 8px;
+    }
+
+    .advent-date-row {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .advent-date-row select {
+        width: 100%;
+        flex: auto;
+    }
+
+    .advent-date-preview {
+        text-align: center;
+    }
+
+    .advent-admin-card {
+        padding: 14px 16px;
+    }
+
+    .advent-admin-card__title {
+        font-size: 1rem;
+    }
+
+    .advent-admin-card__actions,
+    .admin-activity-actions {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .advent-admin-card__actions .mini-game-edit-button,
+    .advent-admin-card__actions .mini-game-delete-button,
+    .admin-activity-actions .mini-game-edit-button,
+    .admin-activity-actions .mini-game-delete-button {
+        width: 100%;
+        text-align: center;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .admin-section-toggle__body,
+    .advent-admin-edit-form {
+        animation: none;
+    }
+
+    .admin-section-toggle__arrow {
+        transition: none;
+    }
+}
+
+
+
+
+

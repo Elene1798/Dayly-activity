@@ -46,6 +46,9 @@ public class ActivityCompletion {
      * ID занятия сохраняем как число, без внешнего ключа.
      * Благодаря этому история не зависит от того,
      * существует ли занятие в таблице activities сейчас.
+     *
+     * Для адвент-активностей здесь будет NULL,
+     * потому что у адвента нет записи в activities.
      */
     @Column(name = "activity_id")
     private Long activityId;
@@ -73,6 +76,7 @@ public class ActivityCompletion {
     /*
      * CARD — выполнение с карточки занятия.
      * CHALLENGE — выполнение ежедневного задания.
+     * ADVENT — выполнение задания адвент-календаря.
      */
     @Column(name = "source", nullable = false, length = 20)
     private String source;
@@ -87,6 +91,9 @@ public class ActivityCompletion {
 
     public ActivityCompletion() {
     }
+
+
+    // *  ОСНОВНОЙ КОНСТРУКТОР — для обычных занятий (Activity)
 
     public ActivityCompletion(
             User user,
@@ -105,6 +112,29 @@ public class ActivityCompletion {
         this.source = source;
         this.dailyChallengeId = dailyChallengeId;
     }
+
+    //*  КОНСТРУКТОР ДЛЯ АДВЕНТА
+
+    public ActivityCompletion(
+            User user,
+            AdventActivity adventActivity,
+            LocalDateTime completedAt,
+            String source) {
+
+        this.user = user;
+        this.activityId = null;
+        this.snapshotTitle = adventActivity.getTitle();
+        this.snapshotDuration = null;
+        this.snapshotCategory = "advent";
+        this.snapshotLocation = null;
+        this.completedAt = completedAt;
+        this.source = source;
+        this.dailyChallengeId = null;
+    }
+
+    // =========================================================
+    //  ГЕТТЕРЫ
+    // =========================================================
 
     public Long getId() {
         return id;
