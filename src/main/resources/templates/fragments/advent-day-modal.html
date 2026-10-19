@@ -23,9 +23,18 @@
 
     <!-- Картинка -->
     <div class="advent-modal-image"
-         th:if="${activity.imageUrl != null
-                  and !activity.imageUrl.isBlank()}">
-        <img th:src="${activity.imageUrl}"
+         th:if="${(activity.imageFile != null and !activity.imageFile.isBlank())
+            or (activity.imageUrl != null and !activity.imageUrl.isBlank())}">
+
+        <!-- Приоритет: локальный файл -->
+        <img th:if="${activity.imageFile != null and !activity.imageFile.isBlank()}"
+             th:src="@{'/files/advent/' + ${activity.imageFile}}"
+             th:alt="${activity.title}">
+
+        <!-- Если файла нет — URL -->
+        <img th:if="${(activity.imageFile == null or activity.imageFile.isBlank())
+              and activity.imageUrl != null and !activity.imageUrl.isBlank()}"
+             th:src="${activity.imageUrl}"
              th:alt="${activity.title}">
     </div>
 

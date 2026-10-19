@@ -1,0 +1,42 @@
+<div class="mini-game-inline puzzle-game"
+     data-puzzle-game
+     th:attr="
+        data-puzzle-id=${puzzle.id},
+        data-size=${puzzle.defaultSize},
+        data-image=${'/files/puzzles/' + puzzle.imageFile}">
+
+    <p class="puzzle-hint-text">
+        Перетаскивайте фрагменты, чтобы собрать картинку
+    </p>
+
+    <!-- ВЫБОР СЛОЖНОСТИ -->
+    <div class="puzzle-sizes" data-puzzle-sizes>
+        <button type="button" class="puzzle-size-btn" data-size-btn="3">3×3</button>
+        <button type="button" class="puzzle-size-btn" data-size-btn="4">4×4</button>
+        <button type="button" class="puzzle-size-btn" data-size-btn="5">5×5</button>
+        <button type="button" class="puzzle-size-btn" data-size-btn="6">6×6</button>
+    </div>
+
+    <div class="puzzle-header">
+        <span>Ходов: <strong data-puzzle-moves>0</strong></span>
+        <span>Время: <strong data-puzzle-time>0:00</strong></span>
+    </div>
+
+    <div class="puzzle-board" data-puzzle-board></div>
+
+    <div class="puzzle-result" data-puzzle-result></div>
+
+    <div class="puzzle-actions">
+        <button type="button"
+                class="puzzle-shuffle-button"
+                data-puzzle-shuffle>
+            🔀 Перемешать
+        </button>
+
+        <button type="button"
+                class="puzzle-next-button"
+                data-puzzle-next>
+            ⏭ Следующий пазл
+        </button>
+    </div>
+</div>

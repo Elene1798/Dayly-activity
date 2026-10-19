@@ -30,6 +30,9 @@ public class AdventActivity {
     @Column(name = "image_url", length = 2000)
     private String imageUrl;
 
+    @Column(name = "image_file", length = 255)
+    private String imageFile;
+
     @Column(name = "video_url", length = 2000)
     private String videoUrl;
 
@@ -40,10 +43,6 @@ public class AdventActivity {
     @Column(nullable = false)
     private boolean special = false;
 
-    /**
-     * Число месяца (1–31). Заполняется, только если {@code special = true}.
-     * Месяц определяется сезоном, год — текущим при генерации.
-     */
     @Column(name = "special_day")
     private Integer specialDay;
 
@@ -108,6 +107,10 @@ public class AdventActivity {
     public void setImageUrl(String imageUrl) {
         this.imageUrl = imageUrl;
     }
+
+    public String getImageFile() { return imageFile; }
+
+    public void setImageFile(String imageFile) { this.imageFile = imageFile; }
 
     public String getVideoUrl() {
         return videoUrl;

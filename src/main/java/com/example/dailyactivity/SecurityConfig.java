@@ -106,7 +106,10 @@ public class SecurityConfig {
                                 "/register",
                                 "/register/**",
                                 "/advent",
-                                "/advent/**"
+                                "/advent/**",
+                                "/mini-games",
+                                "/mini-game/**",
+                                "/files/**"
                         ).permitAll()
 
                         .requestMatchers("/favorites").authenticated()

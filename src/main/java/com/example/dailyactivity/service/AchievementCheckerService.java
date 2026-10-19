@@ -3,6 +3,7 @@ package com.example.dailyactivity.service;
 import com.example.dailyactivity.model.AchievementType;
 import com.example.dailyactivity.model.User;
 import com.example.dailyactivity.repository.ActivityCompletionRepository;
+import com.example.dailyactivity.repository.PuzzleCompletionRepository;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -11,15 +12,18 @@ public class AchievementCheckerService {
     private final AchievementService achievementService;
     private final VisitStreakService visitStreakService;
     private final ActivityCompletionRepository activityCompletionRepository;
+    private final PuzzleCompletionRepository puzzleCompletionRepository;
 
     public AchievementCheckerService(
             AchievementService achievementService,
             VisitStreakService visitStreakService,
-            ActivityCompletionRepository activityCompletionRepository) {
+            ActivityCompletionRepository activityCompletionRepository,
+            PuzzleCompletionRepository puzzleCompletionRepository){
 
         this.achievementService = achievementService;
         this.visitStreakService = visitStreakService;
         this.activityCompletionRepository = activityCompletionRepository;
+        this.puzzleCompletionRepository = puzzleCompletionRepository;
     }
 
     /**
@@ -340,4 +344,29 @@ public class AchievementCheckerService {
 
         }
     }
+
+    public void checkPuzzleAchievements(User user) {
+
+        // Пазлмэн — любые 5 пазлов
+        long totalPuzzles = puzzleCompletionRepository.countByUser(user);
+
+        if (totalPuzzles >= 5) {
+            achievementService.award(
+                    user,
+                    AchievementType.PUZZLE_MASTER
+            );
+        }
+
+        // СверхУм — 10 пазлов на 6×6
+        long sixBySixCount = puzzleCompletionRepository
+                .countByUserAndGridSize(user, 6);
+
+        if (sixBySixCount >= 10) {
+            achievementService.award(
+                    user,
+                    AchievementType.PUZZLE_SUPER_MIND
+            );
+        }
+    }
+
 }

@@ -5,6 +5,7 @@ import com.example.dailyactivity.repository.*;
 import com.example.dailyactivity.service.AchievementCheckerService;
 import com.example.dailyactivity.service.MiniGameService;
 import com.example.dailyactivity.service.MiniGameTaskService;
+import com.example.dailyactivity.service.PuzzleService;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
@@ -32,6 +33,8 @@ public class MiniGameController {
     private final AchievementCheckerService achievementCheckerService;
     private final MiniGameTaskCompletionRepository miniGameTaskCompletionRepository;
     private final SnakeRecordRepository snakeRecordRepository;
+    private final PuzzleService puzzleService;
+    private final PuzzleCompletionRepository puzzleCompletionRepository;
 
     public MiniGameController(
             MiniGameService miniGameService,
@@ -41,7 +44,9 @@ public class MiniGameController {
             UserRepository userRepository,
             AchievementCheckerService achievementCheckerService,
             MiniGameTaskCompletionRepository miniGameTaskCompletionRepository,
-            SnakeRecordRepository snakeRecordRepository
+            SnakeRecordRepository snakeRecordRepository,
+            PuzzleService puzzleService,
+            PuzzleCompletionRepository puzzleCompletionRepository
     ) {
         this.miniGameService = miniGameService;
         this.miniGameTaskService = miniGameTaskService;
@@ -51,6 +56,8 @@ public class MiniGameController {
         this.achievementCheckerService = achievementCheckerService;
         this.miniGameTaskCompletionRepository = miniGameTaskCompletionRepository;
         this.snakeRecordRepository = snakeRecordRepository;
+        this.puzzleService = puzzleService;
+        this.puzzleCompletionRepository = puzzleCompletionRepository;
     }
 
     @GetMapping("/{id}")
@@ -137,6 +144,22 @@ public class MiniGameController {
             tasks = miniGameTaskService.findActiveByGameType("WORD");
         } else {
             tasks = miniGameTaskService.findActiveByGame(miniGame);
+        }
+
+        if ("PUZZLE".equalsIgnoreCase(miniGame.getGameType())) {
+            List<Puzzle> puzzles = puzzleService.getActiveByMiniGame(miniGame);
+
+            if (puzzles.isEmpty()) {
+                model.addAttribute("noTasksAvailable", true);
+                return "fragments/mini-game-completed";
+            }
+
+            Puzzle puzzle = puzzles.get((int) (Math.random() * puzzles.size()));
+
+            model.addAttribute("puzzle", puzzle);
+            model.addAttribute("miniGame", miniGame);
+
+            return "fragments/mini-game-puzzle";
         }
 
         if (tasks.isEmpty()) {
@@ -771,4 +794,94 @@ public class MiniGameController {
                 .map(r -> String.valueOf(r.getBestScore()))
                 .orElse("0");
     }
+
+    @PostMapping("/puzzle/{id}/complete")
+    @ResponseBody
+    public String completePuzzle(
+            @PathVariable Long id,
+            @RequestParam int size,
+            @RequestParam int moves,
+            @RequestParam int time,
+            Authentication auth
+    ) {
+        if (auth == null
+                || !auth.isAuthenticated()
+                || "anonymousUser".equals(auth.getPrincipal())) {
+            return "GUEST";
+        }
+
+        User user = userRepository
+                .findByUsername(auth.getName())
+                .orElse(null);
+
+        if (user == null) return "GUEST";
+
+        Puzzle puzzle = puzzleService.findById(id);
+        if (puzzle == null) return "ERROR";
+
+        // Проверка: собран ли уже
+        boolean exists = puzzleCompletionRepository
+                .findByUserAndPuzzleAndGridSize(user, puzzle, size)
+                .isPresent();
+
+        if (exists) {
+            return "ALREADY_COMPLETED";
+        }
+
+        PuzzleCompletion completion = new PuzzleCompletion(
+                user, puzzle, size, moves, time
+        );
+
+        try {
+            puzzleCompletionRepository.save(completion);
+        } catch (DataIntegrityViolationException ignored) {
+            return "ALREADY_COMPLETED";
+        }
+
+        // Проверяем достижения
+        achievementCheckerService.checkPuzzleAchievements(user);
+
+        return "SUCCESS";
+    }
+
+    @GetMapping("/{id}/puzzle/next")
+    public String nextPuzzle(
+            @PathVariable Long id,
+            @RequestParam(required = false) Long currentPuzzleId,
+            @RequestParam(defaultValue = "3") int size,
+            Model model
+    ) {
+        MiniGame miniGame = miniGameService.findById(id);
+
+        if (miniGame == null
+                || !miniGame.isActive()
+                || !"PUZZLE".equalsIgnoreCase(miniGame.getGameType())) {
+            return "fragments/mini-game-completed";
+        }
+
+        List<Puzzle> puzzles = puzzleService.getActiveByMiniGame(miniGame);
+
+        if (puzzles.isEmpty()) {
+            return "fragments/mini-game-completed";
+        }
+
+        // Исключаем текущий, если есть другие
+        List<Puzzle> candidates = puzzles;
+        if (currentPuzzleId != null && puzzles.size() > 1) {
+            candidates = puzzles.stream()
+                    .filter(p -> !p.getId().equals(currentPuzzleId))
+                    .toList();
+        }
+
+        Puzzle next = candidates.get(
+                (int) (Math.random() * candidates.size())
+        );
+
+        model.addAttribute("puzzle", next);
+        model.addAttribute("miniGame", miniGame);
+        model.addAttribute("size", size);   // можно передать дальше
+
+        return "fragments/mini-game-puzzle";
+    }
+
 }

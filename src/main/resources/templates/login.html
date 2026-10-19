@@ -94,12 +94,22 @@
             Пароль
         </label>
 
-        <input
-                id="password"
-                type="password"
-                name="password"
-                required
-                autocomplete="current-password">
+        <div class="password-field">
+            <input
+                    id="password"
+                    type="password"
+                    name="password"
+                    required
+                    autocomplete="current-password">
+
+            <button type="button"
+                    class="password-toggle"
+                    data-password-toggle
+                    aria-label="Показать пароль"
+                    title="Показать пароль">
+                🐵
+            </button>
+        </div>
 
         <div class="remember-me">
             <label>
@@ -124,6 +134,8 @@
     </p>
 
 </div>
+
+<script th:src="@{/js/games/password-toggle.js}"></script>
 
 </body>
 </html>

@@ -165,6 +165,7 @@
                     <option value="WORD">🔤 Слова</option>
                     <option value="QUIZ">🧩 Викторина</option>
                     <option value="CROCODILE">🐊 Крокодил</option>
+                    <option value="PUZZLE">🧩 Пазлы</option>
                 </select>
 
                 <label class="admin-checkbox">
@@ -236,6 +237,7 @@
                                 <span th:if="${game.gameType == 'WORD'}">🔤 Слова</span>
                                 <span th:if="${game.gameType == 'QUIZ'}">🧩 Викторина</span>
                                 <span th:if="${game.gameType == 'CROCODILE'}">🐊 Крокодил</span>
+                                <span th:if="${game.gameType == 'PUZZLE'}">🧩 Пазлы</span>
 
                                 <span>·</span>
 
@@ -269,7 +271,14 @@
 
                     <div class="mini-game-actions">
 
-                        <a th:href="@{'/admin/mini-game/' + ${game.id} + '/tasks'}"
+                        <a th:if="${game.gameType == 'PUZZLE'}"
+                           th:href="@{'/admin/mini-game/' + ${game.id} + '/puzzles'}"
+                           class="mini-game-tasks-button">
+                            🧩 Пазлы
+                        </a>
+
+                        <a th:unless="${game.gameType == 'PUZZLE'}"
+                           th:href="@{'/admin/mini-game/' + ${game.id} + '/tasks'}"
                            class="mini-game-tasks-button">
                             🧩 Задания
                         </a>
@@ -309,6 +318,7 @@
                             <option value="WORD" th:selected="${game.gameType == 'WORD'}">🔤 Слова</option>
                             <option value="QUIZ" th:selected="${game.gameType == 'QUIZ'}">🧩 Викторина</option>
                             <option value="CROCODILE" th:selected="${game.gameType == 'CROCODILE'}">🐊 Крокодил</option>
+                            <option value="PUZZLE">🧩 Пазлы</option>
                         </select>
 
                         <label>Категория активности:</label>
@@ -406,91 +416,84 @@
             </div>
 
 
-            <!-- ФОРМА ДОБАВЛЕНИЯ -->
-            <details class="advent-admin-form-toggle">
+            <form th:action="@{/admin/advent/add}"
+                  method="post"
+                  enctype="multipart/form-data">
 
-                <summary class="advent-admin-form-toggle__header">
-                    ➕ Добавить адвент-задание
-                </summary>
+                <label>Сезон *</label>
+                <select name="season" id="adventSeason" required
+                        onchange="updateAdventDays()">
+                    <option value="">— Выберите сезон —</option>
+                    <option th:each="s : ${adventSeasons}"
+                            th:value="${s.name()}"
+                            th:text="${s.icon} + ' ' + ${s.label} + ' (' + ${s.month} + ')'">
+                        🌸 Весна (3)
+                    </option>
+                </select>
 
-                <div class="advent-admin-form-toggle__body">
+                <label>Название *</label>
+                <input type="text" name="title" required>
 
-                    <form th:action="@{/admin/advent/add}" method="post">
+                <label>Описание</label>
+                <textarea name="description" rows="3"></textarea>
 
-                        <label>Сезон *</label>
-                        <select name="season" id="adventSeason" required
-                                onchange="updateAdventDays()">
-                            <option value="">— Выберите сезон —</option>
-                            <option th:each="s : ${adventSeasons}"
-                                    th:value="${s.name()}"
-                                    th:text="${s.icon} + ' ' + ${s.label} + ' (' + ${s.month} + ')'">
-                                🌸 Весна (3)
-                            </option>
+                <label>Инструкция</label>
+                <textarea name="instructions" rows="4"></textarea>
+
+                <label>Иконка</label>
+                <select name="icon">
+                    <option value="🎁">🎁 Подарок</option>
+                    <option value="❄️">❄️ Снежинка</option>
+                    <option value="🌸">🌸 Цветок</option>
+                    <option value="☀️">☀️ Солнце</option>
+                    <option value="🍂">🍂 Лист</option>
+                    <option value="🎄">🎄 Ёлка</option>
+                    <option value="🕯️">🕯️ Свеча</option>
+                    <option value="⭐">⭐ Звезда</option>
+                    <option value="🍎">🍎 Яблоко</option>
+                    <option value="☕">☕ Кофе</option>
+                    <option value="📖">📖 Книга</option>
+                    <option value="🎨">🎨 Творчество</option>
+                </select>
+
+                <!-- 🖼️ КАРТИНКА: URL ИЛИ ФАЙЛ -->
+                <label>🖼️ URL картинки (опционально)</label>
+                <input type="url" name="imageUrl" placeholder="https://...">
+
+                <label>📁 ИЛИ загрузите картинку с компьютера</label>
+                <input type="file"
+                       name="image"
+                       accept="image/jpeg,image/png,image/webp">
+
+                <label>🎬 URL видео</label>
+                <input type="url" name="videoUrl" placeholder="https://...">
+
+                <label>🔗 Полезная ссылка</label>
+                <input type="url" name="linkUrl" placeholder="https://...">
+
+                <label class="admin-checkbox">
+                    <input type="checkbox" name="special" value="true"
+                           id="adventSpecial"
+                           onchange="toggleAdventSpecial()">
+                    🎯 Особый день
+                </label>
+
+                <div id="adventSpecialFields" style="display: none;">
+                    <label>Дата</label>
+                    <div class="advent-date-row">
+                        <select name="specialDay" id="adventDaySelect" disabled>
+                            <option value="">— Сначала выберите сезон —</option>
                         </select>
-
-                        <label>Название *</label>
-                        <input type="text" name="title" required>
-
-                        <label>Описание</label>
-                        <textarea name="description" rows="3"></textarea>
-
-                        <label>Инструкция</label>
-                        <textarea name="instructions" rows="4"></textarea>
-
-                        <label>Иконка</label>
-                        <select name="icon">
-                            <option value="🎁">🎁 Подарок</option>
-                            <option value="❄️">❄️ Снежинка</option>
-                            <option value="🌸">🌸 Цветок</option>
-                            <option value="☀️">☀️ Солнце</option>
-                            <option value="🍂">🍂 Лист</option>
-                            <option value="🎄">🎄 Ёлка</option>
-                            <option value="🕯️">🕯️ Свеча</option>
-                            <option value="⭐">⭐ Звезда</option>
-                            <option value="🍎">🍎 Яблоко</option>
-                            <option value="☕">☕ Кофе</option>
-                            <option value="📖">📖 Книга</option>
-                            <option value="🎨">🎨 Творчество</option>
-                        </select>
-
-                        <label>🖼️ URL картинки</label>
-                        <input type="url" name="imageUrl" placeholder="https://...">
-
-                        <label>🎬 URL видео</label>
-                        <input type="url" name="videoUrl" placeholder="https://...">
-
-                        <label>🔗 Полезная ссылка</label>
-                        <input type="url" name="linkUrl" placeholder="https://...">
-
-                        <label class="admin-checkbox">
-                            <input type="checkbox" name="special" value="true"
-                                   id="adventSpecial"
-                                   onchange="toggleAdventSpecial()">
-                            🎯 Особый день
-                        </label>
-
-                        <div id="adventSpecialFields" style="display: none;">
-                            <label>Дата</label>
-                            <div class="advent-date-row">
-                                <select name="specialDay" id="adventDaySelect" disabled>
-                                    <option value="">— Сначала выберите сезон —</option>
-                                </select>
-
-                                <span class="advent-date-preview" id="adventDatePreview">
-                                    — выберите день —
-                                </span>
-                            </div>
-                        </div>
-
-                        <button type="submit" class="button">
-                            ➕ Добавить
-                        </button>
-
-                    </form>
-
+                        <span class="advent-date-preview" id="adventDatePreview">
+                — выберите день —
+            </span>
+                    </div>
                 </div>
 
-            </details>
+                <button type="submit" class="button">
+                    ➕ Добавить
+                </button>
+            </form>
 
 
             <!-- СПИСОК ЗАДАНИЙ -->
@@ -562,6 +565,7 @@
                           class="advent-admin-edit-form"
                           th:action="@{'/admin/advent/edit/' + ${task.id}}"
                           method="post"
+                          enctype="multipart/form-data"
                           style="display: none;">
 
                         <label>Сезон *</label>
@@ -602,9 +606,18 @@
                             <option value="🎨" th:selected="${task.icon == '🎨'}">🎨 Творчество</option>
                         </select>
 
-                        <label>🖼️ URL картинки</label>
-                        <input type="url" name="imageUrl"
-                               th:value="${task.imageUrl}">
+                        <label>🖼️ URL картинки (опционально)</label>
+                        <input type="url" name="imageUrl" th:value="${task.imageUrl}">
+
+                        <label>📁 ИЛИ новая картинка</label>
+                        <input type="file"
+                               name="image"
+                               accept="image/jpeg,image/png,image/webp">
+
+                        <img th:if="${task.imageFile != null}"
+                             th:src="@{'/files/advent/' + ${task.imageFile}}"
+                             alt=""
+                             style="max-width: 200px; border-radius: 12px; margin: 8px 0;">
 
                         <label>🎬 URL видео</label>
                         <input type="url" name="videoUrl"

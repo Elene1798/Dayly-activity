@@ -154,6 +154,9 @@
             🐍
         </span>
 
+                        <span th:case="'PUZZLE'" class="mini-game-art-puzzle">
+            🧩
+        </span>
                         <span th:case="*" class="mini-game-art-default">
             🎮
         </span>
@@ -294,6 +297,7 @@
     const crocodileGame = content.querySelector('[data-crocodile-game]');
     const wordGame = content.querySelector('[data-word-game]');
     const snakeGame = content.querySelector('[data-snake-game]');
+    const puzzleGame = content.querySelector('[data-puzzle-game]');
 
     if (memoryGame && typeof initializeMemoryGame === 'function') {
         initializeMemoryGame(memoryGame);
@@ -303,6 +307,8 @@
         initializeWordGame(wordGame);
     } else if (snakeGame && typeof initializeSnakeGame === 'function') {
         initializeSnakeGame(snakeGame);
+    } else if (puzzleGame && typeof initializePuzzleGame === 'function') {
+            initializePuzzleGame(puzzleGame);
     } else if (card.dataset.gameType?.toUpperCase() === 'WORD') {
         content.innerHTML =
             '<p class="mini-games-completed">Все игры пройдены</p>';
@@ -381,6 +387,7 @@
 <script th:src="@{/js/games/mini-game-inline.js}"></script>
 <script th:src="@{/js/games/mini-game-memory.js}"></script>
 <script th:src="@{/js/games/mini-game-snake.js}"></script>
+<script th:src="@{/js/games/mini-game-puzzle.js}"></script>
 
 </body>
 </html>

@@ -270,6 +270,22 @@ public enum AchievementType {
             "Выполни занятия общей продолжительностью 100 часов",
             "💯",
             false
+    ),
+
+    PUZZLE_MASTER(
+            "puzzle_master",
+                    "Пазлмэн",
+                    "Собери любые 5 пазлов",
+                    "🧩",
+                    true
+    ),
+
+    PUZZLE_SUPER_MIND(
+            "puzzle_super_mind",
+                    "СверхУм",
+                    "Собери 10 пазлов на 6×6",
+                    "🧠",
+                    true
     );
 
 

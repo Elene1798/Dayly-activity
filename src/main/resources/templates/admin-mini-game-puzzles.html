@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="ru" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Пазлы — задания</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+</head>
+<body>
+
+<div class="container">
+
+    <a th:href="@{/admin}" class="site-header-link">← Вернуться в админку</a>
+
+    <h1>🧩 Пазлы</h1>
+
+    <h2 th:text="${miniGame.title}">Название игры</h2>
+    <p th:text="${miniGame.description}">Описание</p>
+
+    <!-- ФОРМА ДОБАВЛЕНИЯ -->
+    <section class="admin-section">
+        <h2>➕ Добавить пазл</h2>
+
+        <form th:action="@{'/admin/mini-game/' + ${miniGame.id} + '/puzzles/add'}"
+              method="post"
+              enctype="multipart/form-data">
+
+            <label>Название</label>
+            <input type="text" name="title" required>
+
+            <label>Размер сетки</label>
+            <select name="defaultSize" required>
+                <option value="3">3×3 (просто)</option>
+                <option value="4">4×4 (средне)</option>
+                <option value="5">5×5 (сложно)</option>
+                <option value="6">6×6 (очень сложно)</option>
+            </select>
+
+            <label>Картинка</label>
+            <input type="file"
+                   name="image"
+                   accept="image/jpeg,image/png,image/webp"
+                   required>
+
+            <button type="submit" class="button">➕ Добавить пазл</button>
+        </form>
+    </section>
+
+    <!-- СПИСОК -->
+    <section class="admin-section">
+        <h2>📋 Все пазлы</h2>
+
+        <div class="advent-admin-list">
+            <div class="advent-admin-card"
+                 th:each="puzzle : ${puzzles}">
+
+                <div class="advent-admin-card__header">
+                    <span class="advent-admin-card__icon">🧩</span>
+                    <span class="advent-admin-card__title"
+                          th:text="${puzzle.title}">Название</span>
+                    <span class="advent-admin-card__season"
+                          th:text="${puzzle.defaultSize + '×' + puzzle.defaultSize}">3×3</span>
+                </div>
+
+                <img th:if="${puzzle.imageFile != null}"
+                     th:src="@{'/files/puzzles/' + ${puzzle.imageFile}}"
+                     alt=""
+                     style="max-width: 200px; border-radius: 12px; margin: 8px 0;">
+
+                <div class="advent-admin-card__actions">
+
+                    <button type="button"
+                            class="mini-game-edit-button"
+                            th:onclick="'togglePuzzleEdit(' + ${puzzle.id} + ')'">
+                        ✏️ Редактировать
+                    </button>
+
+                    <form th:action="@{'/admin/mini-game/puzzle/delete/' + ${puzzle.id}}"
+                          method="post">
+                        <button type="submit"
+                                class="mini-game-delete-button"
+                                onclick="return confirm('Удалить этот пазл?');">
+                            🗑️ Удалить
+                        </button>
+                    </form>
+                </div>
+
+                <form th:id="'puzzle-edit-' + ${puzzle.id}"
+                      class="advent-admin-edit-form"
+                      th:action="@{'/admin/mini-game/puzzle/edit/' + ${puzzle.id}}"
+                      method="post"
+                      enctype="multipart/form-data"
+                      style="display: none;">
+
+                    <label>Название</label>
+                    <input type="text" name="title"
+                           th:value="${puzzle.title}" required>
+
+                    <label>Размер сетки</label>
+                    <select name="defaultSize">
+                        <option value="3" th:selected="${puzzle.defaultSize == 3}">3×3</option>
+                        <option value="4" th:selected="${puzzle.defaultSize == 4}">4×4</option>
+                        <option value="5" th:selected="${puzzle.defaultSize == 5}">5×5</option>
+                        <option value="6" th:selected="${puzzle.defaultSize == 6}">6×6</option>
+                    </select>
+
+                    <label>Новая картинка (опционально)</label>
+                    <input type="file"
+                           name="image"
+                           accept="image/jpeg,image/png,image/webp">
+
+                    <label class="admin-checkbox">
+                        <input type="checkbox" name="active" value="true"
+                               th:checked="${puzzle.active}">
+                        🟢 Пазл активен
+                    </label>
+
+                    <div class="admin-edit-actions">
+                        <button type="submit" class="button">💾 Сохранить</button>
+                        <button type="button" class="button secondary-button"
+                                th:onclick="'togglePuzzleEdit(' + ${puzzle.id} + ')'">
+                            Отмена
+                        </button>
+                    </div>
+                </form>
+
+            </div>
+
+            <p th:if="${#lists.isEmpty(puzzles)}" class="empty-message">
+                Пока нет пазлов. Добавьте первый!
+            </p>
+        </div>
+    </section>
+
+</div>
+
+<script>
+    function togglePuzzleEdit(id) {
+        const form = document.getElementById('puzzle-edit-' + id);
+        if (!form) return;
+        if (form.style.display === 'none' || form.style.display === '') {
+            form.style.display = 'block';
+        } else {
+            form.style.display = 'none';
+        }
+    }
+</script>
+
+</body>
+</html>

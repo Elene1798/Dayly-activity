@@ -7,6 +7,7 @@ import com.example.dailyactivity.repository.ActivityCompletionRepository;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -20,15 +21,18 @@ public class AdventService {
     private final AdventActivityRepository activityRepository;
     private final AdventDayRepository dayRepository;
     private final ActivityCompletionRepository completionRepository;
+    private final FileStorageService fileStorage;
 
     public AdventService(
             AdventActivityRepository activityRepository,
             AdventDayRepository dayRepository,
-            ActivityCompletionRepository completionRepository
+            ActivityCompletionRepository completionRepository,
+            FileStorageService fileStorage
     ) {
         this.activityRepository = activityRepository;
         this.dayRepository = dayRepository;
         this.completionRepository = completionRepository;
+        this.fileStorage = fileStorage;
     }
 
     //  СЕЗОН
@@ -266,5 +270,22 @@ public class AdventService {
 
     public long countBySeason(AdventSeason season) {
         return activityRepository.countBySeason(season);
+    }
+
+    @Transactional
+    public AdventActivity save(AdventActivity activity, MultipartFile image) {
+
+        if (image != null && !image.isEmpty()) {
+            String fileName = fileStorage.save(image, "advent");
+
+            // Если был старый файл — удалить
+            if (activity.getImageFile() != null) {
+                fileStorage.delete("advent", activity.getImageFile());
+            }
+
+            activity.setImageFile(fileName);
+        }
+
+        return activityRepository.save(activity);
     }
 }

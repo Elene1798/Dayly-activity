@@ -1,18 +1,16 @@
 package com.example.dailyactivity;
 
-import com.example.dailyactivity.model.Activity;
-import com.example.dailyactivity.model.AdventActivity;
-import com.example.dailyactivity.model.AdventSeason;
-import com.example.dailyactivity.model.MiniGame;
-import com.example.dailyactivity.model.MiniGameTask;
+import com.example.dailyactivity.model.*;
 import com.example.dailyactivity.repository.ActivityRepository;
 import com.example.dailyactivity.repository.DailyRecommendationRepository;
 import com.example.dailyactivity.service.AdventService;
 import com.example.dailyactivity.service.MiniGameService;
 import com.example.dailyactivity.service.MiniGameTaskService;
+import com.example.dailyactivity.service.PuzzleService;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.time.LocalDate;
 import java.time.YearMonth;
@@ -28,19 +26,22 @@ public class AdminController {
     private final MiniGameTaskService miniGameTaskService;
     private final AdventService adventService;
     private final DailyRecommendationRepository dailyRecommendationRepository;
+    private final PuzzleService puzzleService;
 
     public AdminController(
             ActivityRepository activityRepository,
             MiniGameService miniGameService,
             MiniGameTaskService miniGameTaskService,
             AdventService adventService,
-            DailyRecommendationRepository dailyRecommendationRepository
+            DailyRecommendationRepository dailyRecommendationRepository,
+            PuzzleService puzzleService
     ) {
         this.activityRepository = activityRepository;
         this.miniGameService = miniGameService;
         this.miniGameTaskService = miniGameTaskService;
         this.adventService = adventService;
         this.dailyRecommendationRepository = dailyRecommendationRepository;
+        this.puzzleService = puzzleService;
     }
 
     // =========================================================
@@ -330,7 +331,8 @@ public class AdminController {
             @RequestParam(required = false) String videoUrl,
             @RequestParam(required = false) String linkUrl,
             @RequestParam(defaultValue = "false") boolean special,
-            @RequestParam(required = false) Integer specialDay
+            @RequestParam(required = false) Integer specialDay,
+            @RequestParam(value = "image", required = false) MultipartFile image
     ) {
         AdventSeason adventSeason;
         try {
@@ -353,7 +355,6 @@ public class AdminController {
                 return "redirect:/admin?adventError=special-day-required";
             }
 
-            // Проверяем, что такой день существует в месяце сезона
             int year = LocalDate.now().getYear();
             int daysInMonth = java.time.YearMonth
                     .of(year, adventSeason.getMonth())
@@ -368,7 +369,7 @@ public class AdminController {
             activity.setSpecialDay(null);
         }
 
-        adventService.save(activity);
+        adventService.save(activity, image);
 
         return "redirect:/admin?adventSuccess=added";
     }
@@ -385,7 +386,8 @@ public class AdminController {
             @RequestParam(required = false) String videoUrl,
             @RequestParam(required = false) String linkUrl,
             @RequestParam(defaultValue = "false") boolean special,
-            @RequestParam(required = false) Integer specialDay
+            @RequestParam(required = false) Integer specialDay,
+            @RequestParam(value = "image", required = false) MultipartFile image
     ) {
         AdventActivity activity = adventService.findById(id);
         if (activity == null) {
@@ -428,7 +430,7 @@ public class AdminController {
             activity.setSpecialDay(null);
         }
 
-        adventService.save(activity);
+        adventService.save(activity, image);
 
         return "redirect:/admin?adventSuccess=edited";
     }
@@ -445,5 +447,81 @@ public class AdminController {
 
     private String blankToNull(String value) {
         return (value == null || value.isBlank()) ? null : value;
+    }
+
+    // =========================================================
+//  ПАЗЛЫ (задания для мини-игры PUZZLE)
+// =========================================================
+
+    @PostMapping("/mini-game/{id}/puzzles/add")
+    public String addPuzzle(
+            @PathVariable Long id,
+            @RequestParam String title,
+            @RequestParam int defaultSize,
+            @RequestParam("image") MultipartFile image
+    ) {
+        MiniGame miniGame = miniGameService.findById(id);
+
+        if (miniGame == null || !"PUZZLE".equalsIgnoreCase(miniGame.getGameType())) {
+            return "redirect:/admin";
+        }
+
+        Puzzle puzzle = new Puzzle(title, null, defaultSize);
+        puzzle.setMiniGame(miniGame);
+
+        puzzleService.save(puzzle, image);
+
+        return "redirect:/admin/mini-game/" + id + "/puzzles";
+    }
+
+    @PostMapping("/mini-game/puzzle/edit/{id}")
+    public String editPuzzle(
+            @PathVariable Long id,
+            @RequestParam String title,
+            @RequestParam int defaultSize,
+            @RequestParam(value = "image", required = false) MultipartFile image,
+            @RequestParam(defaultValue = "false") boolean active
+    ) {
+        Puzzle puzzle = puzzleService.findById(id);
+        if (puzzle == null) return "redirect:/admin";
+
+        puzzle.setTitle(title);
+        puzzle.setDefaultSize(defaultSize);
+        puzzle.setActive(active);
+
+        puzzleService.save(puzzle, image);
+
+        return "redirect:/admin/mini-game/"
+                + puzzle.getMiniGame().getId()
+                + "/puzzles";
+    }
+
+    @PostMapping("/mini-game/puzzle/delete/{id}")
+    public String deletePuzzle(@PathVariable Long id) {
+        Puzzle puzzle = puzzleService.findById(id);
+        if (puzzle == null) return "redirect:/admin";
+
+        Long miniGameId = puzzle.getMiniGame().getId();
+        puzzleService.delete(id);
+
+        return "redirect:/admin/mini-game/" + miniGameId + "/puzzles";
+    }
+
+    @GetMapping("/mini-game/{id}/puzzles")
+    public String miniGamePuzzles(
+            @PathVariable Long id,
+            Model model
+    ) {
+        MiniGame miniGame = miniGameService.findById(id);
+
+        if (miniGame == null
+                || !"PUZZLE".equalsIgnoreCase(miniGame.getGameType())) {
+            return "redirect:/admin";
+        }
+
+        model.addAttribute("miniGame", miniGame);
+        model.addAttribute("puzzles", puzzleService.getByMiniGame(miniGame));
+
+        return "admin-mini-game-puzzles";
     }
 }
