@@ -65,7 +65,7 @@
 
         <div class="admin-section-toggle__body">
 
-            <form th:action="@{/admin/add}" method="post">
+            <form th:action="@{/admin/add}" method="post" enctype="multipart/form-data">>
 
                 <p><label>Название:</label></p>
                 <input type="text" name="title" required>
@@ -107,8 +107,13 @@
                 <textarea name="interestingFact" rows="4"
                           placeholder="Интересный факт, связанный с этим занятием."></textarea>
 
-                <p><label>🖼️ Ссылка на картинку:</label></p>
+               <p><label>🖼️ URL картинки (опционально)</label></p>
                 <input type="url" name="imageUrl" placeholder="https://...">
+
+                <p><label>📁 ИЛИ загрузите картинку с компьютера</label></p>
+                <input type="file"
+                       name="image"
+                       accept="image/jpeg,image/png,image/webp">
 
                 <p><label>🔗 Ссылка на полезный материал:</label></p>
                 <input type="url" name="linkUrl" placeholder="https://...">

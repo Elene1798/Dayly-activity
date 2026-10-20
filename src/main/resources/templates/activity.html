@@ -200,11 +200,19 @@
         </div>
 
         <div class="activity-image"
-             th:if="${activity.imageUrl != null and !#strings.isEmpty(activity.imageUrl)}">
+             th:if="${(activity.imageFile != null and !activity.imageFile.isBlank())
+            or (activity.imageUrl != null and !activity.imageUrl.isBlank())}">
 
-            <img th:src="${activity.imageUrl}"
-                 alt="Изображение занятия">
+            <!-- Приоритет: локальный файл -->
+            <img th:if="${activity.imageFile != null and !activity.imageFile.isBlank()}"
+                 th:src="@{'/files/activities/' + ${activity.imageFile}}"
+                 th:alt="${activity.title}">
 
+            <!-- Если файла нет — URL -->
+            <img th:if="${(activity.imageFile == null or activity.imageFile.isBlank())
+              and activity.imageUrl != null and !activity.imageUrl.isBlank()}"
+                 th:src="${activity.imageUrl}"
+                 th:alt="${activity.title}">
         </div>
 
         <!-- ОСНОВНАЯ ИНФОРМАЦИЯ -->

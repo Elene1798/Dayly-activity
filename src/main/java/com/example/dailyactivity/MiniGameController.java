@@ -852,7 +852,6 @@ public class MiniGameController {
             Model model
     ) {
         MiniGame miniGame = miniGameService.findById(id);
-
         if (miniGame == null
                 || !miniGame.isActive()
                 || !"PUZZLE".equalsIgnoreCase(miniGame.getGameType())) {
@@ -860,17 +859,21 @@ public class MiniGameController {
         }
 
         List<Puzzle> puzzles = puzzleService.getActiveByMiniGame(miniGame);
-
         if (puzzles.isEmpty()) {
             return "fragments/mini-game-completed";
         }
 
-        // Исключаем текущий, если есть другие
+        // Исключаем текущий
         List<Puzzle> candidates = puzzles;
         if (currentPuzzleId != null && puzzles.size() > 1) {
             candidates = puzzles.stream()
                     .filter(p -> !p.getId().equals(currentPuzzleId))
                     .toList();
+        }
+
+        // Если кандидатов не осталось (был один пазл) — возвращаем тот же
+        if (candidates.isEmpty()) {
+            candidates = puzzles;
         }
 
         Puzzle next = candidates.get(
@@ -879,7 +882,7 @@ public class MiniGameController {
 
         model.addAttribute("puzzle", next);
         model.addAttribute("miniGame", miniGame);
-        model.addAttribute("size", size);   // можно передать дальше
+        model.addAttribute("size", size);
 
         return "fragments/mini-game-puzzle";
     }

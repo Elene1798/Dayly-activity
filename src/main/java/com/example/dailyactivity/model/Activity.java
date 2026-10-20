@@ -36,6 +36,9 @@ public class Activity {
     @Column(length = 2000)
     private String imageUrl;
 
+    @Column(name = "image_file", length = 255)
+    private String imageFile;
+
     @Column(length = 2000)
     private String linkUrl;
 
@@ -138,6 +141,8 @@ public class Activity {
         return imageUrl;
     }
 
+    public String getImageFile() {return imageFile;    }
+
     public String getLinkUrl() {
         return linkUrl;
     }
@@ -183,6 +188,8 @@ public class Activity {
     public void setImageUrl(String imageUrl) {
         this.imageUrl = imageUrl;
     }
+
+    public void setImageFile(String imageFile) { this.imageFile = imageFile;}
 
     public void setLinkUrl(String linkUrl) {
         this.linkUrl = linkUrl;

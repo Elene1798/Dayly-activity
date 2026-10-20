@@ -29,6 +29,7 @@ public class FileStorageService {
         try {
             Files.createDirectories(rootPath.resolve("puzzles"));
             Files.createDirectories(rootPath.resolve("advent"));
+            Files.createDirectories(rootPath.resolve("activities"));
         } catch (IOException e) {
             throw new IllegalStateException(
                     "Не удалось создать папки для загрузок", e

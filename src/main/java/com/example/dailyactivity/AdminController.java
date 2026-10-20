@@ -3,10 +3,7 @@ package com.example.dailyactivity;
 import com.example.dailyactivity.model.*;
 import com.example.dailyactivity.repository.ActivityRepository;
 import com.example.dailyactivity.repository.DailyRecommendationRepository;
-import com.example.dailyactivity.service.AdventService;
-import com.example.dailyactivity.service.MiniGameService;
-import com.example.dailyactivity.service.MiniGameTaskService;
-import com.example.dailyactivity.service.PuzzleService;
+import com.example.dailyactivity.service.*;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -27,6 +24,7 @@ public class AdminController {
     private final AdventService adventService;
     private final DailyRecommendationRepository dailyRecommendationRepository;
     private final PuzzleService puzzleService;
+    private final ActivityService activityService;
 
     public AdminController(
             ActivityRepository activityRepository,
@@ -34,7 +32,8 @@ public class AdminController {
             MiniGameTaskService miniGameTaskService,
             AdventService adventService,
             DailyRecommendationRepository dailyRecommendationRepository,
-            PuzzleService puzzleService
+            PuzzleService puzzleService,
+            ActivityService activityService
     ) {
         this.activityRepository = activityRepository;
         this.miniGameService = miniGameService;
@@ -42,6 +41,7 @@ public class AdminController {
         this.adventService = adventService;
         this.dailyRecommendationRepository = dailyRecommendationRepository;
         this.puzzleService = puzzleService;
+        this.activityService = activityService;
     }
 
     // =========================================================
@@ -87,15 +87,18 @@ public class AdminController {
             @RequestParam(required = false) String interestingFact,
             @RequestParam(required = false) String imageUrl,
             @RequestParam(required = false) String linkUrl,
-            @RequestParam(required = false) String videoUrl) {
-
+            @RequestParam(required = false) String videoUrl,
+            @RequestParam(value = "image", required = false) MultipartFile image
+    ) {
         Activity activity = new Activity(
                 title, description, category, duration, location,
                 instructions, benefit, interestingFact,
                 imageUrl, linkUrl, videoUrl
         );
-        activityRepository.save(activity);
-        return "redirect:/admin";
+
+        activityService.save(activity, image);
+
+        return "redirect:/admin?activitySuccess=added";
     }
 
     @GetMapping("/edit/{id}")
@@ -121,8 +124,9 @@ public class AdminController {
             @RequestParam(required = false) String imageUrl,
             @RequestParam(required = false) String linkUrl,
             @RequestParam(required = false) String videoUrl,
-            @RequestParam(required = false) Long miniGameId) {
-
+            @RequestParam(required = false) Long miniGameId,
+            @RequestParam(value = "image", required = false) MultipartFile image
+    ) {
         Activity activity = activityRepository.findById(id).orElse(null);
         if (activity == null) return "redirect:/admin";
 
@@ -145,15 +149,15 @@ public class AdminController {
             activity.setMiniGame(null);
         }
 
-        activityRepository.save(activity);
-        return "redirect:/admin";
+        activityService.save(activity, image);
+
+        return "redirect:/admin?activitySuccess=edited";
     }
 
     @PostMapping("/delete/{id}")
     public String deleteActivity(@PathVariable Long id) {
-        dailyRecommendationRepository.deleteByActivityId(id);
-        activityRepository.deleteById(id);
-        return "redirect:/admin";
+        activityService.delete(id);
+        return "redirect:/admin?activitySuccess=deleted";
     }
 
     // =========================================================

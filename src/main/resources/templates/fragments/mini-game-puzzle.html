@@ -22,6 +22,14 @@
         <span>Время: <strong data-puzzle-time>0:00</strong></span>
     </div>
 
+    <div class="puzzle-preview-row">
+        <button type="button"
+                class="puzzle-preview-button"
+                data-puzzle-preview>
+            🐵 Показать картинку
+        </button>
+    </div>
+
     <div class="puzzle-board" data-puzzle-board></div>
 
     <div class="puzzle-result" data-puzzle-result></div>
@@ -38,5 +46,22 @@
                 data-puzzle-next>
             ⏭ Следующий пазл
         </button>
+    </div>
+
+    <div class="puzzle-preview-modal"
+         data-puzzle-preview-modal
+         hidden>
+        <div class="puzzle-preview-backdrop"
+             data-puzzle-preview-close></div>
+        <div class="puzzle-preview-window">
+            <button type="button"
+                    class="puzzle-preview-close-btn"
+                    data-puzzle-preview-close>
+                ✕
+            </button>
+            <img th:src="${'/files/puzzles/' + puzzle.imageFile}"
+                 alt=""
+                 class="puzzle-preview-image">
+        </div>
     </div>
 </div>

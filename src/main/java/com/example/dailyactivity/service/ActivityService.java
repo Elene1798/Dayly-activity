@@ -3,6 +3,8 @@ package com.example.dailyactivity.service;
 import com.example.dailyactivity.model.Activity;
 import com.example.dailyactivity.repository.ActivityRepository;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 import java.util.Optional;
@@ -14,9 +16,12 @@ public class ActivityService {
 
     private final ActivityRepository activityRepository;
     private final Random random = new Random();
+    private final FileStorageService fileStorage;
 
-    public ActivityService(ActivityRepository activityRepository) {
+    public ActivityService(ActivityRepository activityRepository,
+                           FileStorageService fileStorage) {
         this.activityRepository = activityRepository;
+        this.fileStorage = fileStorage;
     }
 
     public Activity getRandomActivity(
@@ -118,4 +123,37 @@ public class ActivityService {
     public Optional<Activity> getActivityById(Long id) {
         return activityRepository.findById(id);
     }
+
+    @Transactional
+    public Activity save(Activity activity, MultipartFile image) {
+
+        if (image != null && !image.isEmpty()) {
+            String fileName = fileStorage.save(image, "activities");
+
+            // Если был старый файл — удалить
+            if (activity.getImageFile() != null) {
+                fileStorage.delete("activities", activity.getImageFile());
+            }
+
+            activity.setImageFile(fileName);
+        }
+
+        return activityRepository.save(activity);
+    }
+
+    /**
+     * Удаляет активность и её картинку.
+     */
+    @Transactional
+    public void delete(Long id) {
+        Activity activity = activityRepository.findById(id).orElse(null);
+        if (activity == null) return;
+
+        if (activity.getImageFile() != null) {
+            fileStorage.delete("activities", activity.getImageFile());
+        }
+
+        activityRepository.delete(activity);
+    }
 }
+

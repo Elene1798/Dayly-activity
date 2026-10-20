@@ -29,6 +29,31 @@ function initializePuzzleGame(game) {
     let started = false;
     let dragged = null;
 
+    // ---------- Показать картинку ----------
+
+    const previewBtn = game.querySelector('[data-puzzle-preview]');
+    const previewModal = game.querySelector('[data-puzzle-preview-modal]');
+    const previewCloseBtns = game.querySelectorAll('[data-puzzle-preview-close]');
+
+    if (previewBtn && previewModal) {
+        previewBtn.addEventListener('click', () => {
+            previewModal.hidden = false;
+        });
+
+        previewCloseBtns.forEach(btn => {
+            btn.addEventListener('click', () => {
+                previewModal.hidden = true;
+            });
+        });
+
+        // Escape для закрытия
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape' && !previewModal.hidden) {
+                previewModal.hidden = true;
+            }
+        });
+    }
+
     // ---------- Построение поля ----------
 
     function buildBoard() {

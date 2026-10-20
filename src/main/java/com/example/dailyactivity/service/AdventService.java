@@ -55,10 +55,7 @@ public class AdventService {
     public List<AdventDay> getOrCreateAdventForCurrentSeason(User user) {
 
         AdventSeason season = getCurrentSeason();
-
-        if (season == null) {
-            return List.of();
-        }
+        if (season == null) return List.of();
 
         LocalDate today = LocalDate.now();
         YearMonth yearMonth = YearMonth.from(today);
@@ -67,7 +64,12 @@ public class AdventService {
         LocalDate end = yearMonth.atEndOfMonth();
 
         if (dayRepository.existsByUserAndAdventDateBetween(user, start, end)) {
-            return dayRepository.findByUserAndAdventDateBetween(user, start, end);
+            // Явная сортировка по дате
+            return dayRepository
+                    .findByUserAndAdventDateBetween(user, start, end)
+                    .stream()
+                    .sorted(Comparator.comparing(AdventDay::getAdventDate))
+                    .toList();
         }
         return generateAdventFor(user, season, yearMonth);
     }
