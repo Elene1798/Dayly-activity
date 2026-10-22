@@ -183,11 +183,20 @@
                     value="memory"
             >
 
+            <label>
+                📏 Размер (сколько пар)
+            </label>
+            <select name="difficulty" required>
+                <option value="">— Выбери размер —</option>
+                <option value="3">3×3 (3 пары)</option>
+                <option value="4">4×4 (4 пары)</option>
+                <option value="5">5×5 (5 пар)</option>
+                <option value="6">6×6 (6 пар)</option>
+            </select>
 
             <label>
                 🖼️ Выбери картинку
             </label>
-
 
             <select
                     name="imageUrl"
@@ -352,6 +361,30 @@
                         value="/images/games/memory/pinguin.png"
                 >
                     Пингвин
+                </option>
+
+                <option
+                        value="/images/games/memory/botinki.png"
+                >
+                    Ботинки
+                </option>
+
+                <option
+                        value="/images/games/memory/shapka.png"
+                >
+                    Шапка
+                </option>
+
+                <option
+                        value="/images/games/memory/shtani.png"
+                >
+                    Штаны
+                </option>
+
+                <option
+                        value="/images/games/memory/sviter.png"
+                >
+                    Свитер
                 </option>
 
             </select>
@@ -641,6 +674,13 @@
                     <div
                             th:if="${miniGame.gameType == 'MEMORY'}"
                     >
+                        <label>📏 Размер</label>
+                        <select name="difficulty">
+                            <option value="3" th:selected="${task.difficulty == '3'}">3×3 (3 пары)</option>
+                            <option value="4" th:selected="${task.difficulty == '4'}">4×4 (4 пары)</option>
+                            <option value="5" th:selected="${task.difficulty == '5'}">5×5 (5 пар)</option>
+                            <option value="6" th:selected="${task.difficulty == '6'}">6×6 (6 пар)</option>
+                        </select>
 
                         <label>
                             🖼️ Картинка
@@ -846,6 +886,34 @@
                                     th:selected="${task != null and task.imageUrl != null and task.imageUrl == '/images/games/memory/pinguin.png'}"
                             >
                                 Пингвин
+                            </option>
+
+                            <option
+                                    value="/images/games/memory/botinki.png"
+                                    th:selected="${task != null and task.imageUrl != null and task.imageUrl == '/images/games/memory/botinki.png'}"
+                            >
+                                Ботинки
+                            </option>
+
+                            <option
+                                    value="/images/games/memory/shapka.png"
+                                    th:selected="${task != null and task.imageUrl != null and task.imageUrl == '/images/games/memory/shapka.png'}"
+                            >
+                                Шапка
+                            </option>
+
+                            <option
+                                    value="/images/games/memory/shtani.png"
+                                    th:selected="${task != null and task.imageUrl != null and task.imageUrl == '/images/games/memory/shtani.png'}"
+                            >
+                                Штаны
+                            </option>
+
+                            <option
+                                    value="/images/games/memory/sviter.png"
+                                    th:selected="${task != null and task.imageUrl != null and task.imageUrl == '/images/games/memory/sviter.png'}"
+                            >
+                                Свитер
                             </option>
 
 

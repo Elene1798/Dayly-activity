@@ -1,0 +1,32 @@
+<div class="mini-game-inline sudoku-game"
+     data-sudoku-game
+     th:attr="data-game-id=${miniGame.id}">
+
+    <div class="sudoku-header">
+        <span>🏆 Рекорд: <strong data-sudoku-best>0</strong></span>
+        <div class="sudoku-difficulty">
+            <button type="button" class="sudoku-diff-btn" data-difficulty="EASY">🟢 Лёгкий</button>
+            <button type="button" class="sudoku-diff-btn" data-difficulty="MEDIUM">🟡 Средний</button>
+            <button type="button" class="sudoku-diff-btn" data-difficulty="HARD">🔴 Сложный</button>
+        </div>
+        <div class="sudoku-info">
+            <span>Ошибки: <strong data-sudoku-mistakes>0</strong></span>
+            <span>Время: <strong data-sudoku-time>0:00</strong></span>
+        </div>
+
+        <button type="button" class="sudoku-hint-btn" data-sudoku-hint>
+            💡 Подсказка
+        </button>
+    </div>
+
+    <div class="sudoku-board" data-sudoku-board></div>
+
+    <div class="sudoku-result" data-sudoku-result></div>
+
+    <div class="sudoku-actions">
+
+        <button type="button" class="sudoku-new-btn" data-sudoku-new>
+            🔄 Играть ещё
+        </button>
+    </div>
+</div>

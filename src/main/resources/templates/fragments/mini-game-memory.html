@@ -1,78 +1,57 @@
 <div class="mini-game-inline memory-game"
      data-memory-game
-     th:attr="data-activity-id=${activityId},
-              data-game-id=${miniGame.id}">
+     th:attr="data-activity-id=${activityId}, data-game-id=${miniGame.id}">
 
-    <input
-            type="hidden"
-            class="memory-csrf-token"
-            th:name="${_csrf.parameterName}"
-            th:value="${_csrf.token}"
-    >
+    <input type="hidden" class="memory-csrf-token"
+           th:name="${_csrf.parameterName}" th:value="${_csrf.token}">
 
-
-    <div class="memory-game-board">
-
-        <th:block th:each="task : ${tasks}">
-
-            <!-- Первая карточка пары -->
-
-            <div class="memory-card"
-                 th:attr="
-                    data-task-id=${task.id},
-                    data-image=${task.imageUrl}">
-
-                <div class="memory-card-inner">
-
-                    <div class="memory-card-front">
-                        ?
-                    </div>
-
-                    <div class="memory-card-back">
-
-                        <img
-                                th:src="${task.imageUrl}"
-                                alt="Карточка"
-                        >
-
-                    </div>
-
-                </div>
-
-            </div>
-
-
-            <!-- Вторая карточка пары -->
-
-            <div class="memory-card"
-                 th:attr="
-                    data-task-id=${task.id},
-                    data-image=${task.imageUrl}">
-
-                <div class="memory-card-inner">
-
-                    <div class="memory-card-front">
-                        ?
-                    </div>
-
-                    <div class="memory-card-back">
-
-                        <img
-                                th:src="${task.imageUrl}"
-                                alt="Карточка"
-                        >
-
-                    </div>
-
-                </div>
-
-            </div>
-
-        </th:block>
-
+    <div class="memory-sizes" data-memory-sizes>
+        <button type="button" class="memory-size-btn" data-size-btn="3">3 пары</button>
+        <button type="button" class="memory-size-btn" data-size-btn="4">4 пары</button>
+        <button type="button" class="memory-size-btn" data-size-btn="5">5 пар</button>
+        <button type="button" class="memory-size-btn" data-size-btn="6">6 пар</button>
     </div>
 
+    <div class="memory-game-board"></div>
 
     <div class="memory-game-result"></div>
 
+    <div class="memory-actions">
+        <button type="button" class="memory-play-again-button" data-memory-play-again hidden>
+            🔄 Играть ещё
+        </button>
+    </div>
+
+    <!-- Скрытые шаблоны -->
+    <div class="memory-templates" style="display: none;">
+        <th:block th:each="task : ${tasks}">
+            <!-- Первая карточка пары -->
+            <div class="memory-card"
+                 th:attr="data-task-id=${task.id},
+                      data-image=${task.imageUrl},
+                      data-difficulty=${task.difficulty},
+                      data-game-id=${task.miniGame.id}">
+                <div class="memory-card-inner">
+                    <div class="memory-card-front">?</div>
+                    <div class="memory-card-back">
+                        <img th:src="${task.imageUrl}" alt="Карточка">
+                    </div>
+                </div>
+            </div>
+
+            <!-- Вторая карточка пары (дубликат) -->
+            <div class="memory-card"
+                 th:attr="data-task-id=${task.id},
+                      data-image=${task.imageUrl},
+                      data-difficulty=${task.difficulty},
+                      data-game-id=${task.miniGame.id}">
+                <div class="memory-card-inner">
+                    <div class="memory-card-front">?</div>
+                    <div class="memory-card-back">
+                        <img th:src="${task.imageUrl}" alt="Карточка">
+                    </div>
+                </div>
+            </div>
+        </th:block>
+    </div>
 </div>

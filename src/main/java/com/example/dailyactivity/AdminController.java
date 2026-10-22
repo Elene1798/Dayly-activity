@@ -266,7 +266,10 @@ public class AdminController {
             task.setImageUrl(imageUrl);
 
             miniGameTaskService.save(task);
+
         }
+
+
 
         return "redirect:/admin/mini-game/" + id + "/tasks";
     }

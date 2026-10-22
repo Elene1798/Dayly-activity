@@ -35,6 +35,7 @@ public class MiniGameController {
     private final SnakeRecordRepository snakeRecordRepository;
     private final PuzzleService puzzleService;
     private final PuzzleCompletionRepository puzzleCompletionRepository;
+    private final SudokuRecordRepository sudokuRecordRepository;
 
     public MiniGameController(
             MiniGameService miniGameService,
@@ -46,7 +47,8 @@ public class MiniGameController {
             MiniGameTaskCompletionRepository miniGameTaskCompletionRepository,
             SnakeRecordRepository snakeRecordRepository,
             PuzzleService puzzleService,
-            PuzzleCompletionRepository puzzleCompletionRepository
+            PuzzleCompletionRepository puzzleCompletionRepository,
+            SudokuRecordRepository sudokuRecordRepository
     ) {
         this.miniGameService = miniGameService;
         this.miniGameTaskService = miniGameTaskService;
@@ -58,6 +60,7 @@ public class MiniGameController {
         this.snakeRecordRepository = snakeRecordRepository;
         this.puzzleService = puzzleService;
         this.puzzleCompletionRepository = puzzleCompletionRepository;
+        this.sudokuRecordRepository = sudokuRecordRepository;
     }
 
     @GetMapping("/{id}")
@@ -136,6 +139,11 @@ public class MiniGameController {
             model.addAttribute("miniGame", miniGame);
             model.addAttribute("activityId", activityId);
             return "fragments/mini-game-snake";
+        }
+
+        if ("SUDOKU".equalsIgnoreCase(miniGame.getGameType())) {
+            model.addAttribute("miniGame", miniGame);
+            return "fragments/mini-game-sudoku";
         }
 
         List<MiniGameTask> tasks;
@@ -222,7 +230,15 @@ public class MiniGameController {
         }
 
         if ("MEMORY".equalsIgnoreCase(miniGame.getGameType())) {
-            model.addAttribute("tasks", tasks);
+            // Собираем задачи из ВСЕХ игр MEMORY
+            List<MiniGame> allMemoryGames = miniGameService.findActiveGamesByType("MEMORY");
+
+            List<MiniGameTask> allTasks = new ArrayList<>();
+            for (MiniGame g : allMemoryGames) {
+                allTasks.addAll(miniGameTaskService.findActiveByGame(g));
+            }
+
+            model.addAttribute("tasks", allTasks);
             return "fragments/mini-game-memory";
         }
 
@@ -885,6 +901,74 @@ public class MiniGameController {
         model.addAttribute("size", size);
 
         return "fragments/mini-game-puzzle";
+    }
+
+    @PostMapping("/sudoku/save-record")
+    @ResponseBody
+    public String saveSudokuRecord(
+            @RequestParam int time,
+            @RequestParam String difficulty,
+            Authentication auth
+    ) {
+        if (auth == null
+                || !auth.isAuthenticated()
+                || "anonymousUser".equals(auth.getPrincipal())) {
+            return "AUTH_REQUIRED";
+        }
+
+        User user = userRepository
+                .findByUsername(auth.getName())
+                .orElse(null);
+
+        if (user == null) {
+            return "AUTH_REQUIRED";
+        }
+
+        SudokuRecord record = sudokuRecordRepository
+                .findByUser(user)
+                .orElse(null);
+
+        if (record == null) {
+            record = new SudokuRecord();
+            record.setUser(user);
+            record.setBestTime(time);
+            record.setDifficulty(difficulty);
+            record.setAchievedAt(LocalDateTime.now());
+        } else if (time < record.getBestTime()) {
+            // Меньше время — лучше рекорд
+            record.setBestTime(time);
+            record.setDifficulty(difficulty);
+            record.setAchievedAt(LocalDateTime.now());
+        } else {
+            return "OK";
+        }
+
+        sudokuRecordRepository.save(record);
+
+        return "SUCCESS";
+    }
+
+    @GetMapping("/sudoku/record")
+    @ResponseBody
+    public String getSudokuRecord(Authentication auth) {
+        if (auth == null
+                || !auth.isAuthenticated()
+                || "anonymousUser".equals(auth.getPrincipal())) {
+            return "0";
+        }
+
+        User user = userRepository
+                .findByUsername(auth.getName())
+                .orElse(null);
+
+        if (user == null) {
+            return "0";
+        }
+
+        return sudokuRecordRepository
+                .findByUser(user)
+                .map(r -> String.valueOf(r.getBestTime()))
+                .orElse("0");
     }
 
 }

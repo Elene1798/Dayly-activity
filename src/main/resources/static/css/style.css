@@ -9298,6 +9298,498 @@ body.page-with-header:has(.mini-games-page) .site-header {
     }
 }
 
+.memory-sizes {
+    display: flex;
+    justify-content: center;
+    gap: 8px;
+    margin-bottom: 16px;
+    flex-wrap: wrap;
+}
+
+.memory-size-btn {
+    padding: 8px 16px;
+    border: 2px solid #bda7f3;
+    border-radius: 10px;
+    background: #fff;
+    color: #51318f;
+    font-weight: 800;
+    font-size: 0.9rem;
+    cursor: pointer;
+    transition: background 0.15s ease, border-color 0.15s ease;
+}
+
+.memory-size-btn:hover {
+    background: #f0e8ff;
+}
+
+.memory-size-btn.active {
+    background: #8053e8;
+    color: #fff;
+    border-color: #45238e;
+    box-shadow: 0 3px 0 #45238e;
+}
+
+@media (max-width: 600px) {
+    .memory-size-btn {
+        padding: 6px 12px;
+        font-size: 0.85rem;
+    }
+}
+
+.memory-sizes {
+    display: flex;
+    justify-content: center;
+    gap: 8px;
+    margin-bottom: 16px;
+    flex-wrap: wrap;
+}
+
+.memory-size-btn {
+    padding: 8px 16px;
+    border: 2px solid #bda7f3;
+    border-radius: 10px;
+    background: #fff;
+    color: #51318f;
+    font-weight: 800;
+    font-size: 0.9rem;
+    cursor: pointer;
+    transition: background 0.15s ease, border-color 0.15s ease;
+}
+
+.memory-size-btn:hover {
+    background: #f0e8ff;
+}
+
+.memory-size-btn.active {
+    background: #8053e8;
+    color: #fff;
+    border-color: #45238e;
+    box-shadow: 0 3px 0 #45238e;
+}
+
+.memory-play-again-button {
+    padding: 12px 24px;
+    border: 3px solid #45238e;
+    border-radius: 8px;
+    background: #8053e8;
+    color: #fff;
+    font-weight: 900;
+    cursor: pointer;
+    box-shadow: 4px 4px 0 #45238e;
+}
+
+.memory-play-again-button[hidden] {
+    display: none;
+}
+
+.mini-game-art-sudoku {
+    font-size: 5rem;
+    line-height: 1;
+    filter: drop-shadow(0 5px 0 rgba(111, 75, 202, 0.2));
+}
+
+/* =========================================================
+   🔢 СУДОКУ — адаптация под телефоны и планшеты
+   ========================================================= */
+
+/* Общий контейнер */
+.standalone-mini-game-content .sudoku-game {
+    width: 100%;
+    max-width: 520px; /* Чуть уменьшил для лучшего вида */
+    margin: 0 auto;
+    padding: 20px;
+    box-sizing: border-box;
+    background: #f8f2ff;
+    border: 3px solid #6040a8;
+    border-radius: 12px;
+    box-shadow: 6px 6px 0 #d6c5f5;
+}
+
+/* Заголовок с кнопками сложности и таймером */
+.sudoku-header {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    margin-bottom: 16px;
+}
+
+.sudoku-difficulty {
+    display: flex;
+    justify-content: center;
+    gap: 6px;
+    flex-wrap: wrap;
+}
+
+.sudoku-diff-btn {
+    flex: 1; /* Кнопки растягиваются на всю ширину */
+    min-width: 90px;
+    padding: 8px 10px;
+    border: 2px solid #bda7f3;
+    border-radius: 8px;
+    background: #fff;
+    color: #51318f;
+    font-weight: 800;
+    font-size: 0.9rem;
+    cursor: pointer;
+    transition: background 0.15s ease, transform 0.1s ease;
+}
+
+.sudoku-diff-btn:hover {
+    background: #f0e8ff;
+}
+
+.sudoku-diff-btn:active {
+    transform: scale(0.96);
+}
+
+.sudoku-diff-btn.active {
+    background: #8053e8;
+    color: #fff;
+    border-color: #45238e;
+    box-shadow: 0 3px 0 #45238e;
+}
+
+.sudoku-info {
+    display: flex;
+    justify-content: space-between;
+    font-size: 0.95rem;
+    font-weight: 700;
+    color: #51318f;
+    padding: 10px 14px;
+    background: #fff0a8;
+    border: 2px solid #45238e;
+    border-radius: 8px;
+}
+
+/* Игровое поле */
+.sudoku-board {
+    display: grid;
+    grid-template-columns: repeat(9, 1fr);
+    gap: 0;
+    width: 100%;
+    aspect-ratio: 1 / 1;
+    margin: 0 auto 16px;
+    border: 3px solid #45238e;
+    border-radius: 6px;
+    overflow: hidden;
+    background: #fff;
+}
+
+.sudoku-cell {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid #d6c5f5;
+    background: #fff;
+    font-size: 1.1rem;
+    font-weight: 800;
+    color: #382273;
+    /* Убираем стандартное поведение инпутов */
+    position: relative;
+}
+
+.sudoku-cell--right-border {
+    border-right: 2px solid #45238e;
+}
+
+.sudoku-cell--bottom-border {
+    border-bottom: 2px solid #45238e;
+}
+
+.sudoku-cell--fixed {
+    background: #f0edff;
+    color: #45238e;
+}
+
+.sudoku-cell--error {
+    background: #ffe2eb;
+    color: #a52e52;
+    animation: shake 0.2s ease-in-out; /* Легкая анимация ошибки */
+}
+
+@keyframes shake {
+    0%, 100% { transform: translateX(0); }
+    25% { transform: translateX(-2px); }
+    75% { transform: translateX(2px); }
+}
+
+.sudoku-cell input {
+    width: 100%;
+    height: 100%;
+    border: none;
+    text-align: center;
+    font-size: 1.1rem;
+    font-weight: 800;
+    color: #51318f;
+    background: transparent;
+    outline: none;
+    /* Убираем стрелочки у input type="number" */
+    -moz-appearance: textfield;
+}
+
+.sudoku-cell input::-webkit-outer-spin-button,
+.sudoku-cell input::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}
+
+.sudoku-cell input:focus {
+    background: #fff9d6;
+}
+
+/* Результат */
+.sudoku-result {
+    min-height: 28px;
+    margin: 14px 0;
+    padding: 10px 14px;
+    border-radius: 6px;
+    text-align: center;
+    font-weight: 800;
+    font-size: 1rem;
+}
+
+.sudoku-result.success {
+    background: #d9ffeb;
+    color: #126b4b;
+    border: 2px solid #35ae7b;
+}
+
+/* Кнопка «Играть ещё» */
+.sudoku-actions {
+    display: flex;
+    justify-content: center;
+    margin-top: 16px;
+}
+
+.sudoku-new-btn {
+    width: 100%;
+    padding: 14px 20px;
+    border: 3px solid #45238e;
+    border-radius: 10px;
+    background: #8053e8;
+    color: #fff;
+    font-weight: 900;
+    font-size: 1rem;
+    cursor: pointer;
+    box-shadow: 4px 4px 0 #45238e;
+    transition: transform 0.1s ease, box-shadow 0.1s ease;
+}
+
+.sudoku-new-btn:hover {
+    transform: translate(-2px, -2px);
+    box-shadow: 6px 6px 0 #45238e;
+}
+
+.sudoku-new-btn:active {
+    transform: translate(2px, 2px);
+    box-shadow: 2px 2px 0 #45238e;
+}
+
+
+/* =========================================================
+   📱 Адаптация под планшеты (max-width: 768px)
+   ========================================================= */
+@media (max-width: 768px) {
+    .standalone-mini-game-content .sudoku-game {
+        padding: 16px;
+        max-width: 460px;
+    }
+
+    .sudoku-board {
+        border-width: 2px;
+        aspect-ratio: auto;
+    }
+
+    .sudoku-cell {
+        font-size: 1rem;
+    }
+
+    .sudoku-cell input {
+        font-size: 1rem;
+    }
+
+    .sudoku-cell--right-border {
+        border-right: 2px solid #45238e;
+    }
+
+    .sudoku-cell--bottom-border {
+        border-bottom: 2px solid #45238e;
+    }
+}
+
+
+/* =========================================================
+   📱 Адаптация под телефоны (max-width: 480px)
+   ========================================================= */
+@media (max-width: 480px) {
+    /* Контейнер: минимальные отступы, чтобы сетка была шире */
+    .standalone-mini-game-content .sudoku-game {
+        padding: 8px;
+        border-width: 2px;
+        border-radius: 8px;
+        box-shadow: 4px 4px 0 #d6c5f5;
+    }
+
+    /* Кнопки сложности: компактнее */
+    .sudoku-diff-btn {
+        font-size: 0.75rem;
+        padding: 6px 4px;
+        min-width: 0;
+        border-width: 1.5px;
+    }
+
+    /* Информация (ошибки и время) */
+    .sudoku-info {
+        font-size: 0.8rem;
+        padding: 6px 8px;
+        border-width: 1.5px;
+    }
+
+    /* Сетка */
+    .sudoku-board {
+        border-width: 2px; /* Тоньше внешняя рамка */
+        border-radius: 4px;
+        margin-bottom: 10px;
+    }
+
+    /* Клетки */
+    .sudoku-cell {
+        font-size: 0.75rem;
+        border-width: 0.4px; /* Очень тонкие линии между клетками */
+    }
+
+    .sudoku-cell input {
+        font-size: 0.85rem;
+    }
+
+    /* Границы между блоками 3х3 */
+    .sudoku-cell--right-border {
+        border-right: 1.5px solid #45238e;
+    }
+
+    .sudoku-cell--bottom-border {
+        border-bottom: 1.5px solid #45238e;
+    }
+
+    /* Кнопка «Играть ещё» */
+    .sudoku-new-btn {
+        padding: 10px 12px;
+        font-size: 0.8rem;
+        border-width: 2px;
+        box-shadow: 3px 3px 0 #45238e;
+    }
+
+    .sudoku-board {
+        max-height: none;        /* Убираем ограничение */
+        height: auto;
+    }
+
+    .sudoku-cell {
+        padding: 0;              /* Убираем внутренние отступы */
+        overflow: hidden;        /* Обрезаем всё, что вылезает */
+    }
+
+    .sudoku-cell input {
+        width: 100%;
+        height: 100%;
+        padding: 0;              /* Убираем padding у инпута */
+        margin: 0;
+        font-size: 0.75rem;      /* Уменьшаем шрифт */
+        line-height: 1;          /* Убираем лишнюю высоту строки */
+        text-align: center;
+        border: none;
+        background: transparent;
+        color: #51318f;
+        /* Убираем стандартные отступы браузера */
+        box-sizing: border-box;
+    }
+
+    /* Для Safari (iPhone) — убираем внутренние отступы */
+    .sudoku-cell input::-webkit-outer-spin-button,
+    .sudoku-cell input::-webkit-inner-spin-button {
+        -webkit-appearance: none;
+        margin: 0;
+    }
+}
+
+/* =========================================================
+   📱 Очень маленькие экраны (max-width: 380px)
+   ========================================================= */
+@media (max-width: 380px) {
+    .standalone-mini-game-content .sudoku-game {
+        padding: 6px;
+    }
+
+    .sudoku-cell {
+        font-size: 0.7rem;
+    }
+
+    .sudoku-cell input {
+        font-size: 0.7rem;
+    }
+
+    .sudoku-diff-btn {
+        font-size: 0.7rem;
+        padding: 5px 2px;
+    }
+
+    .sudoku-board {
+        aspect-ratio: auto;
+        max-height: 340px;
+    }
+
+    .sudoku-cell {
+        min-height: 32px;
+    }
+
+    .sudoku-cell input {
+        font-size: 0.65rem;      /* Ещё меньше для маленьких экранов */
+    }
+}
+
+.sudoku-cell--hint {
+    background: #fff3c4;   /* Жёлтый фон */
+    color: #805700;
+    animation: hintPulse 0.5s ease;
+}
+
+@keyframes hintPulse {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.1); }
+    100% { transform: scale(1); }
+}
+
+.sudoku-hint-btn {
+    border: 3px solid #b58a2e;
+    border-radius: 8px;
+    background: #ffe58a;
+    color: #805700;
+    font-weight: 900;
+    cursor: pointer;
+    box-shadow: 4px 4px 0 #b58a2e;
+    transition: transform 0.1s ease, box-shadow 0.1s ease;
+    margin-right: 10px;
+}
+
+.sudoku-hint-btn:hover {
+    transform: translate(-2px, -2px);
+    box-shadow: 6px 6px 0 #b58a2e;
+}
+
+.sudoku-hint-btn:active {
+    transform: translate(2px, 2px);
+    box-shadow: 2px 2px 0 #b58a2e;
+}
+
+.sudoku-actions {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+    margin-top: 16px;
+    flex-wrap: wrap;
+}
+
+
 
 
 

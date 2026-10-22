@@ -75,7 +75,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
                 const memoryGame =
                     content.querySelector("[data-memory-game]");
-                if (memoryGame) {
+                if (memoryGame && typeof initializeMemoryGame === 'function') {
                     initializeMemoryGame(memoryGame);
                 }
 
