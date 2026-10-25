@@ -61,10 +61,20 @@
                 </button>
             </div>
 
-            <div class="draw-timer-badge">
-                <span>⏱</span>
-                <span class="draw-timer" data-draw-timer>90</span>
-                <small>сек.</small>
+            <div class="draw-timer-controls">
+                <div class="draw-timer-badge">
+                    <span>⏱</span>
+                    <span class="draw-timer" data-draw-timer>90</span>
+                    <small>сек.</small>
+                </div>
+
+                <button type="button"
+                        class="button draw-pause-button"
+                        data-draw-pause
+                        aria-label="Поставить игру на паузу"
+                        title="Пауза">
+                    <span data-draw-pause-icon>Ⅱ</span>
+                </button>
             </div>
         </header>
 
@@ -114,6 +124,13 @@
                 <div class="draw-controls-row"
                      data-draw-painter-controls
                      hidden>
+                    <button type="button"
+                            class="button secondary-button draw-eraser-button"
+                            data-draw-eraser
+                            aria-pressed="false"
+                            title="Включить или выключить ластик">
+                        🩹 Ластик
+                    </button>
                     <button type="button"
                             class="button secondary-button"
                             data-draw-clear>

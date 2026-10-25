@@ -50,7 +50,10 @@ public class ChallengeService {
             User user,
             LocalDate today) {
 
-        List<Activity> activities = activityRepository.findAll();
+        List<Activity> activities = activityRepository.findAll()
+                .stream()
+                .filter(activity -> activity.getMiniGame() == null)
+                .toList();
 
         if (activities.isEmpty()) {
             return null;

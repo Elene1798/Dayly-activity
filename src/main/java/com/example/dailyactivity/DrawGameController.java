@@ -235,6 +235,10 @@ public class DrawGameController {
                 return;
             }
 
+            room.setPaused(false);
+            room.setRemainingSeconds(ROUND_DURATION_SECONDS);
+            room.setRoundEndsAtMillis(0);
+
             List<MiniGame> games =
                     miniGameService.findAllActiveByType(
                             "DRAW_AND_GUESS"
@@ -295,23 +299,20 @@ public class DrawGameController {
                 return;
             }
 
+
             List<String> availableKeys = new ArrayList<>();
 
             String previousKey = normalizeWord(room.getCurrentWord());
 
+// Берём только слова, которые ещё не выпадали
+// ни одному игроку в этой комнате.
             for (String key : uniqueWords.keySet()) {
                 if (!room.getUsedWords().contains(key)) {
                     availableKeys.add(key);
                 }
             }
 
-// Если остались неиспользованные слова, по возможности
-// исключаем последнее показанное слово.
-            if (availableKeys.size() > 1) {
-                availableKeys.removeIf(key -> key.equals(previousKey));
-            }
-
-// Если все слова уже использованы, начинаем новый цикл.
+// Если все слова закончились, начинаем новый цикл.
             if (availableKeys.isEmpty()) {
                 room.getUsedWords().clear();
 
@@ -321,7 +322,7 @@ public class DrawGameController {
                     }
                 }
 
-                // Если в базе только одно слово, повтор неизбежен.
+                // Если в базе только одно слово, используем его снова.
                 if (availableKeys.isEmpty()) {
                     availableKeys.addAll(uniqueWords.keySet());
                 }
@@ -333,10 +334,16 @@ public class DrawGameController {
 
             String word = uniqueWords.get(selectedKey);
 
-// Запоминаем выбранное слово до начала следующего раунда.
+// Запоминаем слово для обоих игроков до начала раунда.
             room.getUsedWords().add(selectedKey);
             room.setCurrentWord(word);
             room.setRoundActive(true);
+            room.setPaused(false);
+            room.setRemainingSeconds(ROUND_DURATION_SECONDS);
+            room.setRoundEndsAtMillis(
+                    System.currentTimeMillis()
+                            + ROUND_DURATION_SECONDS * 1000L
+            );
 
             Map<String, Object> wordMessage = message("word");
             wordMessage.put("word", word);
@@ -350,7 +357,7 @@ public class DrawGameController {
             // Сервер сам завершит раунд через 90 секунд.
             roundScheduler.schedule(
                     () -> finishRoundByTimeout(room, version),
-                    ROUND_DURATION_SECONDS,
+                    room.getRemainingSeconds(),
                     TimeUnit.SECONDS
             );
         }
@@ -377,12 +384,15 @@ public class DrawGameController {
         synchronized (room) {
             if (roomService.getRoom(room.getRoomId()) != room
                     || !room.isRoundActive()
+                    || room.isPaused()
                     || room.getRoundVersion() != expectedVersion) {
                 return;
             }
 
             room.setRoundActive(false);
             room.nextRoundVersion();
+            room.setPaused(false);
+            room.setRoundEndsAtMillis(0);
 
             Map<String, Object> timeout = message("round_skipped");
             timeout.put("word", room.getCurrentWord());
@@ -421,6 +431,82 @@ public class DrawGameController {
         }
     }
 
+    @MessageMapping("/draw/{roomId}/pause")
+    public void togglePause(
+            @DestinationVariable String roomId,
+            SimpMessageHeaderAccessor headerAccessor) {
+
+        String sessionId = getSessionId(headerAccessor);
+
+        if (sessionId == null || sessionId.isBlank()) {
+            return;
+        }
+
+        DrawRoom room = roomService.getRoom(roomId);
+
+        if (room == null) {
+            return;
+        }
+
+        synchronized (room) {
+            boolean isPlayer =
+                    sessionId.equals(room.getPainterSessionId())
+                            || sessionId.equals(room.getGuesserSessionId());
+
+            if (!isPlayer || !room.isFull() || !room.isRoundActive()) {
+                return;
+            }
+
+            if (!room.isPaused()) {
+                long millisLeft =
+                        room.getRoundEndsAtMillis() - System.currentTimeMillis();
+
+                int secondsLeft = (int) Math.ceil(millisLeft / 1000.0);
+
+                // Если время уже вышло, не ставим завершённый раунд на паузу.
+                if (secondsLeft <= 0) {
+                    return;
+                }
+
+                room.setRemainingSeconds(secondsLeft);
+                room.setPaused(true);
+
+                // Делаем запланированное завершение недействительным.
+                room.nextRoundVersion();
+
+                Map<String, Object> paused = message("round_paused");
+                paused.put("remainingSeconds", secondsLeft);
+
+                sendRoomMessage(room, paused);
+
+            } else {
+                int secondsLeft = room.getRemainingSeconds();
+
+                if (secondsLeft <= 0) {
+                    return;
+                }
+
+                room.setPaused(false);
+                room.setRoundEndsAtMillis(
+                        System.currentTimeMillis() + secondsLeft * 1000L
+                );
+
+                long version = room.nextRoundVersion();
+
+                Map<String, Object> resumed = message("round_resumed");
+                resumed.put("remainingSeconds", secondsLeft);
+
+                sendRoomMessage(room, resumed);
+
+                roundScheduler.schedule(
+                        () -> finishRoundByTimeout(room, version),
+                        secondsLeft,
+                        TimeUnit.SECONDS
+                );
+            }
+        }
+    }
+
     @MessageMapping("/draw/{roomId}/stroke")
     public void handleStroke(
             @DestinationVariable String roomId,
@@ -441,6 +527,7 @@ public class DrawGameController {
 
         synchronized (room) {
             if (!room.isRoundActive()
+                    || room.isPaused()
                     || !sessionId.equals(room.getPainterSessionId())) {
                 return;
             }
@@ -461,6 +548,11 @@ public class DrawGameController {
             stroke.put(
                     "start",
                     Boolean.TRUE.equals(point.get("start"))
+            );
+
+            stroke.put(
+                    "eraser",
+                    Boolean.TRUE.equals(point.get("eraser"))
             );
 
             sendRoomMessage(room, stroke);
@@ -502,7 +594,8 @@ public class DrawGameController {
 
         synchronized (room) {
             if (room.isRoundActive()
-                    && sessionId.equals(room.getPainterSessionId())) {
+                    || !room.isPaused()
+                    || !sessionId.equals(room.getPainterSessionId())) {
                 sendRoomMessage(room, message("clear"));
             }
         }
@@ -528,6 +621,7 @@ public class DrawGameController {
 
         synchronized (room) {
             if (!room.isRoundActive()
+                    || room.isPaused()
                     || !sessionId.equals(room.getGuesserSessionId())) {
                 return;
             }
@@ -547,6 +641,8 @@ public class DrawGameController {
 
             if (correct) {
                 room.setRoundActive(false);
+                room.setPaused(false);
+                room.setRoundEndsAtMillis(0);
                 room.nextRoundVersion();
 
                 Map<String, Object> won = message("round_won");
@@ -580,6 +676,8 @@ public class DrawGameController {
             }
 
             room.setRoundActive(false);
+            room.setPaused(false);
+            room.setRoundEndsAtMillis(0);
             room.nextRoundVersion();
 
             Map<String, Object> skipped = message("round_skipped");
@@ -654,6 +752,9 @@ public class DrawGameController {
         }
 
         roomService.leaveAllRooms(sessionId);
+
+        room.setPaused(false);
+        room.setRoundEndsAtMillis(0);
 
         // Уведомляем браузер выходящего игрока, чтобы показать лобби.
         sendToSession(sessionId, message("left"));

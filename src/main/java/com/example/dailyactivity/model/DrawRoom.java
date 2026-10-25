@@ -11,6 +11,9 @@ public class DrawRoom {
     private String painterSessionId;
     private String guesserSessionId;
     private String currentWord;
+    private boolean paused = false;
+    private int remainingSeconds = 90;
+    private long roundEndsAtMillis = 0;
 
     private boolean roundActive = false;
 
@@ -84,5 +87,29 @@ public class DrawRoom {
     public boolean isFull() {
         return painterSessionId != null
                 && guesserSessionId != null;
+    }
+
+    public boolean isPaused() {
+        return paused;
+    }
+
+    public void setPaused(boolean paused) {
+        this.paused = paused;
+    }
+
+    public int getRemainingSeconds() {
+        return remainingSeconds;
+    }
+
+    public void setRemainingSeconds(int remainingSeconds) {
+        this.remainingSeconds = remainingSeconds;
+    }
+
+    public long getRoundEndsAtMillis() {
+        return roundEndsAtMillis;
+    }
+
+    public void setRoundEndsAtMillis(long roundEndsAtMillis) {
+        this.roundEndsAtMillis = roundEndsAtMillis;
     }
 }

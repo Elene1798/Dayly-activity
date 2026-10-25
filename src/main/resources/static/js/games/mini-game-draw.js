@@ -1,4 +1,3 @@
-
 function initializeDrawGame(game) {
     if (!game || game.dataset.drawInitialized === 'true') return;
     game.dataset.drawInitialized = 'true';
@@ -22,64 +21,32 @@ function initializeDrawGame(game) {
     const joinButton = game.querySelector('[data-draw-join]');
     const codeInput = game.querySelector('[data-draw-code-input]');
     const clearButton = game.querySelector('[data-draw-clear]');
+    const eraserButton = game.querySelector('[data-draw-eraser]');
+    const pauseButton = game.querySelector('[data-draw-pause]');
+    const pauseIcon = game.querySelector('[data-draw-pause-icon]');
     const skipButton = game.querySelector('[data-draw-skip]');
     const guessButton = game.querySelector('[data-draw-guess-submit]');
     const copyButton = game.querySelector('[data-draw-copy]');
     const nextButton = game.querySelector('[data-draw-next]');
     const exitButton = game.querySelector('[data-draw-exit]');
 
-    if (copyButton) {
-        copyButton.addEventListener('click', async function () {
-            const code = roomCodeEl?.textContent?.trim();
-
-            if (!code || code === '—') {
-                playStatus.textContent = 'Код комнаты ещё не получен.';
-                return;
-            }
-
-            try {
-                if (navigator.clipboard && window.isSecureContext) {
-                    await navigator.clipboard.writeText(code);
-                } else {
-                    // Запасной вариант для браузеров без Clipboard API.
-                    const temporaryInput = document.createElement('textarea');
-                    temporaryInput.value = code;
-                    temporaryInput.style.position = 'fixed';
-                    temporaryInput.style.opacity = '0';
-
-                    document.body.appendChild(temporaryInput);
-                    temporaryInput.select();
-
-                    const copied = document.execCommand('copy');
-                    temporaryInput.remove();
-
-                    if (!copied) {
-                        throw new Error('Не удалось скопировать код');
-                    }
-                }
-
-                playStatus.textContent = '✅ Код комнаты скопирован: ' + code;
-            } catch (error) {
-                console.error('Ошибка копирования кода:', error);
-                playStatus.textContent =
-                    'Не удалось скопировать. Код комнаты: ' + code;
-            }
-        });
-    }
-
     if (!canvas || !lobby || !play || !status || !playStatus) {
-        console.error('Draw and Guess: не найдены обязательные элементы HTML.');
+        console.error(
+            'Draw and Guess: не найдены обязательные элементы HTML.'
+        );
         return;
     }
 
     const ctx = canvas.getContext('2d');
 
     if (!ctx) {
-        console.error('Draw and Guess: не удалось создать контекст canvas.');
+        console.error(
+            'Draw and Guess: не удалось создать контекст canvas.'
+        );
         return;
     }
 
-    // Единое внутреннее разрешение для обоих смартфонов.
+    // Единое внутреннее разрешение холста.
     const CANVAS_W = 1000;
     const CANVAS_H = 600;
 
@@ -90,9 +57,14 @@ function initializeDrawGame(game) {
     let stompClient = null;
     let roomId = null;
     let myRole = null;
+
     let drawing = false;
+    let eraserEnabled = false;
+    let gamePaused = false;
+
     let timerInterval = null;
     let timeLeft = 90;
+
     let roomSubscription = null;
     let connecting = false;
     let localLastPoint = null;
@@ -100,8 +72,13 @@ function initializeDrawGame(game) {
     let subscribedRoomId = null;
     let isRoomCreator = false;
 
+    // --------------------------------------------------
+    // CANVAS
+    // --------------------------------------------------
+
     function clearCanvasLocal() {
         ctx.save();
+        ctx.globalCompositeOperation = 'source-over';
         ctx.fillStyle = '#ffffff';
         ctx.fillRect(0, 0, CANVAS_W, CANVAS_H);
         ctx.restore();
@@ -113,7 +90,6 @@ function initializeDrawGame(game) {
 
     clearCanvasLocal();
 
-    // Возвращает нормализованные координаты от 0 до 1.
     function getCanvasPoint(e) {
         const rect = canvas.getBoundingClientRect();
 
@@ -121,19 +97,27 @@ function initializeDrawGame(game) {
             return null;
         }
 
-        const x = (e.clientX - rect.left) / rect.width;
-        const y = (e.clientY - rect.top) / rect.height;
-
         return {
-            x: Math.max(0, Math.min(1, x)),
-            y: Math.max(0, Math.min(1, y))
+            x: Math.max(
+                0,
+                Math.min(1, (e.clientX - rect.left) / rect.width)
+            ),
+            y: Math.max(
+                0,
+                Math.min(1, (e.clientY - rect.top) / rect.height)
+            )
         };
     }
 
-    function drawSegment(from, to) {
+    function drawSegment(from, to, useEraser = false) {
         ctx.save();
+
+        ctx.globalCompositeOperation = useEraser
+            ? 'destination-out'
+            : 'source-over';
+
         ctx.strokeStyle = '#382273';
-        ctx.lineWidth = 4;
+        ctx.lineWidth = useEraser ? 24 : 4;
         ctx.lineCap = 'round';
         ctx.lineJoin = 'round';
 
@@ -145,7 +129,7 @@ function initializeDrawGame(game) {
         ctx.restore();
     }
 
-    // Локальный рисунок художника.
+    // Рисование художником на своём экране.
     function drawLocal(point, isStart) {
         if (!point) return;
 
@@ -154,12 +138,14 @@ function initializeDrawGame(game) {
             return;
         }
 
-        drawSegment(localLastPoint, point);
+        drawSegment(localLastPoint, point, eraserEnabled);
         localLastPoint = point;
     }
 
-    // Рисунок, полученный от другого игрока.
+    // Отображение штрихов, полученных от другого игрока.
     function drawRemote(data) {
+        if (gamePaused) return;
+
         if (
             typeof data.x !== 'number' ||
             typeof data.y !== 'number' ||
@@ -179,52 +165,109 @@ function initializeDrawGame(game) {
             return;
         }
 
-        drawSegment(remoteLastPoint, point);
+        drawSegment(
+            remoteLastPoint,
+            point,
+            data.eraser === true
+        );
+
         remoteLastPoint = point;
     }
 
-    function connect(onConnected) {
-        if (connecting) return;
+    // --------------------------------------------------
+    // TIMER
+    // --------------------------------------------------
 
-        if (stompClient && stompClient.connected) {
-            onConnected();
+    function stopTimer() {
+        if (timerInterval !== null) {
+            clearInterval(timerInterval);
+        }
+
+        timerInterval = null;
+    }
+
+    function startTimer(seconds) {
+        stopTimer();
+
+        timeLeft = Math.max(0, Number(seconds) || 90);
+
+        if (timerEl) {
+            timerEl.textContent = Math.ceil(timeLeft);
+        }
+
+        if (gamePaused || timeLeft <= 0) {
             return;
         }
 
-        connecting = true;
-        status.textContent = 'Подключаемся к серверу...';
+        let lastTick = Date.now();
 
-        const socket = new SockJS('/ws-draw');
-        stompClient = Stomp.over(socket);
-        stompClient.debug = null;
-
-        stompClient.connect(
-            {},
-            function () {
-                connecting = false;
-
-                stompClient.subscribe('/user/queue/draw', function (msg) {
-                    try {
-                        handlePersonalMessage(JSON.parse(msg.body));
-                    } catch (error) {
-                        console.error('Ошибка личного сообщения:', error);
-                    }
-                });
-
-                onConnected();
-            },
-            function (error) {
-                connecting = false;
-                status.textContent = 'Ошибка подключения. Обнови страницу.';
-                console.error('WebSocket connection error:', error);
+        timerInterval = setInterval(function () {
+            if (gamePaused) {
+                stopTimer();
+                return;
             }
-        );
+
+            const now = Date.now();
+            const elapsedSeconds = (now - lastTick) / 1000;
+
+            lastTick = now;
+            timeLeft = Math.max(0, timeLeft - elapsedSeconds);
+
+            if (timerEl) {
+                timerEl.textContent = Math.ceil(timeLeft);
+            }
+
+            if (timeLeft <= 0) {
+                stopTimer();
+                drawing = false;
+                localLastPoint = null;
+                remoteLastPoint = null;
+            }
+        }, 200);
     }
+
+    // --------------------------------------------------
+    // PAUSE BUTTON UI
+    // --------------------------------------------------
+
+    function updatePauseUI() {
+        if (pauseButton) {
+            pauseButton.disabled = !roomId || !myRole;
+
+            pauseButton.setAttribute(
+                'aria-pressed',
+                String(gamePaused)
+            );
+
+            pauseButton.setAttribute(
+                'aria-label',
+                gamePaused
+                    ? 'Продолжить игру'
+                    : 'Поставить игру на паузу'
+            );
+
+            pauseButton.title = gamePaused
+                ? 'Продолжить'
+                : 'Пауза';
+        }
+
+        if (pauseIcon) {
+            pauseIcon.textContent = gamePaused ? '▶' : 'Ⅱ';
+        }
+    }
+
+    // --------------------------------------------------
+    // ROLE UI
+    // --------------------------------------------------
 
     function updateRoleUI() {
         if (roleEl) {
             roleEl.textContent =
-                myRole === 'painter' ? '🎨 Художник' : '🕵️ Угадывающий';
+                myRole === 'painter'
+                    ? '🎨 Художник'
+                    : myRole === 'guesser'
+                        ? '🕵️ Угадывающий'
+                        : '';
         }
 
         if (painterControls) {
@@ -242,7 +285,64 @@ function initializeDrawGame(game) {
         if (copyButton) {
             copyButton.hidden = !isRoomCreator;
         }
+
+        updatePauseUI();
     }
+
+    // --------------------------------------------------
+    // WEBSOCKET CONNECTION
+    // --------------------------------------------------
+
+    function connect(onConnected) {
+        if (connecting) return;
+
+        if (stompClient && stompClient.connected) {
+            onConnected();
+            return;
+        }
+
+        connecting = true;
+        status.textContent = 'Подключаемся к серверу...';
+
+        const socket = new SockJS('/ws-draw');
+
+        stompClient = Stomp.over(socket);
+        stompClient.debug = null;
+
+        stompClient.connect(
+            {},
+            function () {
+                connecting = false;
+
+                stompClient.subscribe(
+                    '/user/queue/draw',
+                    function (msg) {
+                        try {
+                            handlePersonalMessage(JSON.parse(msg.body));
+                        } catch (error) {
+                            console.error(
+                                'Ошибка личного сообщения:',
+                                error
+                            );
+                        }
+                    }
+                );
+
+                onConnected();
+            },
+            function (error) {
+                connecting = false;
+                status.textContent =
+                    'Ошибка подключения. Обнови страницу.';
+
+                console.error('WebSocket connection error:', error);
+            }
+        );
+    }
+
+    // --------------------------------------------------
+    // PERSONAL MESSAGES
+    // --------------------------------------------------
 
     function handlePersonalMessage(data) {
         switch (data.type) {
@@ -250,6 +350,7 @@ function initializeDrawGame(game) {
                 isRoomCreator = true;
                 roomId = data.roomId;
                 myRole = data.role;
+
                 enterRoom();
                 updateRoleUI();
                 break;
@@ -258,53 +359,56 @@ function initializeDrawGame(game) {
                 isRoomCreator = false;
                 roomId = data.roomId;
                 myRole = data.role;
+
                 enterRoom();
                 updateRoleUI();
                 break;
 
             case 'role_changed':
                 myRole = data.role;
-                updateRoleUI();
-
-                // При смене роли очищаем прежнее слово и сбрасываем рисование.
-                if (wordText) {
-                    wordText.textContent = '';
-                }
-
-                if (wordBanner) {
-                    wordBanner.hidden = myRole !== 'painter';
-                }
 
                 drawing = false;
                 localLastPoint = null;
                 remoteLastPoint = null;
+
+                if (wordText) {
+                    wordText.textContent = '';
+                }
+
+                updateRoleUI();
                 break;
 
             case 'word':
-                if (myRole === 'painter' && wordText && wordBanner) {
+                if (
+                    myRole === 'painter' &&
+                    wordText &&
+                    wordBanner
+                ) {
                     wordText.textContent = data.word || '';
                     wordBanner.hidden = false;
                 }
                 break;
 
             case 'left':
-                // Если мы уже вернулись в лобби по нажатию кнопки,
-                // повторно сбрасывать состояние не нужно.
                 if (roomId !== null) {
                     resetToLobby('Ты вышел из комнаты.');
                 }
                 break;
 
             case 'error':
-                status.textContent = data.message || 'Произошла ошибка.';
-                playStatus.textContent = data.message || 'Произошла ошибка.';
+                status.textContent =
+                    data.message || 'Произошла ошибка.';
 
-                // Если вход в комнату не состоялся, разрешаем повторную попытку.
+                playStatus.textContent =
+                    data.message || 'Произошла ошибка.';
+
+                // Если присоединение не удалось, возвращаемся в лобби.
                 if (lobby && !lobby.hidden && roomId) {
                     roomId = null;
                     subscribedRoomId = null;
                     myRole = null;
                     isRoomCreator = false;
+                    gamePaused = false;
 
                     if (roomSubscription) {
                         roomSubscription.unsubscribe();
@@ -314,32 +418,30 @@ function initializeDrawGame(game) {
                     updateRoleUI();
                 }
                 break;
-
-
         }
-
-
     }
+
+    // --------------------------------------------------
+    // ENTER ROOM
+    // --------------------------------------------------
 
     function enterRoom() {
         if (!roomId || !stompClient || !stompClient.connected) {
-            status.textContent = 'Не удалось подключиться к комнате.';
+            status.textContent =
+                'Не удалось подключиться к комнате.';
             return;
         }
 
         lobby.hidden = true;
         play.hidden = false;
 
-        // Показываем код комнаты.
         if (roomCodeEl) {
             roomCodeEl.textContent = roomId;
         }
 
-        // Показываем текущую роль.
         updateRoleUI();
 
-        // Подписываемся на комнату только один раз.
-        // Здесь нельзя повторно отправлять запрос /join.
+        // Не подписываемся на одну комнату повторно.
         if (subscribedRoomId !== roomId) {
             if (roomSubscription) {
                 roomSubscription.unsubscribe();
@@ -353,7 +455,10 @@ function initializeDrawGame(game) {
                     try {
                         handleRoomMessage(JSON.parse(msg.body));
                     } catch (error) {
-                        console.error('Ошибка сообщения комнаты:', error);
+                        console.error(
+                            'Ошибка сообщения комнаты:',
+                            error
+                        );
                     }
                 }
             );
@@ -362,18 +467,30 @@ function initializeDrawGame(game) {
         status.textContent = '';
     }
 
+    // --------------------------------------------------
+    // ROOM MESSAGES
+    // --------------------------------------------------
+
     function handleRoomMessage(data) {
         switch (data.type) {
             case 'room_state':
                 if (data.painterConnected && data.guesserConnected) {
                     playStatus.textContent = 'Оба игрока на месте!';
                 } else {
-                    playStatus.textContent = 'Ожидаем второго игрока...';
+                    playStatus.textContent =
+                        'Ожидаем второго игрока...';
                 }
                 break;
 
             case 'round_started':
-                playStatus.textContent = 'Раунд начался!';
+                gamePaused = false;
+                eraserEnabled = false;
+
+                if (eraserButton) {
+                    eraserButton.setAttribute('aria-pressed', 'false');
+                    eraserButton.textContent = '🩹 Ластик';
+                }
+
                 if (nextButton) {
                     nextButton.hidden = true;
                     nextButton.disabled = false;
@@ -381,12 +498,14 @@ function initializeDrawGame(game) {
 
                 clearCanvasLocal();
                 startTimer(data.duration || 90);
+
+                playStatus.textContent = 'Раунд начался!';
                 updateRoleUI();
                 break;
 
             case 'stroke':
-                // Художник уже рисует локально.
-                // Повторно свой же рисунок не отрисовываем.
+                // Художник рисует локально.
+                // Угадывающий получает штрихи через WebSocket.
                 if (myRole === 'guesser') {
                     drawRemote(data);
                 }
@@ -399,75 +518,105 @@ function initializeDrawGame(game) {
             case 'guess_result':
                 if (data.correct) {
                     playStatus.textContent = '✅ Верно!';
-                } else if (myRole === 'guesser') {
-                    playStatus.textContent = '❌ Не то. Попробуй ещё.';
+                } else if (myRole === 'guesser' && !gamePaused) {
+                    playStatus.textContent = '❌ Попробуй ещё';
                 }
                 break;
 
-            case 'round_won':
-                playStatus.textContent = '🎉 Угадано! Слово: ' + data.word;
+            case 'round_paused':
+                gamePaused = true;
                 stopTimer();
+
+                if (typeof data.remainingSeconds === 'number') {
+                    timeLeft = data.remainingSeconds;
+                }
+
+                if (timerEl) {
+                    timerEl.textContent = Math.ceil(timeLeft);
+                }
+
                 drawing = false;
+                localLastPoint = null;
+                remoteLastPoint = null;
+
+                playStatus.textContent = '⏸ Игра на паузе.';
+                updatePauseUI();
+                break;
+
+            case 'round_resumed':
+                gamePaused = false;
+
+                if (typeof data.remainingSeconds === 'number') {
+                    timeLeft = data.remainingSeconds;
+                }
+
+                playStatus.textContent = '▶ Игра продолжается!';
+                startTimer(timeLeft);
+                updatePauseUI();
+                break;
+
+            case 'round_won':
+                gamePaused = false;
+                stopTimer();
+
+                drawing = false;
+                localLastPoint = null;
+                remoteLastPoint = null;
+
+                playStatus.textContent =
+                    '🎉 Угадано! Слово: ' + (data.word || '');
 
                 if (nextButton) {
                     nextButton.hidden = false;
                     nextButton.disabled = false;
                 }
 
+                updatePauseUI();
                 break;
 
             case 'round_skipped':
-                playStatus.textContent = 'Слово пропущено: ' + data.word;
+                gamePaused = false;
                 stopTimer();
+
+                drawing = false;
                 clearCanvasLocal();
+
+                playStatus.textContent =
+                    'Слово пропущено: ' + (data.word || '');
+
+                updatePauseUI();
                 break;
 
             case 'player_left':
-                playStatus.textContent = 'Игрок отключился.';
+                gamePaused = false;
                 stopTimer();
+
                 drawing = false;
+                localLastPoint = null;
+                remoteLastPoint = null;
+
+                playStatus.textContent = 'Игрок отключился.';
+                updatePauseUI();
                 break;
 
             case 'error':
-                playStatus.textContent = data.message || 'Ошибка игры.';
+                playStatus.textContent =
+                    data.message || 'Ошибка игры.';
                 break;
         }
     }
 
-    function startTimer(seconds) {
-        stopTimer();
-
-        timeLeft = seconds;
-        if (timerEl) {
-            timerEl.textContent = timeLeft;
-        }
-
-        timerInterval = setInterval(function () {
-            timeLeft--;
-            if (timerEl) {
-                timerEl.textContent = Math.max(0, timeLeft);
-            }
-
-            if (timeLeft <= 0) {
-                stopTimer();
-                drawing = false;
-            }
-        }, 1000);
-    }
-
-    function stopTimer() {
-        if (timerInterval !== null) {
-            clearInterval(timerInterval);
-        }
-
-        timerInterval = null;
-    }
-
+    // --------------------------------------------------
+    // RESET TO LOBBY
+    // --------------------------------------------------
 
     function resetToLobby(message) {
         stopTimer();
 
         drawing = false;
+        gamePaused = false;
+        eraserEnabled = false;
+
         localLastPoint = null;
         remoteLastPoint = null;
 
@@ -484,29 +633,55 @@ function initializeDrawGame(game) {
         if (lobby) lobby.hidden = false;
         if (play) play.hidden = true;
 
-        if (roomCodeEl) roomCodeEl.textContent = '—';
-        if (wordText) wordText.textContent = '';
-        if (wordBanner) wordBanner.hidden = true;
+        if (roomCodeEl) {
+            roomCodeEl.textContent = '—';
+        }
 
-        if (timerEl) timerEl.textContent = '90';
+        if (wordText) {
+            wordText.textContent = '';
+        }
+
+        if (wordBanner) {
+            wordBanner.hidden = true;
+        }
+
+        if (timerEl) {
+            timerEl.textContent = '90';
+        }
+
+        timeLeft = 90;
 
         if (nextButton) {
             nextButton.hidden = true;
             nextButton.disabled = false;
         }
 
-        if (guessInput) guessInput.value = '';
+        if (guessInput) {
+            guessInput.value = '';
+        }
+
+        if (eraserButton) {
+            eraserButton.setAttribute('aria-pressed', 'false');
+            eraserButton.textContent = '🩹 Ластик';
+        }
 
         clearCanvasLocal();
         updateRoleUI();
 
-        status.textContent = message || 'Можно создать комнату или присоединиться к другой.';
+        status.textContent =
+            message ||
+            'Можно создать комнату или присоединиться к другой.';
+
         playStatus.textContent = '';
     }
 
+    // --------------------------------------------------
+    // SEND DRAWING STROKES
+    // --------------------------------------------------
 
     function sendStroke(point, isStart) {
         if (
+            gamePaused ||
             myRole !== 'painter' ||
             !roomId ||
             !stompClient ||
@@ -515,8 +690,6 @@ function initializeDrawGame(game) {
             return;
         }
 
-        // ВАЖНО: сервер пересылает объект без изменения,
-        // поэтому поле type обязательно для клиентского обработчика.
         stompClient.send(
             '/app/draw/' + roomId + '/stroke',
             {},
@@ -524,13 +697,24 @@ function initializeDrawGame(game) {
                 type: 'stroke',
                 x: point.x,
                 y: point.y,
-                start: Boolean(isStart)
+                start: Boolean(isStart),
+                eraser: eraserEnabled
             })
         );
     }
 
+    // --------------------------------------------------
+    // CANVAS POINTER EVENTS
+    // --------------------------------------------------
+
     canvas.addEventListener('pointerdown', function (e) {
-        if (myRole !== 'painter' || !roomId) return;
+        if (
+            gamePaused ||
+            myRole !== 'painter' ||
+            !roomId
+        ) {
+            return;
+        }
 
         e.preventDefault();
 
@@ -549,7 +733,13 @@ function initializeDrawGame(game) {
     });
 
     canvas.addEventListener('pointermove', function (e) {
-        if (!drawing || myRole !== 'painter') return;
+        if (
+            gamePaused ||
+            !drawing ||
+            myRole !== 'painter'
+        ) {
+            return;
+        }
 
         e.preventDefault();
 
@@ -575,100 +765,194 @@ function initializeDrawGame(game) {
 
     canvas.addEventListener('pointerup', finishDrawing);
     canvas.addEventListener('pointercancel', finishDrawing);
+
     canvas.addEventListener('lostpointercapture', function () {
         drawing = false;
         localLastPoint = null;
     });
 
-    createButton.addEventListener('click', function () {
-        if (connecting || roomId) return;
+    // --------------------------------------------------
+    // CREATE ROOM
+    // --------------------------------------------------
 
-        status.textContent = 'Создаём комнату...';
+    if (createButton) {
+        createButton.addEventListener('click', function () {
+            if (connecting || roomId) return;
 
-        connect(function () {
-            stompClient.send(
-                '/app/draw/create',
-                {},
-                JSON.stringify({})
-            );
-        });
-    });
+            status.textContent = 'Создаём комнату...';
 
-    joinButton.addEventListener('click', function () {
-        const code = codeInput.value.trim().toUpperCase();
-
-        if (!code) {
-            status.textContent = 'Введи код комнаты';
-            return;
-        }
-
-        if (connecting || roomId) return;
-
-        status.textContent = 'Подключаемся к комнате...';
-
-        connect(function () {
-            // Сначала подписываемся на комнату,
-            // чтобы не пропустить сообщения о начале раунда.
-            roomId = code;
-
-            if (roomSubscription) {
-                roomSubscription.unsubscribe();
-            }
-
-            subscribedRoomId = roomId;
-
-            roomSubscription = stompClient.subscribe(
-                '/topic/draw/' + roomId,
-                function (msg) {
-                    try {
-                        handleRoomMessage(JSON.parse(msg.body));
-                    } catch (error) {
-                        console.error('Ошибка сообщения комнаты:', error);
-                    }
-                }
-            );
-
-            // Только один запрос на вход.
-            stompClient.send(
-                '/app/draw/' + roomId + '/join',
-                {},
-                JSON.stringify({})
-            );
-        });
-    });
-
-    if (clearButton) {
-        clearButton.addEventListener('click', function () {
-            if (myRole !== 'painter') return;
-
-            clearCanvasLocal();
-
-            if (stompClient && stompClient.connected && roomId) {
+            connect(function () {
                 stompClient.send(
-                    '/app/draw/' + roomId + '/clear',
+                    '/app/draw/create',
                     {},
                     JSON.stringify({})
                 );
-            }
+            });
         });
     }
+
+    // --------------------------------------------------
+    // JOIN ROOM
+    // --------------------------------------------------
+
+    if (joinButton) {
+        joinButton.addEventListener('click', function () {
+            const code = codeInput
+                ? codeInput.value.trim().toUpperCase()
+                : '';
+
+            if (!code) {
+                status.textContent = 'Введи код комнаты';
+                return;
+            }
+
+            if (connecting || roomId) return;
+
+            status.textContent = 'Подключаемся к комнате...';
+
+            connect(function () {
+                // Подписываемся до отправки запроса на вход.
+                roomId = code;
+
+                if (roomSubscription) {
+                    roomSubscription.unsubscribe();
+                    roomSubscription = null;
+                }
+
+                subscribedRoomId = roomId;
+
+                roomSubscription = stompClient.subscribe(
+                    '/topic/draw/' + roomId,
+                    function (msg) {
+                        try {
+                            handleRoomMessage(JSON.parse(msg.body));
+                        } catch (error) {
+                            console.error(
+                                'Ошибка сообщения комнаты:',
+                                error
+                            );
+                        }
+                    }
+                );
+
+                stompClient.send(
+                    '/app/draw/' + roomId + '/join',
+                    {},
+                    JSON.stringify({})
+                );
+            });
+        });
+    }
+
+    // --------------------------------------------------
+    // CLEAR CANVAS
+    // --------------------------------------------------
+
+    if (clearButton) {
+        clearButton.addEventListener('click', function () {
+            if (
+                gamePaused ||
+                myRole !== 'painter' ||
+                !roomId ||
+                !stompClient ||
+                !stompClient.connected
+            ) {
+                return;
+            }
+
+            clearCanvasLocal();
+
+            stompClient.send(
+                '/app/draw/' + roomId + '/clear',
+                {},
+                JSON.stringify({})
+            );
+        });
+    }
+
+    // --------------------------------------------------
+    // ERASER
+    // --------------------------------------------------
+
+    if (eraserButton) {
+        eraserButton.addEventListener('click', function () {
+            if (
+                gamePaused ||
+                myRole !== 'painter' ||
+                !roomId
+            ) {
+                return;
+            }
+
+            eraserEnabled = !eraserEnabled;
+
+            eraserButton.setAttribute(
+                'aria-pressed',
+                String(eraserEnabled)
+            );
+
+            eraserButton.textContent = eraserEnabled
+                ? '✏️ Карандаш'
+                : '🩹 Ластик';
+
+            playStatus.textContent = eraserEnabled
+                ? 'Ластик включён.'
+                : 'Карандаш включён.';
+        });
+    }
+
+    // --------------------------------------------------
+    // PAUSE / RESUME
+    // --------------------------------------------------
+
+    if (pauseButton) {
+        pauseButton.addEventListener('click', function () {
+            if (
+                !roomId ||
+                !myRole ||
+                !stompClient ||
+                !stompClient.connected
+            ) {
+                return;
+            }
+
+            // Состояние меняет сервер и сообщает об этом обоим игрокам.
+            // Не переключаем gamePaused локально до ответа сервера.
+            stompClient.send(
+                '/app/draw/' + roomId + '/pause',
+                {},
+                JSON.stringify({})
+            );
+        });
+    }
+
+    // --------------------------------------------------
+    // SKIP WORD
+    // --------------------------------------------------
 
     if (skipButton) {
         skipButton.addEventListener('click', function () {
             if (
-                myRole === 'painter' &&
-                stompClient &&
-                stompClient.connected &&
-                roomId
+                gamePaused ||
+                myRole !== 'painter' ||
+                !stompClient ||
+                !stompClient.connected ||
+                !roomId
             ) {
-                stompClient.send(
-                    '/app/draw/' + roomId + '/skip',
-                    {},
-                    JSON.stringify({})
-                );
+                return;
             }
+
+            stompClient.send(
+                '/app/draw/' + roomId + '/skip',
+                {},
+                JSON.stringify({})
+            );
         });
     }
+
+    // --------------------------------------------------
+    // NEXT ROUND
+    // --------------------------------------------------
 
     if (nextButton) {
         nextButton.addEventListener('click', function () {
@@ -692,6 +976,56 @@ function initializeDrawGame(game) {
         });
     }
 
+    // --------------------------------------------------
+    // COPY ROOM CODE
+    // --------------------------------------------------
+
+    if (copyButton) {
+        copyButton.addEventListener('click', async function () {
+            const code = roomCodeEl?.textContent?.trim();
+
+            if (!code || code === '—') {
+                playStatus.textContent =
+                    'Код комнаты ещё не получен.';
+                return;
+            }
+
+            try {
+                if (navigator.clipboard && window.isSecureContext) {
+                    await navigator.clipboard.writeText(code);
+                } else {
+                    const temporaryInput =
+                        document.createElement('textarea');
+
+                    temporaryInput.value = code;
+                    temporaryInput.style.position = 'fixed';
+                    temporaryInput.style.opacity = '0';
+
+                    document.body.appendChild(temporaryInput);
+                    temporaryInput.select();
+
+                    const copied = document.execCommand('copy');
+                    temporaryInput.remove();
+
+                    if (!copied) {
+                        throw new Error('Не удалось скопировать код');
+                    }
+                }
+
+                playStatus.textContent =
+                    '✅ Код комнаты скопирован: ' + code;
+            } catch (error) {
+                console.error('Ошибка копирования кода:', error);
+
+                playStatus.textContent =
+                    'Не удалось скопировать. Код комнаты: ' + code;
+            }
+        });
+    }
+
+    // --------------------------------------------------
+    // EXIT ROOM
+    // --------------------------------------------------
 
     if (exitButton) {
         exitButton.addEventListener('click', function () {
@@ -702,7 +1036,6 @@ function initializeDrawGame(game) {
 
             const leavingRoomId = roomId;
 
-            // Сначала сообщаем серверу, что игрок выходит.
             if (stompClient && stompClient.connected) {
                 stompClient.send(
                     '/app/draw/' + leavingRoomId + '/leave',
@@ -711,11 +1044,15 @@ function initializeDrawGame(game) {
                 );
             }
 
-            // Возвращаем игрока в лобби без перезагрузки страницы.
-            resetToLobby('Ты вышел из комнаты. Можно создать новую.');
+            resetToLobby(
+                'Ты вышел из комнаты. Можно создать новую.'
+            );
         });
     }
 
+    // --------------------------------------------------
+    // GUESS WORD
+    // --------------------------------------------------
 
     if (guessButton) {
         guessButton.addEventListener('click', submitGuess);
@@ -731,10 +1068,11 @@ function initializeDrawGame(game) {
     }
 
     function submitGuess() {
-        const text = guessInput.value.trim();
+        const text = guessInput ? guessInput.value.trim() : '';
 
         if (
             !text ||
+            gamePaused ||
             myRole !== 'guesser' ||
             !stompClient ||
             !stompClient.connected ||
@@ -751,4 +1089,7 @@ function initializeDrawGame(game) {
 
         guessInput.value = '';
     }
+
+    // Начальное состояние кнопок.
+    updateRoleUI();
 }
