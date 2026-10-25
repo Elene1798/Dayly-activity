@@ -9259,7 +9259,6 @@ body.page-with-header:has(.mini-games-page) .site-header {
         height: 34px;
         font-size: 14px;
     }
-}
 
     .puzzle-preview-window {
         max-width: calc(100vw - 20px);
@@ -9787,6 +9786,802 @@ body.page-with-header:has(.mini-games-page) .site-header {
     gap: 10px;
     margin-top: 16px;
     flex-wrap: wrap;
+}
+
+.mini-game-art-draw {
+    font-size: 5rem;
+    line-height: 1;
+    filter: drop-shadow(0 5px 0 rgba(111, 75, 202, 0.2));
+}
+
+/* Обертка для холста: задает рамку и скрывает всё лишнее */
+.standalone-mini-game-content .draw-canvas-wrapper {
+    width: 100%;
+    overflow: hidden;
+    border-radius: 12px;
+    border: 3px solid #6040a8;
+    box-shadow: 4px 4px 0 #d6c5f5;
+    margin: 15px 0;
+    background: #ffffff;
+    display: flex;
+}
+
+/* Сам холст */
+.standalone-mini-game-content .draw-canvas {
+    /* Растягиваем на всю ширину обертки */
+    width: 100%;
+    /* Задаем жесткое соотношение сторон 1000:600 (то есть 5:3) */
+    aspect-ratio: 1000 / 600;
+    display: block;
+    touch-action: none; /* Отключаем скролл при рисовании пальцем */
+    cursor: crosshair;
+    background: #fff;
+}
+
+
+.draw-controls {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    margin-top: 16px;
+}
+
+.draw-controls-row {
+    display: flex;
+    gap: 12px;
+    width: 100%;
+}
+
+.draw-controls-row .button {
+    flex: 1;
+    margin-top: 0;
+}
+
+.draw-next-button {
+    width: 100%;
+    margin-top: 0;
+}
+
+.draw-room-code,
+.draw-word-banner {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+
+.draw-room-code strong,
+.draw-word-banner strong {
+    display: inline-block;
+    padding: 6px 12px;
+    border: 1px solid rgba(255, 255, 255, 0.65);
+    border-radius: 10px;
+}
+
+.draw-word-banner {
+    margin: 12px 0;
+    padding: 12px;
+    border: 1px solid rgba(255, 255, 255, 0.45);
+    border-radius: 12px;
+}
+
+@media (max-width: 480px) {
+    .draw-controls-row {
+        gap: 8px;
+    }
+
+    .draw-controls-row .button {
+        padding: 12px 8px;
+    }
+}
+
+       /* ================================
+          DRAW & GUESS — ОБЩИЙ ДИЗАЙН
+          ================================ */
+
+.draw-game {
+       --draw-purple: #6c55d9;
+       --draw-purple-dark: #513bb5;
+       --draw-ink: #292343;
+       --draw-muted: #77738e;
+       --draw-border: #e9e5f5;
+       --draw-surface: #ffffff;
+
+       width: 100%;
+       max-width: 900px;
+       margin: 24px auto;
+       color: var(--draw-ink);
+       box-sizing: border-box;
+}
+
+.draw-game *,
+.draw-game *::before,
+.draw-game *::after {
+    box-sizing: border-box;
+}
+
+.draw-game [hidden] {
+    display: none !important;
+}
+
+/* Лобби */
+
+.draw-lobby {
+    padding: clamp(20px, 4vw, 40px);
+    overflow: hidden;
+    border: 1px solid rgba(255, 255, 255, 0.8);
+    border-radius: 28px;
+    background:
+            radial-gradient(ellipse at top left, #eeeaff 0, transparent 48%),
+            linear-gradient(145deg, #ffffff, #f8f6ff);
+    box-shadow: 0 18px 55px rgba(55, 38, 112, 0.12);
+    text-align: center;
+}
+
+.draw-lobby-icon {
+    display: grid;
+    place-items: center;
+    width: 76px;
+    height: 76px;
+    margin: 0 auto 16px;
+    border: 1px solid #e4dcff;
+    border-radius: 24px;
+    background: #f0ebff;
+    font-size: 38px;
+}
+
+.draw-title {
+    margin: 0;
+    color: var(--draw-ink);
+    font-size: clamp(25px, 4vw, 34px);
+    font-weight: 800;
+    letter-spacing: -0.7px;
+}
+
+.draw-subtitle {
+    max-width: 530px;
+    margin: 12px auto 28px;
+    color: var(--draw-muted);
+    font-size: 15px;
+    line-height: 1.65;
+}
+
+.draw-lobby-card {
+    width: 100%;
+    max-width: 540px;
+    margin: 0 auto;
+    padding: 24px;
+    border: 1px solid var(--draw-border);
+    border-radius: 22px;
+    background: var(--draw-surface);
+    box-shadow: 0 8px 24px rgba(56, 40, 105, 0.05);
+}
+
+.draw-card-icon {
+    margin-bottom: 10px;
+    font-size: 28px;
+}
+
+.draw-lobby-card h3 {
+    margin: 0 0 8px;
+    font-size: 19px;
+    font-weight: 750;
+}
+
+.draw-lobby-card p {
+    margin: 0 0 18px;
+    color: var(--draw-muted);
+    font-size: 14px;
+    line-height: 1.55;
+}
+
+.draw-game .draw-primary-button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 48px;
+    margin: 0;
+    padding: 12px 22px;
+    border: none;
+    border-radius: 14px;
+    background: linear-gradient(135deg, #7962e8, #6045cb);
+    box-shadow: 0 6px 14px rgba(108, 85, 217, 0.22);
+    color: #fff;
+    font-size: 15px;
+    font-weight: 700;
+    line-height: 1.3;
+    cursor: pointer;
+    transition: transform 0.18s ease, box-shadow 0.18s ease;
+}
+
+.draw-game .draw-primary-button:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 9px 20px rgba(108, 85, 217, 0.3);
+}
+
+.draw-game .draw-primary-button:active {
+    transform: translateY(0);
+}
+
+.draw-game .draw-primary-button:focus-visible,
+.draw-game .button:focus-visible,
+.draw-game input:focus-visible {
+    outline: 3px solid rgba(108, 85, 217, 0.3);
+    outline-offset: 3px;
+}
+
+.draw-or {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    max-width: 540px;
+    margin: 20px auto;
+    color: #a29bb9;
+    font-size: 13px;
+}
+
+.draw-or::before,
+.draw-or::after {
+    flex: 1;
+    height: 1px;
+    background: #e6e0f4;
+    content: "";
+}
+
+.draw-join-form {
+    display: flex;
+    gap: 10px;
+    align-items: stretch;
+}
+
+.draw-game .draw-code-input,
+.draw-game .draw-guess-form input {
+    display: block;
+    flex: 1;
+    width: 100%;
+    min-width: 0;
+    min-height: 48px;
+    margin: 0;
+    padding: 12px 14px;
+    border: 1px solid #e2ddef;
+    border-radius: 13px;
+    background: #fbfaff;
+    color: var(--draw-ink);
+    font: inherit;
+    font-size: 15px;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.draw-game .draw-code-input {
+    text-align: center;
+    font-weight: 800;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+}
+
+.draw-game .draw-code-input:focus,
+.draw-game .draw-guess-form input:focus {
+    border-color: var(--draw-purple);
+    outline: none;
+    box-shadow: 0 0 0 4px rgba(108, 85, 217, 0.1);
+}
+
+.draw-lobby-status,
+.draw-status {
+    min-height: 22px;
+    margin: 16px 0 0;
+    color: var(--draw-muted);
+    font-size: 14px;
+    line-height: 1.5;
+    overflow-wrap: anywhere;
+}
+
+/* Игровая комната */
+
+.draw-play {
+    padding: clamp(14px, 3vw, 28px);
+    border: 1px solid rgba(255, 255, 255, 0.8);
+    border-radius: 26px;
+    background:
+            radial-gradient(ellipse at top right, #f0eaff 0, transparent 42%),
+            #fbfaff;
+    box-shadow: 0 18px 55px rgba(55, 38, 112, 0.12);
+}
+
+.draw-game-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    margin-bottom: 20px;
+}
+
+.draw-game-heading {
+    min-width: 0;
+}
+
+.draw-eyebrow {
+    display: block;
+    margin-bottom: 6px;
+    color: var(--draw-purple);
+    font-size: 10px;
+    font-weight: 800;
+    letter-spacing: 1.5px;
+}
+
+.draw-game-heading h2 {
+    margin: 0;
+    color: var(--draw-ink);
+    font-size: clamp(22px, 3.5vw, 30px);
+    font-weight: 800;
+    letter-spacing: -0.5px;
+}
+
+.draw-timer-badge {
+    display: flex;
+    flex-shrink: 0;
+    align-items: center;
+    gap: 6px;
+    padding: 11px 15px;
+    border: 1px solid #e6dfff;
+    border-radius: 15px;
+    background: #f0ebff;
+    color: var(--draw-purple-dark);
+    font-weight: 800;
+}
+
+.draw-timer {
+    min-width: 22px;
+    font-size: 22px;
+    font-variant-numeric: tabular-nums;
+    text-align: center;
+}
+
+.draw-timer-badge small {
+    font-size: 11px;
+    font-weight: 600;
+}
+
+.draw-info-grid {
+    display: grid;
+    grid-template-columns: minmax(0, 0.8fr) minmax(0, 1.2fr);
+    gap: 12px;
+    margin-bottom: 16px;
+}
+
+.draw-info-card {
+    min-width: 0;
+    padding: 15px 17px;
+    border: 1px solid var(--draw-border);
+    border-radius: 17px;
+    background: #fff;
+}
+
+.draw-info-label {
+    display: block;
+    margin-bottom: 8px;
+    color: var(--draw-muted);
+    font-size: 10px;
+    font-weight: 800;
+    letter-spacing: 1px;
+}
+
+.draw-role {
+    display: inline-block;
+    color: var(--draw-purple-dark);
+    font-size: 16px;
+    font-weight: 800;
+    overflow-wrap: anywhere;
+}
+
+.draw-room-code {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+
+.draw-room-code strong {
+    display: inline-flex;
+    align-items: center;
+    min-height: 36px;
+    padding: 6px 13px;
+    border: 1px dashed #b7a8f1;
+    border-radius: 10px;
+    background: #f5f1ff;
+    color: var(--draw-purple-dark);
+    font-size: 19px;
+    font-weight: 850;
+    letter-spacing: 2px;
+    overflow-wrap: anywhere;
+}
+
+.draw-game .draw-copy-button {
+    min-height: 36px;
+    margin: 0;
+    padding: 7px 11px;
+    border-radius: 10px;
+    font-size: 12px;
+}
+
+/* Слово художника */
+
+.draw-word-banner {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    margin: 0 0 16px;
+    padding: 16px 18px;
+    border: 1px solid #d9cdfc;
+    border-radius: 17px;
+    background: linear-gradient(120deg, #f0eaff, #fff);
+    box-shadow: 0 5px 18px rgba(108, 85, 217, 0.07);
+}
+
+.draw-word-icon {
+    display: grid;
+    flex-shrink: 0;
+    place-items: center;
+    width: 45px;
+    height: 45px;
+    border-radius: 14px;
+    background: #e4dcff;
+    font-size: 23px;
+}
+
+.draw-word-banner strong {
+    display: inline-block;
+    padding: 5px 11px;
+    border: 1px solid #c9baf9;
+    border-radius: 9px;
+    background: #fff;
+    color: var(--draw-purple-dark);
+    font-size: 20px;
+    font-weight: 850;
+    overflow-wrap: anywhere;
+}
+
+/* Холст */
+
+.draw-board-card {
+    min-width: 0;
+    padding: clamp(10px, 2vw, 18px);
+    border: 1px solid var(--draw-border);
+    border-radius: 21px;
+    background: #fff;
+    box-shadow: 0 8px 24px rgba(56, 40, 105, 0.05);
+}
+
+.draw-board-heading {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-bottom: 13px;
+    color: var(--draw-ink);
+    font-size: 14px;
+    font-weight: 800;
+}
+
+.draw-board-hint {
+    margin-left: auto;
+    color: #9791aa;
+    font-size: 11px;
+    font-weight: 500;
+}
+
+.draw-canvas-wrapper {
+    width: 100%;
+    overflow: hidden;
+    border: 1px solid #e9e5f2;
+    border-radius: 14px;
+    background: #fff;
+    line-height: 0;
+}
+
+.draw-game .draw-canvas {
+    display: block;
+    width: 100%;
+    height: auto;
+    aspect-ratio: 5 / 3;
+    background: #fff;
+    touch-action: none;
+    cursor: crosshair;
+}
+
+/* Кнопки под холстом */
+
+.draw-controls {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin-top: 14px;
+}
+
+.draw-controls-row {
+    display: flex;
+    width: 100%;
+    gap: 10px;
+}
+
+.draw-controls-row .button,
+.draw-next-button {
+    display: inline-flex;
+    flex: 1;
+    align-items: center;
+    justify-content: center;
+    min-width: 0;
+    min-height: 46px;
+    margin: 0;
+    padding: 11px 15px;
+    border-radius: 13px;
+    font-size: 14px;
+    font-weight: 750;
+    cursor: pointer;
+}
+
+.draw-game .draw-next-button {
+    width: 100%;
+    flex: none;
+    border: none;
+    background: linear-gradient(135deg, #7962e8, #6045cb);
+    color: #fff;
+}
+
+.draw-game button:disabled {
+    opacity: 0.55;
+    cursor: not-allowed;
+    transform: none;
+}
+
+/* Поле угадывания */
+
+.draw-guess {
+    margin-top: 18px;
+    padding: 17px;
+    border: 1px solid #e2d9fc;
+    border-radius: 16px;
+    background: #f8f5ff;
+}
+
+.draw-guess label {
+    display: block;
+    margin-bottom: 10px;
+    color: var(--draw-ink);
+    font-size: 14px;
+    font-weight: 750;
+}
+
+.draw-guess-form {
+    display: flex;
+    align-items: stretch;
+    gap: 10px;
+}
+
+.draw-guess-form .draw-primary-button {
+    flex-shrink: 0;
+}
+
+.draw-status {
+    margin-top: 16px;
+    text-align: center;
+}
+
+/* ================================
+   АДАПТАЦИЯ ПОД ТЕЛЕФОНЫ
+   ================================ */
+
+@media (max-width: 600px) {
+    .draw-game {
+        margin: 12px auto;
+        border-radius: 20px;
+    }
+
+    .draw-lobby {
+        padding: 22px 14px;
+        border-radius: 21px;
+    }
+
+    .draw-lobby-icon {
+        width: 62px;
+        height: 62px;
+        margin-bottom: 12px;
+        border-radius: 19px;
+        font-size: 31px;
+    }
+
+    .draw-subtitle {
+        margin: 10px auto 21px;
+        font-size: 14px;
+    }
+
+    .draw-lobby-card {
+        padding: 19px 14px;
+        border-radius: 18px;
+    }
+
+    .draw-join-form {
+        flex-direction: column;
+    }
+
+    .draw-join-form .button {
+        width: 100%;
+    }
+
+    .draw-play {
+        padding: 14px 10px;
+        border-radius: 20px;
+    }
+
+    .draw-game-header {
+        align-items: flex-start;
+        gap: 8px;
+        margin-bottom: 14px;
+    }
+
+    .draw-eyebrow {
+        font-size: 9px;
+        letter-spacing: 1px;
+    }
+
+    .draw-game-heading h2 {
+        font-size: 21px;
+    }
+
+    .draw-timer-badge {
+        gap: 4px;
+        padding: 8px 9px;
+        border-radius: 12px;
+    }
+
+    .draw-timer {
+        font-size: 19px;
+    }
+
+    .draw-info-grid {
+        grid-template-columns: 1fr;
+        gap: 9px;
+        margin-bottom: 12px;
+    }
+
+    .draw-info-card {
+        padding: 12px 13px;
+        border-radius: 14px;
+    }
+
+    .draw-info-label {
+        margin-bottom: 6px;
+        font-size: 9px;
+    }
+
+    .draw-role {
+        font-size: 15px;
+    }
+
+    .draw-room-code strong {
+        font-size: 17px;
+    }
+
+    .draw-word-banner {
+        gap: 10px;
+        padding: 12px;
+        border-radius: 14px;
+    }
+
+    .draw-word-icon {
+        width: 38px;
+        height: 38px;
+        border-radius: 11px;
+        font-size: 20px;
+    }
+
+    .draw-word-banner strong {
+        font-size: 18px;
+    }
+
+    .draw-board-card {
+        padding: 8px;
+        border-radius: 16px;
+    }
+
+    .draw-board-heading {
+        gap: 6px;
+        margin-bottom: 9px;
+        font-size: 12px;
+    }
+
+    .draw-board-hint {
+        width: 100%;
+        margin-left: 0;
+        font-size: 10px;
+    }
+
+    .draw-canvas-wrapper {
+        border-radius: 10px;
+    }
+
+    .draw-controls {
+        gap: 8px;
+        margin-top: 10px;
+    }
+
+    .draw-controls-row {
+        gap: 8px;
+    }
+
+    .draw-controls-row .button,
+    .draw-next-button {
+        min-height: 46px;
+        padding: 10px 7px;
+        border-radius: 11px;
+        font-size: 12px;
+    }
+
+    .draw-guess {
+        margin-top: 12px;
+        padding: 12px;
+    }
+
+    .draw-guess-form {
+        flex-direction: column;
+        gap: 8px;
+    }
+
+    .draw-guess-form .draw-primary-button {
+        width: 100%;
+    }
+}
+
+@media (max-width: 360px) {
+    .draw-game-heading h2 {
+        font-size: 18px;
+    }
+
+    .draw-timer-badge {
+        padding: 7px;
+    }
+
+    .draw-room-code {
+        align-items: flex-start;
+    }
+
+    .draw-game .draw-copy-button {
+        width: 100%;
+    }
+
+    .draw-controls-row .button {
+        font-size: 11px;
+    }
+}
+
+.draw-game-heading {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 12px;
+}
+
+.draw-game .draw-exit-button {
+    min-height: 36px;
+    margin: 0;
+    padding: 8px 13px;
+    border: 1px solid #e5def5;
+    border-radius: 11px;
+    background: #fff;
+    color: #65548e;
+    font-size: 13px;
+    font-weight: 700;
+}
+
+.draw-game .draw-exit-button:hover {
+    background: #f1edfb;
+}
+
+@media (max-width: 600px) {
+    .draw-game .draw-exit-button {
+        min-height: 40px;
+    }
 }
 
 

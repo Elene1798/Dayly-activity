@@ -162,6 +162,11 @@
 
         </span>
 
+                        <span th:case="'DRAW_AND_GUESS'" class="mini-game-art-draw">
+            🎨
+
+        </span>
+
                         <span th:case="*" class="mini-game-art-default">
             🎮
         </span>
@@ -304,6 +309,7 @@
     const snakeGame = content.querySelector('[data-snake-game]');
     const puzzleGame = content.querySelector('[data-puzzle-game]');
     const sudokuGame = content.querySelector('[data-sudoku-game]');
+    const drawGame = content.querySelector('[data-draw-game]');
 
     if (memoryGame && typeof initializeMemoryGame === 'function') {
         initializeMemoryGame(memoryGame);
@@ -317,6 +323,8 @@
         initializePuzzleGame(puzzleGame);
     } else if (sudokuGame && typeof initializeSudokuGame === 'function') {
             initializeSudokuGame(sudokuGame);
+    } else if (drawGame && typeof initializeDrawGame === 'function') {
+        initializeDrawGame(drawGame);
     } else if (card.dataset.gameType?.toUpperCase() === 'WORD') {
         content.innerHTML =
             '<p class="mini-games-completed">Все игры пройдены</p>';
@@ -397,6 +405,9 @@
 <script th:src="@{/js/games/mini-game-snake.js}"></script>
 <script th:src="@{/js/games/mini-game-puzzle.js}"></script>
 <script th:src="@{/js/games/mini-game-sudoku.js}"></script>
+<script src="https://cdn.jsdelivr.net/npm/sockjs-client@1/dist/sockjs.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/stompjs@2.3.3/lib/stomp.min.js"></script>
+<script th:src="@{/js/games/mini-game-draw.js}"></script>
 
 </body>
 </html>

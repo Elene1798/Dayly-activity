@@ -255,7 +255,8 @@ public class AdminController {
 
         if (miniGame != null) {
 
-            if ("CROCODILE".equalsIgnoreCase(miniGame.getGameType())) {
+            if ("CROCODILE".equalsIgnoreCase(miniGame.getGameType())
+                    || "DRAW_AND_GUESS".equalsIgnoreCase(miniGame.getGameType())) {
                 answer = content;
             }
 
@@ -302,7 +303,8 @@ public class AdminController {
 
         if (task != null) {
 
-            if ("CROCODILE".equalsIgnoreCase(task.getMiniGame().getGameType())) {
+            if ("CROCODILE".equalsIgnoreCase(task.getMiniGame().getGameType())
+                    || "DRAW_AND_GUESS".equalsIgnoreCase(task.getMiniGame().getGameType())) {
                 answer = content;
             }
 

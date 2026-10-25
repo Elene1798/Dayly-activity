@@ -158,7 +158,26 @@
                 🧩 Добавить
             </button>
 
+            <!-- DRAW_AND_GUESS -->
+            <div th:if="${miniGame.gameType == 'DRAW_AND_GUESS'}">
+                <input type="text"
+                       name="content"
+                       placeholder="Слово для рисования"
+                       required>
+                <input type="hidden" name="answer" value="">
+            </div>
+
         </form>
+
+
+        <!-- =========================
+             MEMORY
+             ========================= -->
+
+
+        <!-- =========================
+             MEMORY
+             ========================= -->
 
 
         <!-- =========================
@@ -664,6 +683,15 @@
 
                         </label>
 
+                    </div>
+
+                    <div th:if="${miniGame.gameType == ''}">
+                        <input type="text"
+                               name="content"
+                               th:value="${task.content}"
+                               placeholder="Слово для рисования"
+                               required>
+                        <input type="hidden" name="answer" value="">
                     </div>
 
 

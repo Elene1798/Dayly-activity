@@ -166,5 +166,10 @@ public class MiniGameService {
         // Удаляем саму игру.
         miniGameRepository.delete(miniGame);
     }
+
+    public List<MiniGame> findAllActiveByType(String gameType) {
+        return miniGameRepository
+                .findByGameTypeAndActiveTrueOrderByIdAsc(gameType);
+    }
 }
 

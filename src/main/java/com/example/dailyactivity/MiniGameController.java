@@ -6,6 +6,7 @@ import com.example.dailyactivity.service.AchievementCheckerService;
 import com.example.dailyactivity.service.MiniGameService;
 import com.example.dailyactivity.service.MiniGameTaskService;
 import com.example.dailyactivity.service.PuzzleService;
+import jakarta.servlet.http.HttpSession;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
@@ -139,6 +140,12 @@ public class MiniGameController {
             model.addAttribute("miniGame", miniGame);
             model.addAttribute("activityId", activityId);
             return "fragments/mini-game-snake";
+        }
+
+        if ("DRAW_AND_GUESS".equalsIgnoreCase(miniGame.getGameType())) {
+            model.addAttribute("miniGame", miniGame);
+            model.addAttribute("activityId", activityId);
+            return "fragments/mini-game-draw";
         }
 
         if ("SUDOKU".equalsIgnoreCase(miniGame.getGameType())) {

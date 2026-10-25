@@ -1,0 +1,161 @@
+<div class="mini-game-inline draw-game"
+     data-draw-game
+     th:attr="data-game-id=${miniGame.id}">
+
+    <input type="hidden" class="draw-csrf-token"
+           th:name="${_csrf.parameterName}"
+           th:value="${_csrf.token}">
+
+    <!-- Лобби: создание и подключение -->
+    <section class="draw-lobby" data-draw-lobby>
+        <p class="draw-subtitle">
+            Один рисует, второй угадывает. Проверьте, насколько хорошо вы понимаете друг друга!
+        </p>
+
+        <div class="draw-lobby-card">
+            <div class="draw-card-icon">✨</div>
+            <h3>Создать новую игру</h3>
+            <p>Создай комнату и отправь её код другу.</p>
+            <button type="button" class="button draw-primary-button"
+                    data-draw-create>
+                🎮 Создать комнату
+            </button>
+        </div>
+
+        <div class="draw-or"><span>или</span></div>
+
+        <div class="draw-lobby-card draw-join-card">
+            <div class="draw-card-icon">🔗</div>
+            <h3>Присоединиться</h3>
+            <p>Введи код комнаты, который прислал друг.</p>
+
+            <div class="draw-join-form">
+                <input type="text"
+                       class="draw-code-input"
+                       data-draw-code-input
+                       placeholder="КОД КОМНАТЫ"
+                       maxlength="6"
+                       autocomplete="off"
+                       aria-label="Код комнаты">
+
+                <button type="button"
+                        class="button draw-primary-button"
+                        data-draw-join>
+                    Войти
+                </button>
+            </div>
+        </div>
+
+        <p class="draw-lobby-status" data-draw-status aria-live="polite"></p>
+    </section>
+
+    <!-- Игровая комната -->
+    <section class="draw-play" data-draw-play hidden>
+        <header class="draw-game-header">
+            <div class="draw-game-heading">
+                <span class="draw-eyebrow">DAILY ACTIVITY · DUO GAME</span>
+                <button type="button"
+                        class="button draw-exit-button"
+                        data-draw-exit>
+                    ↩ Выйти
+                </button>
+            </div>
+
+            <div class="draw-timer-badge">
+                <span>⏱</span>
+                <span class="draw-timer" data-draw-timer>90</span>
+                <small>сек.</small>
+            </div>
+        </header>
+
+        <div class="draw-info-grid">
+            <div class="draw-info-card">
+                <span class="draw-info-label">ТВОЯ РОЛЬ</span>
+                <strong class="draw-role" data-draw-role>Художник</strong>
+            </div>
+
+            <div class="draw-info-card draw-room-info">
+                <span class="draw-info-label">КОД КОМНАТЫ</span>
+                <div class="draw-room-code">
+                    <strong data-draw-room-code>—</strong>
+                    <button type="button"
+                            class="button secondary-button draw-copy-button"
+                            data-draw-copy
+                            hidden>
+                        📋 Копировать
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <div class="draw-word-banner" data-draw-word hidden>
+            <span class="draw-word-icon">💡</span>
+            <div>
+                <span class="draw-info-label">ТВОЁ СЛОВО — НАРИСУЙ ЕГО!</span>
+                <strong data-draw-word-text></strong>
+            </div>
+        </div>
+
+        <div class="draw-board-card">
+            <div class="draw-board-heading">
+                <span>🖌️</span>
+                <span>Игровой холст</span>
+                <span class="draw-board-hint">Рисуй пальцем или мышкой</span>
+            </div>
+
+            <div class="draw-canvas-wrapper">
+                <canvas class="draw-canvas"
+                        width="1000"
+                        height="600"
+                        data-draw-canvas></canvas>
+            </div>
+
+            <div class="draw-controls">
+                <div class="draw-controls-row"
+                     data-draw-painter-controls
+                     hidden>
+                    <button type="button"
+                            class="button secondary-button"
+                            data-draw-clear>
+                        🗑 Очистить
+                    </button>
+
+                    <button type="button"
+                            class="button"
+                            data-draw-skip>
+                        ⏭ Пропустить
+                    </button>
+                </div>
+
+                <button type="button"
+                        class="button draw-next-button"
+                        data-draw-next
+                        hidden>
+                    ➡️ Следующее слово
+                </button>
+            </div>
+
+            <div class="draw-guess" data-draw-guess-controls hidden>
+                <label for="drawGuessInput">Как думаешь, что нарисовано?</label>
+
+                <div class="draw-guess-form">
+                    <input type="text"
+                           id="drawGuessInput"
+                           data-draw-guess-input
+                           placeholder="Твой вариант ответа..."
+                           autocomplete="off">
+
+                    <button type="button"
+                            class="button draw-primary-button"
+                            data-draw-guess-submit>
+                        ✓ Угадать
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <p class="draw-status" data-draw-play-status aria-live="polite">
+            Ожидаем второго игрока...
+        </p>
+    </section>
+</div>

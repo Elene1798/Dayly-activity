@@ -172,6 +172,7 @@
                     <option value="CROCODILE">🐊 Крокодил</option>
                     <option value="PUZZLE">🧩 Пазлы</option>
                     <option value="SUDOKU">🔢 Судоку</option>
+                    <option value="DRAW_AND_GUESS">🎨 Рисуй и угадывай</option>
                 </select>
 
                 <label class="admin-checkbox">
@@ -244,6 +245,7 @@
                                 <span th:if="${game.gameType == 'QUIZ'}">🧩 Викторина</span>
                                 <span th:if="${game.gameType == 'CROCODILE'}">🐊 Крокодил</span>
                                 <span th:if="${game.gameType == 'PUZZLE'}">🧩 Пазлы</span>
+                                <span th:if="${game.gameType == 'DRAW_AND_GUESS'}">🎨 Рисуй и угадывай</span>
 
                                 <span>·</span>
 
@@ -325,6 +327,7 @@
                             <option value="QUIZ" th:selected="${game.gameType == 'QUIZ'}">🧩 Викторина</option>
                             <option value="CROCODILE" th:selected="${game.gameType == 'CROCODILE'}">🐊 Крокодил</option>
                             <option value="PUZZLE">🧩 Пазлы</option>
+                            <option value="DRAW_AND_GUESS" th:selected="${game.gameType == 'DRAW_AND_GUESS'}">🎨 Рисуй и угадывай</option>
                         </select>
 
                         <label>Категория активности:</label>
