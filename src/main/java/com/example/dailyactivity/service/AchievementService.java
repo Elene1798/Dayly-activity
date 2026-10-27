@@ -9,6 +9,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Arrays;
 
 @Service
 public class AchievementService {
@@ -42,6 +43,29 @@ public class AchievementService {
         userAchievementRepository.save(achievement);
 
         return true;
+    }
+
+    /**
+     * Забирает одно новое уведомление и сразу фиксирует в базе,
+     * что поздравление уже было показано. Старые записи с null
+     * не попадут в выборку.
+     */
+    @Transactional
+    public AchievementType claimNextNotification(User user) {
+
+        return userAchievementRepository
+                .findFirstByUserAndNotificationShownFalseOrderByEarnedAtAsc(user)
+                .map(achievement -> {
+                    achievement.setNotificationShown(true);
+                    userAchievementRepository.save(achievement);
+
+                    return Arrays.stream(AchievementType.values())
+                            .filter(type -> type.getKey().equals(
+                                    achievement.getAchievementKey()))
+                            .findFirst()
+                            .orElse(null);
+                })
+                .orElse(null);
     }
 
     /**

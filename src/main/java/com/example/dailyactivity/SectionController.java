@@ -7,6 +7,7 @@ import com.example.dailyactivity.repository.UserRepository;
 import com.example.dailyactivity.service.AchievementService;
 import com.example.dailyactivity.service.ChallengeService;
 import com.example.dailyactivity.service.MiniGameService;
+import org.springframework.security.authentication.AnonymousAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -183,6 +184,12 @@ public class SectionController {
             @RequestParam(required = false) Integer month,
             @RequestParam(required = false) String date,
             Model model) {
+
+        if (authentication == null
+                || !authentication.isAuthenticated()
+                || authentication instanceof AnonymousAuthenticationToken) {
+            return "redirect:/login";
+        }
 
         User user = userRepository.findByUsername(authentication.getName())
                 .orElseThrow(() ->

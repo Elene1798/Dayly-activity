@@ -7,7 +7,7 @@
     <title>Избранное</title>
 
     <link rel="stylesheet"
-          th:href="@{/css/style.css}">
+          th:href="@{/css/style.css(v=3)}">
 </head>
 
 <body class="page-with-header">
@@ -244,6 +244,8 @@
     </a>
 
 </div>
+
+    <div th:replace="~{fragments/achievement-notification :: notification}"></div>
 
 </body>
 </html>

@@ -12,7 +12,7 @@
     <title>Твоё занятие</title>
 
     <link rel="stylesheet"
-          th:href="@{/css/style.css(v=2)}">
+          th:href="@{/css/style.css(v=3)}">
 
 </head>
 
@@ -500,6 +500,11 @@
                            name="surprise"
                            th:value="${surprise}">
 
+                    <!-- ВАЖНО: передаём источник выполнения -->
+                    <input type="hidden"
+                           name="randomActivity"
+                           th:value="${randomActivity}">
+
                     <input type="hidden"
                            th:name="${_csrf.parameterName}"
                            th:value="${_csrf.token}">
@@ -646,6 +651,8 @@
     <script th:src="@{/js/games/mini-game-inline.js}"></script>
 
     <script th:src="@{/js/games/mini-game-memory.js}"></script>
+
+    <div th:replace="~{fragments/achievement-notification :: notification}"></div>
 
 </body>
 

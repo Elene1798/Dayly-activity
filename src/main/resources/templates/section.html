@@ -8,7 +8,7 @@
 
     <title>Личный кабинет — Daily Activity</title>
 
-    <link rel="stylesheet" th:href="@{/css/style.css}">
+    <link rel="stylesheet" th:href="@{/css/style.css(v=3)}">
 </head>
 
 <body class="section-page">
@@ -439,6 +439,8 @@
         }
     }
 </script>
+
+    <div th:replace="~{fragments/achievement-notification :: notification}"></div>
 
 </body>
 </html>

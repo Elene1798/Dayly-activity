@@ -26,6 +26,11 @@ public interface ActivityCompletionRepository
             String source
     );
 
+    Optional<ActivityCompletion> findFirstByUserAndActivityIdOrderByCompletedAtDesc(
+            User user,
+            Long activityId
+    );
+
     List<Long> findActivityIdsByUserAndSource(User user, String source);
     List<ActivityCompletion> findByUserAndSource(User user, String source);
 

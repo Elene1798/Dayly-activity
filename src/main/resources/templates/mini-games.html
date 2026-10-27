@@ -7,7 +7,7 @@
 
     <title>Мини-игры — Daily Activity</title>
 
-    <link rel="stylesheet" href="/css/style.css">
+    <link rel="stylesheet" href="/css/style.css?v=3">
 </head>
 
 <body class="page-with-header">
@@ -408,6 +408,8 @@
 <script src="https://cdn.jsdelivr.net/npm/sockjs-client@1/dist/sockjs.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/stompjs@2.3.3/lib/stomp.min.js"></script>
 <script th:src="@{/js/games/mini-game-draw.js}"></script>
+
+    <div th:replace="~{fragments/achievement-notification :: notification}"></div>
 
 </body>
 </html>

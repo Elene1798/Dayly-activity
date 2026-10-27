@@ -211,6 +211,7 @@ public class LikeFavoriteController {
                 + activityId;
     }
 
+
     @PostMapping("/activity/{activityId}/uncomplete")
     public String uncompleteActivity(
             @PathVariable Long activityId,
@@ -226,17 +227,13 @@ public class LikeFavoriteController {
             return "redirect:/login";
         }
 
-        // Ищем последнее выполнение этого занятия,
-        // созданное именно с карточки.
         activityCompletionRepository
-                .findFirstByUserAndActivityIdAndSourceOrderByCompletedAtDesc(
+                .findFirstByUserAndActivityIdOrderByCompletedAtDesc(
                         user,
-                        activityId,
-                        "CARD"
+                        activityId
                 )
                 .ifPresent(activityCompletionRepository::delete);
 
-        // Возвращаем пользователя на ту же страницу.
         if (surprise) {
             return "redirect:/surprise?activityId=" + activityId;
         }
@@ -246,6 +243,7 @@ public class LikeFavoriteController {
                 + (location != null ? "&location=" + location : "")
                 + "&activityId=" + activityId;
     }
+
 
     @GetMapping("/favorites")
     public String favorites(

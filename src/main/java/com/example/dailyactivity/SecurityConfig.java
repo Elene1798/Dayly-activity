@@ -14,6 +14,7 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.factory.PasswordEncoderFactories;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.AnonymousAuthenticationFilter;
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
 
 @Configuration
@@ -71,30 +72,21 @@ public class SecurityConfig {
             UserVisitService userVisitService,
             AchievementCheckerService achievementCheckerService) throws Exception {
 
+
         AuthenticationSuccessHandler successHandler =
                 (request, response, authentication) -> {
 
                     String username = authentication.getName();
 
-                    // Администратор не хранится в таблице users.
-                    // Поэтому отправляем его сразу в админ-панель.
+                    // Администратор остаётся отдельным аккаунтом.
                     if (username.equals(adminUsername)) {
                         response.sendRedirect("/admin");
                         return;
                     }
 
-                    // Обычный пользователь хранится в PostgreSQL.
-                    userRepository.findByUsername(username)
-                            .ifPresent(user -> {
-
-                                userVisitService.recordVisit(user);
-
-                                achievementCheckerService
-                                        .checkVisitAchievements(user);
-                            });
-
                     response.sendRedirect("/section");
                 };
+
 
         http
                 .authorizeHttpRequests(auth -> auth
@@ -137,6 +129,16 @@ public class SecurityConfig {
                 .logout(logout -> logout
                         .logoutSuccessUrl("/")
                         .permitAll()
+                )
+                // Учитываем посещение каждый новый календарный день,
+                // даже если пользователь не выходит из аккаунта.
+                .addFilterAfter(
+                        new UserVisitFilter(
+                                userRepository,
+                                userVisitService,
+                                achievementCheckerService
+                        ),
+                        AnonymousAuthenticationFilter.class
                 );
 
         return http.build();

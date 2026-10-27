@@ -7,7 +7,7 @@
 
     <title>Адвент-активность — Daily Activity</title>
 
-    <link rel="stylesheet" th:href="@{/css/style.css}">
+    <link rel="stylesheet" th:href="@{/css/style.css(v=3)}">
 </head>
 
 <body class="page-with-header advent-page"
@@ -334,6 +334,8 @@
 
 
 <script th:src="@{/js/games/advent.js}"></script>
+
+    <div th:replace="~{fragments/achievement-notification :: notification}"></div>
 
 </body>
 

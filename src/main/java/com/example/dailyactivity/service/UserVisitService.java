@@ -1,3 +1,4 @@
+
 package com.example.dailyactivity.service;
 
 import com.example.dailyactivity.model.User;
@@ -19,21 +20,24 @@ public class UserVisitService {
     }
 
     /**
-     * Засчитать посещение пользователя за сегодняшний день.
-     * Повторные заходы в тот же день ничего не добавляют.
+     * Засчитывает посещение за сегодняшний день.
+     *
+     * @return true, если посещение за сегодня создано впервые;
+     *         false, если дата уже была записана.
      */
     @Transactional
-    public void recordVisit(User user) {
+    public boolean recordVisit(User user) {
 
         LocalDate today = LocalDate.now();
 
         if (userVisitRepository.existsByUserAndVisitDate(user, today)) {
-            return;
+            return false;
         }
 
         UserVisit visit = new UserVisit(user, today);
-
         userVisitRepository.save(visit);
+
+        return true;
     }
 
     /**

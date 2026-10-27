@@ -1,0 +1,22 @@
+<th:block xmlns:th="http://www.thymeleaf.org"
+          th:fragment="notification">
+    <div id="achievement-notification-overlay"
+         class="achievement-notification-overlay"
+         aria-hidden="true">
+        <section class="achievement-notification-modal"
+                 role="dialog"
+                 aria-modal="true"
+                 aria-labelledby="achievement-notification-heading">
+            <div class="achievement-notification-confetti" aria-hidden="true">✨ 🎉 ✨</div>
+            <div class="achievement-notification-icon" id="achievement-notification-icon">🏆</div>
+            <h2 id="achievement-notification-heading">Новое достижение!</h2>
+            <p class="achievement-notification-intro">Ты получил достижение</p>
+            <h3 id="achievement-notification-title"></h3>
+            <p id="achievement-notification-description" class="achievement-notification-description"></p>
+            <button type="button" id="achievement-notification-ok" class="achievement-notification-ok">
+                Отлично
+            </button>
+        </section>
+    </div>
+    <script th:src="@{/js/achievement-notifications.js(v=1)}" defer></script>
+</th:block>

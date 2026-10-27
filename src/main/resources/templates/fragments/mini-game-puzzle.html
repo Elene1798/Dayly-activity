@@ -5,6 +5,11 @@
         data-size=${puzzle.defaultSize},
         data-image=${'/files/puzzles/' + puzzle.imageFile}">
 
+    <input type="hidden"
+           class="puzzle-csrf-token"
+           th:name="${_csrf.parameterName}"
+           th:value="${_csrf.token}">
+
     <p class="puzzle-hint-text">
         Перетаскивайте фрагменты, чтобы собрать картинку
     </p>

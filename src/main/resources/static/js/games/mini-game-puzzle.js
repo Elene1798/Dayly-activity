@@ -8,6 +8,7 @@ function initializePuzzleGame(game) {
     const shuffleBtn = game.querySelector('[data-puzzle-shuffle]');
     const nextBtn = game.querySelector('[data-puzzle-next]');
     const sizeButtons = game.querySelectorAll('[data-size-btn]');
+    const csrfInput = game.querySelector(".puzzle-csrf-token");
 
     const puzzleId = game.dataset.puzzleId;
     const imageUrl = game.dataset.image;
@@ -28,6 +29,7 @@ function initializePuzzleGame(game) {
     let timer = null;
     let started = false;
     let dragged = null;
+    let completionSent = false;
 
     // ---------- Показать картинку ----------
 
@@ -289,6 +291,7 @@ function initializePuzzleGame(game) {
         moves = 0;
         movesEl.textContent = 0;
         started = false;
+        completionSent = false;
         resultEl.textContent = '';
         resultEl.className = 'puzzle-result';
         board.style.pointerEvents = '';
@@ -297,10 +300,58 @@ function initializePuzzleGame(game) {
     // ---------- Победа ----------
 
     function finishGame() {
+        if (completionSent) return;
+
+        completionSent = true;
         stopTimer();
-        resultEl.textContent = `🎉 Собрано! Ходов: ${moves}, время: ${timeEl.textContent}`;
+
+        resultEl.textContent =
+            `🎉 Собрано! Ходов: ${moves}, время: ${timeEl.textContent}`;
+
         resultEl.className = 'puzzle-result success';
         board.style.pointerEvents = 'none';
+
+        const formData = new FormData();
+
+        formData.append("size", size);
+        formData.append("moves", moves);
+        formData.append("time", seconds);
+
+        if (csrfInput) {
+            formData.append(csrfInput.name, csrfInput.value);
+        }
+
+        fetch(`/mini-game/puzzle/${puzzleId}/complete`, {
+            method: "POST",
+            body: formData,
+            credentials: "same-origin"
+        })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error(
+                        `Ошибка сохранения результата: ${response.status}`
+                    );
+                }
+
+                return response.text();
+            })
+            .then(result => {
+                if (result === "SUCCESS") {
+                    console.log("Пазл сохранён, достижения проверены");
+                } else if (result === "ALREADY_COMPLETED") {
+                    console.log("Этот пазл на данной сложности уже сохранён");
+                } else if (result === "GUEST") {
+                    resultEl.textContent +=
+                        " Войди в аккаунт, чтобы сохранять достижения.";
+                } else {
+                    console.error("Не удалось сохранить пазл:", result);
+                }
+            })
+            .catch(error => {
+                console.error("Ошибка при сохранении пазла:", error);
+                resultEl.textContent +=
+                    " Не удалось сохранить результат. Попробуй обновить страницу.";
+            });
     }
 
     // ---------- Кнопки сложности ----------
