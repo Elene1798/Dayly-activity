@@ -21,10 +21,6 @@
 
     <div class="card word-game-card">
 
-        <h1 th:text="${miniGame.title}">
-            Собери слово
-        </h1>
-
         <p class="word-game-description"
            th:text="${miniGame.description}">
             Собери правильное слово из букв.
@@ -35,44 +31,35 @@
              th:attr="
         data-answer=${task.answer},
         data-activity-id=${activityId},
-        data-task-id=${task.id}">
+        data-task-id=${task.id},
+        data-standalone=${activityId == null}">
 
-            <p class="word-game-task"
-               th:text="${task.content}">
+            <p class="word-game-task" th:text="${task.content}">
                 Собери слово
             </p>
 
+            <!-- Поле для собранных букв -->
             <div class="word-game-answer"></div>
 
+            <!-- Перемешанные буквы -->
             <div class="word-game-letters"></div>
 
-            <button type="button"
-                    class="button word-game-check">
+            <!-- Кнопки: Проверить и Играть ещё -->
+            <button type="button" class="button word-game-check">
                 Проверить
+            </button>
+            <button type="button" class="button word-game-play-again" hidden>
+                Играть ещё
             </button>
 
             <div class="word-game-result"></div>
 
-            <form class="word-game-complete-form"
-                  th:action="@{/mini-game/complete}"
-                  method="post">
-
-                <input type="hidden"
-                       name="activityId"
-                       th:value="${activityId}">
-
-                <input type="hidden"
-                       name="taskId"
-                       th:value="${task.id}">
-
-                <input type="hidden"
-                       name="answer"
-                       class="word-game-submitted-answer">
-
-                <input type="hidden"
-                       th:name="${_csrf.parameterName}"
-                       th:value="${_csrf.token}">
-
+            <!-- Форма для отправки -->
+            <form class="word-game-complete-form" style="display: none;">
+                <input type="hidden" name="activityId" th:value="${activityId}">
+                <input type="hidden" name="taskId" th:value="${task.id}">
+                <input type="hidden" name="answer" class="word-game-submitted-answer">
+                <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}">
             </form>
 
         </div>

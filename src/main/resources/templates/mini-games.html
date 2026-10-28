@@ -278,6 +278,29 @@
     }
 
 
+    async function playNextWord(button) {
+        const card = button.closest(".mini-game-card");
+
+        if (!card) {
+            return;
+        }
+
+        const startButton = card.querySelector(".mini-game-toggle");
+        const content = card.querySelector(".standalone-mini-game-content");
+
+        if (!startButton || !content) {
+            return;
+        }
+
+        // Сбрасываем старое задание, но сохраняем список уже показанных слов.
+        content.innerHTML = "";
+        card.dataset.currentGameId = card.dataset.miniGameId;
+
+        await startStandaloneMiniGame(startButton);
+    }
+
+
+
     async function startStandaloneMiniGame(button) {
     const card = button.closest('.mini-game-card');
     const gameId = card.dataset.miniGameId;
@@ -288,13 +311,18 @@
     button.hidden = true;
 
     try {
-        const response = await fetch(
-            `/mini-game/${gameId}/content`,
-    {
-        method: 'GET',
-            credentials: 'same-origin'
-    }
-    );
+        const excludeTaskIds = card.dataset.excludedTaskIds || "";
+
+        const contentUrl =
+            `/mini-game/${gameId}/content` +
+            (excludeTaskIds
+                ? `?excludeTaskIds=${encodeURIComponent(excludeTaskIds)}`
+                : "");
+
+        const response = await fetch(contentUrl, {
+            method: "GET",
+            credentials: "same-origin"
+        });
 
     if (!response.ok) {
         throw new Error('Не удалось загрузить игру');
@@ -333,7 +361,6 @@
     }
 
         button.hidden = true;
-        card.querySelector('.mini-game-next')?.remove();
 
     } catch (error) {
         console.error(error);

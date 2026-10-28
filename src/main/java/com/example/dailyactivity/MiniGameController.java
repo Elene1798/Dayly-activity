@@ -1,4 +1,4 @@
-package com.example.dailyactivity.controller;
+package com.example.dailyactivity;
 
 import com.example.dailyactivity.model.*;
 import com.example.dailyactivity.repository.*;
@@ -492,10 +492,12 @@ public class MiniGameController {
         return "redirect:/activity?activityId=" + activityId;
     }
 
+
+
     @PostMapping("/complete-inline")
     @ResponseBody
     public String completeGameInline(
-            @RequestParam Long activityId,
+            @RequestParam(required = false) Long activityId,
             @RequestParam Long taskId,
             @RequestParam String answer,
             Authentication authentication
@@ -514,27 +516,55 @@ public class MiniGameController {
             return "AUTH_REQUIRED";
         }
 
-        Activity activity = activityRepository
-                .findById(activityId)
-                .orElse(null);
-
-        if (activity == null || activity.getMiniGame() == null) {
-            return "ERROR";
-        }
-
         MiniGameTask task = miniGameTaskService.findById(taskId);
 
         if (task == null
+                || !task.isActive()
                 || task.getMiniGame() == null
-                || !task.getMiniGame().getId().equals(activity.getMiniGame().getId())) {
+                || !task.getMiniGame().isActive()
+                || !"WORD".equalsIgnoreCase(task.getMiniGame().getGameType())) {
             return "ERROR";
         }
 
-        if (!task.getAnswer().trim().equalsIgnoreCase(answer.trim())) {
+        if (task.getAnswer() == null
+                || !task.getAnswer().trim().equalsIgnoreCase(answer.trim())) {
             return "WRONG";
         }
 
-        boolean alreadyCompleted =
+        // Если это игра из карточки активности — проверяем связь.
+        Activity activity = null;
+
+        if (activityId != null) {
+            activity = activityRepository.findById(activityId).orElse(null);
+
+            if (activity == null
+                    || activity.getMiniGame() == null
+                    || !activity.getMiniGame().getId()
+                    .equals(task.getMiniGame().getId())) {
+                return "ERROR";
+            }
+        } else if (task.getMiniGame().isAddToActivityCard()) {
+            // Игра предназначена для карточки, но activityId не передан.
+            return "MISSING_ACTIVITY_ID";
+        }
+
+        // Сохраняем выполнение конкретного задания.
+        if (!miniGameTaskCompletionRepository.existsByUserAndTask_Id(user, taskId)) {
+            try {
+                miniGameTaskCompletionRepository.saveAndFlush(
+                        new MiniGameTaskCompletion(user, task, LocalDateTime.now())
+                );
+            } catch (DataIntegrityViolationException e) {
+                // Запись могла появиться параллельно.
+            }
+        }
+
+        // Самостоятельная игра не завершает занятие из карточки.
+        if (activityId == null) {
+            return "SUCCESS";
+        }
+
+        boolean activityAlreadyCompleted =
                 activityCompletionRepository
                         .findFirstByUserAndActivityIdAndSourceOrderByCompletedAtDesc(
                                 user,
@@ -543,26 +573,28 @@ public class MiniGameController {
                         )
                         .isPresent();
 
-        if (!alreadyCompleted) {
-            ActivityCompletion completion =
-                    new ActivityCompletion(
-                            user,
-                            activity,
-                            LocalDateTime.now(),
-                            "CARD",
-                            null
-                    );
-
+        if (!activityAlreadyCompleted) {
             try {
-                activityCompletionRepository.save(completion);
+                activityCompletionRepository.saveAndFlush(
+                        new ActivityCompletion(
+                                user,
+                                activity,
+                                LocalDateTime.now(),
+                                "CARD",
+                                null
+                        )
+                );
+
                 achievementCheckerService.checkCompletionAchievements(user);
-            } catch (DataIntegrityViolationException ignored) {
-                // Уже завершено другим запросом
+            } catch (DataIntegrityViolationException e) {
+                // Активность могла быть сохранена параллельным запросом.
             }
         }
 
         return "SUCCESS";
     }
+
+
 
 
     @PostMapping("/complete-word-standalone")

@@ -10761,3 +10761,32 @@ body.page-with-header:has(.mini-games-page) .site-header {
     .achievement-notification-modal h2 { font-size: 24px; }
     .achievement-notification-modal h3 { font-size: 21px; }
 }
+
+/* Кнопка "Играть ещё" в игре "Собери слово" */
+.word-game-play-again {
+    display: block;
+    margin: 20px auto 0; /* Центрируем */
+    background: #8053e8; /* Фиолетовый, как у других кнопок */
+    color: #fff;
+    border: 3px solid #45238e;
+    border-radius: 5px;
+    padding: 12px 24px;
+    font-weight: 900;
+    box-shadow: 4px 4px 0 #45238e;
+    cursor: pointer;
+    transition: transform 150ms ease, box-shadow 150ms ease;
+}
+
+.word-game-play-again:hover {
+    transform: translate(-2px, -2px);
+    box-shadow: 6px 6px 0 #45238e;
+}
+
+.word-game-play-again:active {
+    transform: translate(2px, 2px);
+    box-shadow: 2px 2px 0 #45238e;
+}
+
+.word-game-play-again[hidden] {
+    display: none !important;
+}
