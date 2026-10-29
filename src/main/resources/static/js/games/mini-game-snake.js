@@ -10,9 +10,88 @@ function initializeSnakeGame(game) {
     const startBtn = game.querySelector("[data-snake-start]");
     const restartBtn = game.querySelector("[data-snake-restart]");
 
-    const csrfInput = game.querySelector(".snake-csrf-token");
+    // Настройки
+    const settingsBtn = game.querySelector("[data-snake-settings-btn]");
+    const settingsMenu = game.querySelector("[data-snake-settings-menu]");
+    const settingsClose = game.querySelector("[data-snake-settings-close]");
+    const dpad = game.querySelector("[data-snake-dpad]");
+    const controlInputs = game.querySelectorAll('input[name="snake-control-mobile"]');
 
-    const CELL = 20;
+    let controlMode = localStorage.getItem("snakeControlMode") || "swipe";
+
+    function applyControlMode() {
+        // Показываем крестовину ТОЛЬКО если выбран режим "buttons"
+        if (dpad) {
+            if (controlMode === "buttons") {
+                dpad.hidden = false;
+                dpad.style.display = "flex";
+            } else {
+                dpad.hidden = true;
+                dpad.style.display = "none";
+            }
+        }
+        controlInputs.forEach(input => {
+            input.checked = input.value === controlMode;
+        });
+    }
+
+    applyControlMode();
+
+    // Асинхронно запрашиваем настройки с сервера (если пользователь авторизован)
+    fetch("/mini-game/snake/settings", { credentials: "same-origin" })
+        .then(r => r.text())
+        .then(mode => {
+            if (mode && mode !== "AUTH_REQUIRED" && mode !== "swipe" || (mode === "swipe" && controlMode !== "swipe")) {
+                // Если на сервере другое значение, обновляем
+                if (["swipe", "buttons", "tap-sides"].includes(mode)) {
+                    controlMode = mode;
+                    localStorage.setItem("snakeControlMode", controlMode);
+                    applyControlMode();
+                }
+            }
+        })
+        .catch(() => {});
+
+    if (settingsBtn) {
+        settingsBtn.addEventListener("click", () => {
+            settingsMenu.hidden = !settingsMenu.hidden;
+        });
+    }
+    if (settingsClose) {
+        settingsClose.addEventListener("click", () => {
+            settingsMenu.hidden = true;
+        });
+    }
+    controlInputs.forEach(input => {
+        input.addEventListener("change", (e) => {
+            controlMode = e.target.value;
+            localStorage.setItem("snakeControlMode", controlMode);
+            applyControlMode();
+
+            const formData = new FormData();
+            formData.append("controlMode", controlMode);
+
+            // Достаем CSRF-токен
+            const csrfInput = game.querySelector(".snake-csrf-token");
+            if (csrfInput) {
+                formData.append(csrfInput.name, csrfInput.value);
+            }
+
+            fetch("/mini-game/snake/settings", {
+                method: "POST",
+                body: formData,
+                credentials: "same-origin"
+            }).catch(() => {});
+        });
+    });
+
+    // Увеличенные ячейки для мобилок
+    const isMobile = window.innerWidth <= 600;
+    const CELL = isMobile ? 32 : 20;
+
+    canvas.width = isMobile ? 288 : 400;
+    canvas.height = isMobile ? 288 : 400;
+
     const COLS = canvas.width / CELL;
     const ROWS = canvas.height / CELL;
 
@@ -28,7 +107,6 @@ function initializeSnakeGame(game) {
 
     const FOOD_EMOJIS = ["🍎", "🍓", "🍒", "🍇", "🍄", "🍊", "🍋", "🥝"];
 
-    // Загружаем рекорд
     fetch("/mini-game/snake/record", { credentials: "same-origin" })
         .then(r => r.text())
         .then(v => {
@@ -42,9 +120,9 @@ function initializeSnakeGame(game) {
 
     function reset() {
         snake = [
-            { x: 5, y: 10 },
-            { x: 4, y: 10 },
-            { x: 3, y: 10 }
+            { x: Math.floor(COLS / 2), y: Math.floor(ROWS / 2) },
+            { x: Math.floor(COLS / 2) - 1, y: Math.floor(ROWS / 2) },
+            { x: Math.floor(COLS / 2) - 2, y: Math.floor(ROWS / 2) }
         ];
         direction = { x: 1, y: 0 };
         nextDirection = { x: 1, y: 0 };
@@ -73,11 +151,9 @@ function initializeSnakeGame(game) {
     }
 
     function draw() {
-        // фон
         ctx.fillStyle = "#f8f2ff";
         ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-        // сетка
         ctx.strokeStyle = "rgba(96, 64, 168, 0.08)";
         ctx.lineWidth = 1;
         for (let i = 0; i <= COLS; i++) {
@@ -93,39 +169,22 @@ function initializeSnakeGame(game) {
             ctx.stroke();
         }
 
-        // еда
         if (food) {
-            ctx.font = `${CELL - 4}px serif`;
+            ctx.font = `${CELL - 6}px serif`;
             ctx.textAlign = "center";
             ctx.textBaseline = "middle";
-            ctx.fillText(
-                food.emoji,
-                food.x * CELL + CELL / 2,
-                food.y * CELL + CELL / 2
-            );
+            ctx.fillText(food.emoji, food.x * CELL + CELL / 2, food.y * CELL + CELL / 2);
         }
 
-        // змейка
         snake.forEach((seg, i) => {
             const isHead = i === 0;
             ctx.fillStyle = isHead ? "#6040a8" : "#8053e8";
-            ctx.fillRect(
-                seg.x * CELL + 1,
-                seg.y * CELL + 1,
-                CELL - 2,
-                CELL - 2
-            );
+            ctx.fillRect(seg.x * CELL + 1, seg.y * CELL + 1, CELL - 2, CELL - 2);
 
             if (isHead) {
                 ctx.fillStyle = "#fff";
                 ctx.beginPath();
-                ctx.arc(
-                    seg.x * CELL + CELL / 2,
-                    seg.y * CELL + CELL / 2,
-                    3,
-                    0,
-                    Math.PI * 2
-                );
+                ctx.arc(seg.x * CELL + CELL / 2, seg.y * CELL + CELL / 2, CELL / 6, 0, Math.PI * 2);
                 ctx.fill();
             }
         });
@@ -133,25 +192,18 @@ function initializeSnakeGame(game) {
 
     function tick() {
         direction = nextDirection;
+        const head = { x: snake[0].x + direction.x, y: snake[0].y + direction.y };
 
-        const head = {
-            x: snake[0].x + direction.x,
-            y: snake[0].y + direction.y
-        };
-
-        // столкновение со стеной
         if (head.x < 0 || head.x >= COLS || head.y < 0 || head.y >= ROWS) {
             return endGame();
         }
 
-        // столкновение с хвостом
         if (snake.some(s => s.x === head.x && s.y === head.y)) {
             return endGame();
         }
 
         snake.unshift(head);
 
-        // съели еду
         if (food && head.x === food.x && head.y === food.y) {
             score++;
             scoreEl.textContent = score;
@@ -185,12 +237,12 @@ function initializeSnakeGame(game) {
     }
 
     function saveRecord(value) {
+        const csrfInput = game.querySelector(".snake-csrf-token");
         const formData = new FormData();
         formData.append("score", value);
         if (csrfInput) {
             formData.append(csrfInput.name, csrfInput.value);
         }
-
         fetch("/mini-game/snake/save-record", {
             method: "POST",
             body: formData,
@@ -199,34 +251,41 @@ function initializeSnakeGame(game) {
     }
 
     function changeDirection(nx, ny) {
-        // нельзя разворачиваться на 180
         if (direction.x === -nx && direction.y === -ny) return;
         nextDirection = { x: nx, y: ny };
     }
 
-    document.addEventListener("keydown", (e) => {
+    // Управление с клавиатуры (всегда работают и WASD, и стрелки)
+    // Управление с клавиатуры (работает всегда и для WASD, и для стрелок)
+    window.addEventListener("keydown", (e) => {
         if (!isRunning) return;
-        switch (e.key) {
-            case "ArrowUp": case "w": case "W":
+
+        // Используем e.code для физических клавиш (W, A, S, D)
+        // и e.key для стрелок, чтобы работало независимо от раскладки
+        const code = e.code;
+
+        switch (code) {
+            case "ArrowUp": case "KeyW":
                 changeDirection(0, -1); e.preventDefault(); break;
-            case "ArrowDown": case "s": case "S":
+            case "ArrowDown": case "KeyS":
                 changeDirection(0, 1); e.preventDefault(); break;
-            case "ArrowLeft": case "a": case "A":
+            case "ArrowLeft": case "KeyA":
                 changeDirection(-1, 0); e.preventDefault(); break;
-            case "ArrowRight": case "d": case "D":
+            case "ArrowRight": case "KeyD":
                 changeDirection(1, 0); e.preventDefault(); break;
         }
     });
 
-    // свайпы
+    // Свайпы (только если выбран режим swipe)
     let touchStart = null;
     canvas.addEventListener("touchstart", (e) => {
+        if (controlMode !== "swipe") return;
         const t = e.touches[0];
         touchStart = { x: t.clientX, y: t.clientY };
     }, { passive: true });
 
     canvas.addEventListener("touchend", (e) => {
-        if (!touchStart || !isRunning) return;
+        if (controlMode !== "swipe" || !touchStart || !isRunning) return;
         const t = e.changedTouches[0];
         const dx = t.clientX - touchStart.x;
         const dy = t.clientY - touchStart.y;
@@ -239,6 +298,39 @@ function initializeSnakeGame(game) {
         touchStart = null;
     }, { passive: true });
 
+    // Нажатия на стороны экрана (только если выбран режим tap-sides)
+    canvas.addEventListener("click", (e) => {
+        if (controlMode !== "tap-sides" || !isRunning) return;
+        const rect = canvas.getBoundingClientRect();
+        const x = e.clientX - rect.left;
+        const y = e.clientY - rect.top;
+        const dx = x - rect.width / 2;
+        const dy = y - rect.height / 2;
+
+        if (Math.abs(dx) > Math.abs(dy)) {
+            changeDirection(dx > 0 ? 1 : -1, 0);
+        } else {
+            changeDirection(0, dy > 0 ? 1 : -1);
+        }
+    });
+
+    // Экранные кнопки (крестовина)
+    if (dpad) {
+        dpad.querySelectorAll("[data-snake-dir]").forEach(btn => {
+            btn.addEventListener("click", (e) => {
+                e.preventDefault();
+                if (!isRunning) return;
+                const dir = btn.dataset.snakeDir;
+                switch (dir) {
+                    case "up": changeDirection(0, -1); break;
+                    case "down": changeDirection(0, 1); break;
+                    case "left": changeDirection(-1, 0); break;
+                    case "right": changeDirection(1, 0); break;
+                }
+            });
+        });
+    }
+
     function startGame() {
         reset();
         isRunning = true;
@@ -250,7 +342,5 @@ function initializeSnakeGame(game) {
 
     startBtn.addEventListener("click", startGame);
     restartBtn.addEventListener("click", startGame);
-
-    // начальная отрисовка
     reset();
 }

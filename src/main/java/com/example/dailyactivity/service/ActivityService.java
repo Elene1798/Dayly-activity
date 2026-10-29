@@ -1,7 +1,11 @@
 package com.example.dailyactivity.service;
 
+import com.example.dailyactivity.DailyRecommendation;
 import com.example.dailyactivity.model.Activity;
-import com.example.dailyactivity.repository.ActivityRepository;
+import com.example.dailyactivity.model.ActivityCompletion;
+import com.example.dailyactivity.model.Favorite;
+import com.example.dailyactivity.model.Like;
+import com.example.dailyactivity.repository.*;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -18,10 +22,23 @@ public class ActivityService {
     private final Random random = new Random();
     private final FileStorageService fileStorage;
 
+    private final FavoriteRepository favoriteRepository;
+    private final LikeRepository likeRepository;
+    private final ActivityCompletionRepository activityCompletionRepository;
+    private final DailyRecommendationRepository dailyRecommendationRepository;
+
     public ActivityService(ActivityRepository activityRepository,
-                           FileStorageService fileStorage) {
+                           FileStorageService fileStorage,
+                           FavoriteRepository favoriteRepository,
+                           LikeRepository likeRepository,
+                           ActivityCompletionRepository activityCompletionRepository,
+                           DailyRecommendationRepository dailyRecommendationRepository) {
         this.activityRepository = activityRepository;
         this.fileStorage = fileStorage;
+        this.favoriteRepository = favoriteRepository;
+        this.likeRepository = likeRepository;
+        this.activityCompletionRepository = activityCompletionRepository;
+        this.dailyRecommendationRepository = dailyRecommendationRepository;
     }
 
     public Activity getRandomActivity(
@@ -126,18 +143,13 @@ public class ActivityService {
 
     @Transactional
     public Activity save(Activity activity, MultipartFile image) {
-
         if (image != null && !image.isEmpty()) {
             String fileName = fileStorage.save(image, "activities");
-
-            // Если был старый файл — удалить
             if (activity.getImageFile() != null) {
                 fileStorage.delete("activities", activity.getImageFile());
             }
-
             activity.setImageFile(fileName);
         }
-
         return activityRepository.save(activity);
     }
 
@@ -149,10 +161,20 @@ public class ActivityService {
         Activity activity = activityRepository.findById(id).orElse(null);
         if (activity == null) return;
 
+        // Удаляем картинку
         if (activity.getImageFile() != null) {
             fileStorage.delete("activities", activity.getImageFile());
         }
 
+        // Удаляем все связи
+        favoriteRepository.deleteByActivity(activity);
+        likeRepository.deleteByActivity(activity);
+        activityCompletionRepository.deleteByActivityId(id);
+
+        // Если есть ссылки из рекомендаций (DailyRecommendation)
+        dailyRecommendationRepository.deleteByActivityId(id);
+
+        // И только теперь удаляем само занятие
         activityRepository.delete(activity);
     }
 }

@@ -37,6 +37,7 @@ public class MiniGameController {
     private final PuzzleService puzzleService;
     private final PuzzleCompletionRepository puzzleCompletionRepository;
     private final SudokuRecordRepository sudokuRecordRepository;
+    private final SnakeSettingsRepository snakeSettingsRepository;
 
     public MiniGameController(
             MiniGameService miniGameService,
@@ -49,7 +50,8 @@ public class MiniGameController {
             SnakeRecordRepository snakeRecordRepository,
             PuzzleService puzzleService,
             PuzzleCompletionRepository puzzleCompletionRepository,
-            SudokuRecordRepository sudokuRecordRepository
+            SudokuRecordRepository sudokuRecordRepository,
+            SnakeSettingsRepository snakeSettingsRepository
     ) {
         this.miniGameService = miniGameService;
         this.miniGameTaskService = miniGameTaskService;
@@ -62,6 +64,7 @@ public class MiniGameController {
         this.puzzleService = puzzleService;
         this.puzzleCompletionRepository = puzzleCompletionRepository;
         this.sudokuRecordRepository = sudokuRecordRepository;
+        this.snakeSettingsRepository = snakeSettingsRepository;
     }
 
     @GetMapping("/{id}")
@@ -1008,6 +1011,41 @@ public class MiniGameController {
                 .findByUser(user)
                 .map(r -> String.valueOf(r.getBestTime()))
                 .orElse("0");
+    }
+
+    @GetMapping("/snake/settings")
+    @ResponseBody
+    public String getSnakeSettings(Authentication auth) {
+        if (auth == null || !auth.isAuthenticated() || "anonymousUser".equals(auth.getPrincipal())) {
+            return "swipe"; // по умолчанию для гостей
+        }
+        User user = userRepository.findByUsername(auth.getName()).orElse(null);
+        if (user == null) return "swipe";
+
+        return snakeSettingsRepository.findByUser(user)
+                .map(SnakeSettings::getControlMode)
+                .orElse("swipe");
+    }
+
+    @PostMapping("/snake/settings")
+    @ResponseBody
+    public String saveSnakeSettings(
+            @RequestParam String controlMode,
+            Authentication auth
+    ) {
+        if (auth == null || !auth.isAuthenticated() || "anonymousUser".equals(auth.getPrincipal())) {
+            return "AUTH_REQUIRED";
+        }
+        User user = userRepository.findByUsername(auth.getName()).orElse(null);
+        if (user == null) return "AUTH_REQUIRED";
+
+        SnakeSettings settings = snakeSettingsRepository.findByUser(user)
+                .orElseGet(() -> new SnakeSettings(user, "swipe"));
+
+        settings.setControlMode(controlMode);
+        snakeSettingsRepository.save(settings);
+
+        return "SUCCESS";
     }
 
 }

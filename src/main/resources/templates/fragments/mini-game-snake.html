@@ -2,52 +2,86 @@
      data-snake-game
      th:attr="data-game-id=${miniGame.id}">
 
-    <input
-            type="hidden"
-            class="snake-csrf-token"
-            th:name="${_csrf.parameterName}"
-            th:value="${_csrf.token}"
-    >
+    <input type="hidden" class="snake-csrf-token"
+           th:name="${_csrf.parameterName}"
+           th:value="${_csrf.token}">
 
+    <!-- Компактная шапка -->
     <div class="snake-header">
-        <div class="snake-score-block">
-            <span class="snake-score-label">Длина:</span>
+        <div class="snake-stat">
+            <span class="snake-stat-label">Длина</span>
             <span class="snake-score" data-snake-score>3</span>
         </div>
 
-        <div class="snake-best-block">
-            <span class="snake-best-label">🏆 Рекорд:</span>
+        <div class="snake-settings-wrapper">
+            <button type="button" class="snake-settings-button" data-snake-settings-btn title="Настройки">
+                ⚙️
+            </button>
+        </div>
+
+        <div class="snake-stat snake-stat-right">
+            <span class="snake-stat-label">Рекорд</span>
             <span class="snake-best" data-snake-best>0</span>
         </div>
     </div>
 
+    <!-- Игровое поле -->
     <div class="snake-board-wrapper">
-        <canvas
-                class="snake-canvas"
-                width="400"
-                height="400"
-                data-snake-canvas
-        ></canvas>
+        <canvas class="snake-canvas" data-snake-canvas></canvas>
+    </div>
+
+    <!-- Экранные кнопки (крестовина) -->
+    <div class="snake-dpad" data-snake-dpad hidden>
+        <button type="button" class="snake-dpad-btn snake-dpad-up" data-snake-dir="up">▲</button>
+        <div class="snake-dpad-middle">
+            <button type="button" class="snake-dpad-btn snake-dpad-left" data-snake-dir="left">◀</button>
+            <button type="button" class="snake-dpad-btn snake-dpad-right" data-snake-dir="right">▶</button>
+        </div>
+        <button type="button" class="snake-dpad-btn snake-dpad-down" data-snake-dir="down">▼</button>
     </div>
 
     <div class="snake-controls">
-        <button type="button"
-                class="snake-start-button"
-                data-snake-start>
+        <button type="button" class="snake-start-button" data-snake-start>
             🐍 Начать игру
         </button>
-
-        <button type="button"
-                class="snake-restart-button"
-                data-snake-restart
-                hidden>
+        <button type="button" class="snake-restart-button" data-snake-restart hidden>
             🔄 Заново
         </button>
     </div>
 
     <div class="snake-result" data-snake-result></div>
 
-    <p class="snake-hint">
-        Управление: стрелки на клавиатуре или свайпы на телефоне
-    </p>
+    <!-- Модальное окно настроек (скрыто по умолчанию) -->
+    <div class="snake-settings-overlay" data-snake-settings-menu hidden>
+        <div class="snake-settings-modal">
+            <h3 class="snake-settings-title">Управление на телефоне</h3>
+
+            <label class="snake-settings-option">
+                <input type="radio" name="snake-control-mobile" value="swipe" checked>
+                <span class="snake-radio-custom"></span>
+                <span class="snake-option-text">👆 Свайпы по экрану</span>
+            </label>
+
+            <label class="snake-settings-option">
+                <input type="radio" name="snake-control-mobile" value="buttons">
+                <span class="snake-radio-custom"></span>
+                <span class="snake-option-text">🔘 Кнопки-стрелочки</span>
+            </label>
+
+            <label class="snake-settings-option">
+                <input type="radio" name="snake-control-mobile" value="tap-sides">
+                <span class="snake-radio-custom"></span>
+                <span class="snake-option-text">📱 Нажатия на стороны</span>
+            </label>
+
+            <div class="snake-settings-note">
+                На компьютере: <strong>WASD</strong> или стрелки
+            </div>
+
+            <button type="button" class="snake-settings-close-btn" data-snake-settings-close>
+                Сохранить и играть
+            </button>
+        </div>
+    </div>
+
 </div>

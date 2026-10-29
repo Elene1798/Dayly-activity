@@ -255,6 +255,9 @@
             grid.classList.add('mini-game-open');
             button.hidden = true;
 
+            // === СОХРАНЯЕМ ОТКРЫТУЮ ИГРУ ===
+            sessionStorage.setItem("openGameId", card.dataset.miniGameId);
+
             // Сразу загружаем игру — дополнительная кнопка не нужна.
             startStandaloneMiniGame(button);
         } else {
@@ -270,6 +273,9 @@
         details.hidden = true;
         card.classList.remove('is-expanded');
         grid.classList.remove('mini-game-open');
+
+        // === УДАЛЯЕМ ИЗ ХРАНИЛИЩА ПРИ ЗАКРЫТИИ ===
+        sessionStorage.removeItem("openGameId");
 
         const toggleButton = card.querySelector('.mini-game-toggle');
         toggleButton.hidden = false;
@@ -302,73 +308,73 @@
 
 
     async function startStandaloneMiniGame(button) {
-    const card = button.closest('.mini-game-card');
-    const gameId = card.dataset.miniGameId;
-    card.dataset.currentGameId = gameId;
-    const content = card.querySelector('.standalone-mini-game-content');
+        const card = button.closest('.mini-game-card');
+        const gameId = card.dataset.miniGameId;
+        card.dataset.currentGameId = gameId;
+        const content = card.querySelector('.standalone-mini-game-content');
 
-    button.disabled = true;
-    button.hidden = true;
-
-    try {
-        const excludeTaskIds = card.dataset.excludedTaskIds || "";
-
-        const contentUrl =
-            `/mini-game/${gameId}/content` +
-            (excludeTaskIds
-                ? `?excludeTaskIds=${encodeURIComponent(excludeTaskIds)}`
-                : "");
-
-        const response = await fetch(contentUrl, {
-            method: "GET",
-            credentials: "same-origin"
-        });
-
-    if (!response.ok) {
-        throw new Error('Не удалось загрузить игру');
-    }
-
-    const html = await response.text();
-    content.innerHTML = html;
-
-    const memoryGame = content.querySelector('[data-memory-game]');
-    const crocodileGame = content.querySelector('[data-crocodile-game]');
-    const wordGame = content.querySelector('[data-word-game]');
-    const snakeGame = content.querySelector('[data-snake-game]');
-    const puzzleGame = content.querySelector('[data-puzzle-game]');
-    const sudokuGame = content.querySelector('[data-sudoku-game]');
-    const drawGame = content.querySelector('[data-draw-game]');
-
-    if (memoryGame && typeof initializeMemoryGame === 'function') {
-        initializeMemoryGame(memoryGame);
-    } else if (crocodileGame && typeof initializeCrocodileGame === 'function') {
-        initializeCrocodileGame(crocodileGame);
-    } else if (wordGame && typeof initializeWordGame === 'function') {
-        initializeWordGame(wordGame);
-    } else if (snakeGame && typeof initializeSnakeGame === 'function') {
-        initializeSnakeGame(snakeGame);
-    } else if (puzzleGame && typeof initializePuzzleGame === 'function') {
-        initializePuzzleGame(puzzleGame);
-    } else if (sudokuGame && typeof initializeSudokuGame === 'function') {
-            initializeSudokuGame(sudokuGame);
-    } else if (drawGame && typeof initializeDrawGame === 'function') {
-        initializeDrawGame(drawGame);
-    } else if (card.dataset.gameType?.toUpperCase() === 'WORD') {
-        content.innerHTML =
-            '<p class="mini-games-completed">Все игры пройдены</p>';
-    } else {
-        content.textContent = 'Не удалось запустить эту игру';
-    }
-
+        button.disabled = true;
         button.hidden = true;
 
-    } catch (error) {
-        console.error(error);
-        content.textContent = 'Не удалось загрузить игру. Попробуй ещё раз';
+        try {
+            const excludeTaskIds = card.dataset.excludedTaskIds || "";
 
-        button.textContent = 'Играть';
-        button.disabled = false;
-    }
+            const contentUrl =
+                `/mini-game/${gameId}/content` +
+                (excludeTaskIds
+                    ? `?excludeTaskIds=${encodeURIComponent(excludeTaskIds)}`
+                    : "");
+
+            const response = await fetch(contentUrl, {
+                method: "GET",
+                credentials: "same-origin"
+            });
+
+            if (!response.ok) {
+                throw new Error('Не удалось загрузить игру');
+            }
+
+            const html = await response.text();
+            content.innerHTML = html;
+
+            const memoryGame = content.querySelector('[data-memory-game]');
+            const crocodileGame = content.querySelector('[data-crocodile-game]');
+            const wordGame = content.querySelector('[data-word-game]');
+            const snakeGame = content.querySelector('[data-snake-game]');
+            const puzzleGame = content.querySelector('[data-puzzle-game]');
+            const sudokuGame = content.querySelector('[data-sudoku-game]');
+            const drawGame = content.querySelector('[data-draw-game]');
+
+            if (memoryGame && typeof initializeMemoryGame === 'function') {
+                initializeMemoryGame(memoryGame);
+            } else if (crocodileGame && typeof initializeCrocodileGame === 'function') {
+                initializeCrocodileGame(crocodileGame);
+            } else if (wordGame && typeof initializeWordGame === 'function') {
+                initializeWordGame(wordGame);
+            } else if (snakeGame && typeof initializeSnakeGame === 'function') {
+                initializeSnakeGame(snakeGame);
+            } else if (puzzleGame && typeof initializePuzzleGame === 'function') {
+                initializePuzzleGame(puzzleGame);
+            } else if (sudokuGame && typeof initializeSudokuGame === 'function') {
+                initializeSudokuGame(sudokuGame);
+            } else if (drawGame && typeof initializeDrawGame === 'function') {
+                initializeDrawGame(drawGame);
+            } else if (card.dataset.gameType?.toUpperCase() === 'WORD') {
+                content.innerHTML =
+                    '<p class="mini-games-completed">Все игры пройдены</p>';
+            } else {
+                content.textContent = 'Не удалось запустить эту игру';
+            }
+
+            button.hidden = true;
+
+        } catch (error) {
+            console.error(error);
+            content.textContent = 'Не удалось загрузить игру. Попробуй ещё раз';
+
+            button.textContent = 'Играть';
+            button.disabled = false;
+        }
     }
 
     async function playNextMiniGame(button) {
@@ -424,6 +430,20 @@
             button.textContent = 'Не удалось запустить следующую игру';
         }
     }
+
+    // === ВОССТАНОВЛЕНИЕ ОТКРЫТОЙ ИГРЫ ПОСЛЕ ОБНОВЛЕНИЯ ===
+    document.addEventListener("DOMContentLoaded", function () {
+        const savedGameId = sessionStorage.getItem("openGameId");
+        if (!savedGameId) return;
+
+        const card = document.querySelector(`.mini-game-card[data-mini-game-id="${savedGameId}"]`);
+        if (!card) return;
+
+        const toggleButton = card.querySelector(".mini-game-toggle");
+        if (toggleButton) {
+            toggleMiniGame(toggleButton);
+        }
+    });
 </script>
 
 <script th:src="@{/js/games/mini-game-crocodile.js}"></script>
@@ -436,8 +456,8 @@
 <script src="https://cdn.jsdelivr.net/npm/stompjs@2.3.3/lib/stomp.min.js"></script>
 <script th:src="@{/js/games/mini-game-draw.js}"></script>
 
-    <div th:replace="~{fragments/achievement-notification :: notification}"></div>
+
+<div th:replace="~{fragments/achievement-notification :: notification}"></div>
 
 </body>
 </html>
-

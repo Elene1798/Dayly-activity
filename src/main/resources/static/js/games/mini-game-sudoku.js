@@ -342,7 +342,7 @@ function initializeSudokuGame(game) {
         useHint();
     });
 
-
+    // ---------- Подсказка (ИСПРАВЛЕНА) ----------
     function useHint() {
         // Ищем все пустые инпуты
         const emptyInputs = Array.from(boardEl.querySelectorAll("input"))
@@ -356,6 +356,7 @@ function initializeSudokuGame(game) {
 
         // Выбираем случайный пустой инпут
         const randomInput = emptyInputs[Math.floor(Math.random() * emptyInputs.length)];
+        if (!randomInput) return;
 
         const row = parseInt(randomInput.dataset.row, 10);
         const col = parseInt(randomInput.dataset.col, 10);
@@ -370,8 +371,8 @@ function initializeSudokuGame(game) {
         randomInput.parentElement.classList.add("sudoku-cell--hint");
         randomInput.parentElement.classList.remove("sudoku-cell--error");
 
-        // Помечаем как fixed (уже нельзя изменить)
-        randomInput.disabled = true;
+        // ВАЖНО: используем readOnly вместо disabled
+        randomInput.readOnly = true;
 
         // Проверяем победу
         checkWin();

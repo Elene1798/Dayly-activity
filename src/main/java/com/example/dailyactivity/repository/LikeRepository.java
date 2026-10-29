@@ -13,4 +13,6 @@ public interface LikeRepository extends JpaRepository<Like, Long> {
     Optional<Like> findByUserAndActivity(User user, Activity activity);
 
     List<Like> findByUser(User user);
+
+    void deleteByActivity(Activity activity);
 }

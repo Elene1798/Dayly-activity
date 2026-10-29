@@ -6960,146 +6960,6 @@ body.page-with-header:has(.mini-games-page) .site-header {
     line-height: 1;
     filter: drop-shadow(0 5px 0 rgba(111, 75, 202, 0.2));
 }
-/* =========================================================
-   🐍 ЗМЕЙКА
-   ========================================================= */
-
-.standalone-mini-game-content .snake-game {
-    width: 100%;
-    max-width: 640px;
-    margin: 0 auto;
-    padding: 22px;
-    box-sizing: border-box;
-    color: #382273;
-    background: #f8f2ff;
-    border: 3px solid #6040a8;
-    border-radius: 8px;
-    box-shadow: 6px 6px 0 #d6c5f5;
-    text-align: center;
-}
-
-.snake-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    gap: 12px;
-    margin-bottom: 16px;
-    padding: 10px 14px;
-    border: 3px solid #45238e;
-    border-radius: 6px;
-    background: #fff0a8;
-    color: #382273;
-    font-weight: 900;
-    box-shadow: 4px 4px 0 #c9a84b;
-}
-
-.snake-score-block,
-.snake-best-block {
-    display: inline-flex;
-    align-items: center;
-    gap: 6px;
-    font-size: 1.05rem;
-}
-
-.snake-score,
-.snake-best {
-    color: #8053e8;
-    font-size: 1.2rem;
-}
-
-.snake-board-wrapper {
-    display: flex;
-    justify-content: center;
-    margin: 16px 0;
-}
-
-.snake-canvas {
-    display: block;
-    width: 100%;
-    max-width: 400px;
-    height: auto;
-    aspect-ratio: 1 / 1;
-    border: 3px solid #6040a8;
-    border-radius: 6px;
-    background: #f8f2ff;
-    box-shadow: 4px 4px 0 #d6c5f5;
-    touch-action: none;
-}
-
-.snake-controls {
-    display: flex;
-    justify-content: center;
-    gap: 12px;
-    margin-top: 14px;
-}
-
-.snake-start-button,
-.snake-restart-button {
-    min-height: 48px;
-    padding: 12px 22px;
-    border: 3px solid #45238e;
-    border-radius: 5px;
-    background: #8053e8;
-    color: #fff;
-    font: inherit;
-    font-weight: 900;
-    box-shadow: 4px 4px 0 #45238e;
-    cursor: pointer;
-    transition: transform 150ms ease, box-shadow 150ms ease;
-}
-
-.snake-start-button:hover,
-.snake-restart-button:hover {
-    transform: translate(-2px, -2px);
-    box-shadow: 6px 6px 0 #45238e;
-}
-
-.snake-start-button:active,
-.snake-restart-button:active {
-    transform: translate(2px, 2px);
-    box-shadow: 2px 2px 0 #45238e;
-}
-
-.snake-start-button[hidden],
-.snake-restart-button[hidden] {
-    display: none;
-}
-
-.snake-result {
-    min-height: 28px;
-    margin-top: 16px;
-    padding: 12px 16px;
-    border: 3px solid transparent;
-    border-radius: 5px;
-    font-weight: 850;
-    text-align: center;
-}
-
-.snake-hint {
-    margin: 14px 0 0;
-    color: #7569a9;
-    font-size: 0.9rem;
-}
-
-@media (max-width: 600px) {
-    .snake-canvas {
-        max-width: 320px;
-    }
-
-    .snake-header {
-        flex-direction: column;
-        align-items: flex-start;
-    }
-
-    .snake-controls {
-        flex-direction: column;
-    }
-
-    .snake-start-button,
-    .snake-restart-button {
-        width: 100%;
-    }
-}
 
 /* =========================================================
    🎄 ADVENT — базовое
@@ -9464,35 +9324,45 @@ body.page-with-header:has(.mini-games-page) .site-header {
 .sudoku-board {
     display: grid;
     grid-template-columns: repeat(9, 1fr);
-    gap: 0;
     width: 100%;
-    aspect-ratio: 1 / 1;
+    max-width: 450px;
     margin: 0 auto 16px;
     border: 3px solid #45238e;
     border-radius: 6px;
-    overflow: hidden;
     background: #fff;
+    overflow: hidden; /* Чтобы внутренние ячейки не вылезали за скругленные края */
 }
 
 .sudoku-cell {
     display: flex;
     align-items: center;
     justify-content: center;
-    border: 1px solid #d6c5f5;
+    aspect-ratio: 1 / 1; /* Делаем ячейки идеально квадратными */
+    border: 1px solid #d6c5f5; /* Тонкая рамка по умолчанию для всех */
     background: #fff;
-    font-size: 1.1rem;
+    font-size: 1.2rem;
     font-weight: 800;
     color: #382273;
-    /* Убираем стандартное поведение инпутов */
     position: relative;
+    box-sizing: border-box; /* Важно: рамки не увеличивают размер ячейки */
 }
 
+/* Жирные границы справа для каждого 3-го столбца (кроме последнего) */
 .sudoku-cell--right-border {
-    border-right: 2px solid #45238e;
+    border-right: 3px solid #45238e;
 }
 
+/* Жирные границы снизу для каждого 3-го ряда (кроме последнего) */
 .sudoku-cell--bottom-border {
-    border-bottom: 2px solid #45238e;
+    border-bottom: 3px solid #45238e;
+}
+
+/* Убираем внешние границы у крайних ячеек, чтобы не было двойных линий с рамкой доски */
+.sudoku-cell:nth-child(9n) {
+    border-right: none;
+}
+.sudoku-cell:nth-last-child(-n+9) {
+    border-bottom: none;
 }
 
 .sudoku-cell--fixed {
@@ -10789,4 +10659,1038 @@ body.page-with-header:has(.mini-games-page) .site-header {
 
 .word-game-play-again[hidden] {
     display: none !important;
+}
+
+/* Обертка для всей игры в карточке */
+.standalone-mini-game-content .snake-game {
+    width: 100%;
+    max-width: 100%;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+/* Шапка игры */
+.snake-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 10px;
+    background: #fff0a8;
+    border: 3px solid #45238e;
+    border-radius: 8px;
+    padding: 10px 15px;
+    margin-bottom: 10px;
+    box-shadow: 4px 4px 0 #c9a84b;
+}
+
+.snake-settings-button {
+    background: #f0edff;
+    border: 2px solid #6040a8;
+    border-radius: 8px;
+    font-size: 1.2rem;
+    padding: 6px 10px;
+    cursor: pointer;
+    box-shadow: 2px 2px 0 #c0a6ed;
+}
+
+.snake-settings-button:active {
+    transform: translateY(2px);
+    box-shadow: none;
+}
+
+/* Меню настроек */
+.snake-settings-menu {
+    margin-bottom: 15px;
+    padding: 15px;
+    background: #f8f2ff;
+    border: 3px solid #6040a8;
+    border-radius: 8px;
+    box-shadow: 4px 4px 0 #d6c5f5;
+}
+
+.snake-settings-title {
+    margin: 0 0 12px;
+    font-weight: 900;
+    color: #382273;
+    text-align: center;
+    font-size: 1.1rem;
+}
+
+.snake-settings-option {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin: 8px 0;
+    font-size: 0.95rem;
+    color: #382273;
+    cursor: pointer;
+}
+
+.snake-settings-note {
+    margin: 12px 0;
+    font-size: 0.85rem;
+    color: #6b5a88;
+    text-align: center;
+}
+
+.snake-settings-close-btn {
+    width: 100%;
+    margin-top: 10px;
+}
+
+/* Крестовина */
+.snake-dpad {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 5px;
+    margin: 15px auto;
+    width: fit-content;
+}
+
+.snake-dpad-middle {
+    display: flex;
+    gap: 70px;
+}
+
+.snake-dpad-btn {
+    width: 60px;
+    height: 60px;
+    font-size: 1.5rem;
+    font-weight: 900;
+    color: #fff;
+    background: #8053e8;
+    border: 3px solid #45238e;
+    border-radius: 12px;
+    box-shadow: 0 5px 0 #45238e;
+    cursor: pointer;
+    transition: all 0.1s ease;
+    user-select: none;
+    -webkit-user-select: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.snake-dpad-btn:active {
+    transform: translateY(4px);
+    box-shadow: 0 1px 0 #45238e;
+}
+
+/* Центрирование холста */
+.snake-board-wrapper {
+    display: flex;
+    justify-content: center;
+    width: 100%;
+    margin-bottom: 15px;
+}
+
+/* РАСШИРЕНИЕ ПОЛЯ НА ТЕЛЕФОНАХ */
+@media (max-width: 600px) {
+    /* Расширяем саму игровую область, отодвигая рамки карточки */
+    .standalone-mini-game-content .snake-game {
+        padding: 0 5px; /* Оставляем небольшой отступ, чтобы декорации не перекрывали */
+    }
+
+    .standalone-mini-game-content .snake-canvas {
+        width: 100% !important;
+        max-width: 100% !important;
+        height: auto !important;
+        aspect-ratio: 1 / 1;
+        display: block;
+        box-sizing: border-box;
+    }
+
+    .snake-board-wrapper {
+        margin: 0 0 15px 0;
+        padding: 0;
+        width: 100%;
+    }
+}
+
+/* Жесткое скрытие крестовины, если на ней есть атрибут hidden */
+.snake-dpad[hidden] {
+    display: none !important;
+}
+
+/* Крестовина */
+.snake-dpad {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 5px;
+    margin: 15px auto;
+    width: fit-content;
+}
+
+/* =========================================================
+   🐍 ЗМЕЙКА: НОВЫЙ ДИЗАЙН
+   ========================================================= */
+
+/* Общий контейнер */
+.standalone-mini-game-content .snake-game {
+    width: 100%;
+    max-width: 100%;
+    padding: 0;
+    box-sizing: border-box;
+    position: relative;
+}
+
+/* Шапка */
+.snake-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background: #fff0a8;
+    border: 3px solid #45238e;
+    border-radius: 12px;
+    padding: 10px 15px;
+    margin-bottom: 15px;
+    box-shadow: 0 4px 0 #c9a84b;
+}
+
+/* Левая и правая колонки (Длина и Рекорд) */
+.snake-stat {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    min-width: 65px; /* Чтобы шестеренка всегда была ровно по центру */
+}
+
+.snake-stat-right {
+    align-items: flex-end;
+}
+
+.snake-stat-label {
+    font-size: 0.7rem;
+    font-weight: 800;
+    color: #8b6b00;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-bottom: 2px;
+}
+
+.snake-score,
+.snake-best {
+    font-size: 1.2rem;
+    font-weight: 900;
+    color: #382273;
+    line-height: 1;
+}
+
+/* Шестеренка по центру */
+.snake-settings-wrapper {
+    display: flex;
+    justify-content: center;
+    flex: 1;
+}
+
+.snake-settings-button {
+    background: #fff;
+    border: 2px solid #6040a8;
+    border-radius: 50%;
+    width: 38px;
+    height: 38px;
+    font-size: 1.1rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    box-shadow: 0 3px 0 #c0a6ed;
+    transition: transform 0.1s, box-shadow 0.1s;
+}
+
+.snake-settings-button:active {
+    transform: translateY(3px);
+    box-shadow: none;
+}
+
+/* Модальное окно настроек */
+.snake-settings-overlay {
+    position: absolute;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background: rgba(56, 34, 115, 0.7);
+    backdrop-filter: blur(3px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 10;
+    border-radius: 12px;
+}
+
+.snake-settings-overlay[hidden] {
+    display: none !important;
+}
+
+.snake-settings-modal {
+    background: #f8f2ff;
+    border: 3px solid #6040a8;
+    border-radius: 16px;
+    padding: 20px;
+    width: 90%;
+    max-width: 320px;
+    box-shadow: 0 8px 0 #45238e;
+}
+
+.snake-settings-title {
+    margin: 0 0 15px;
+    font-size: 1.1rem;
+    font-weight: 900;
+    color: #382273;
+    text-align: center;
+}
+
+/* Кастомные радио-кнопки */
+.snake-settings-option {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 12px;
+    cursor: pointer;
+    font-size: 0.95rem;
+    color: #382273;
+    font-weight: 600;
+}
+
+.snake-settings-option input[type="radio"] {
+    display: none;
+}
+
+.snake-radio-custom {
+    width: 20px;
+    height: 20px;
+    border: 2px solid #6040a8;
+    border-radius: 50%;
+    background: #fff;
+    position: relative;
+    flex-shrink: 0;
+}
+
+.snake-settings-option input[type="radio"]:checked + .snake-radio-custom::after {
+    content: "";
+    position: absolute;
+    top: 50%; left: 50%;
+    transform: translate(-50%, -50%);
+    width: 10px;
+    height: 10px;
+    background: #8053e8;
+    border-radius: 50%;
+}
+
+.snake-settings-note {
+    margin: 15px 0;
+    font-size: 0.8rem;
+    color: #6b5a88;
+    text-align: center;
+    padding-top: 10px;
+    border-top: 1px dashed #c0a6ed;
+}
+
+.snake-settings-close-btn {
+    width: 100%;
+    padding: 12px;
+    background: #8053e8;
+    color: #fff;
+    border: 3px solid #45238e;
+    border-radius: 8px;
+    font-weight: 800;
+    font-size: 1rem;
+    cursor: pointer;
+    box-shadow: 0 4px 0 #45238e;
+}
+
+.snake-settings-close-btn:active {
+    transform: translateY(4px);
+    box-shadow: none;
+}
+
+/* Игровое поле */
+.snake-board-wrapper {
+    display: flex;
+    justify-content: center;
+    width: 100%;
+    margin-bottom: 15px;
+}
+
+.snake-canvas {
+    border: 3px solid #6040a8;
+    border-radius: 12px;
+    box-shadow: 0 4px 0 #d6c5f5;
+    background: #fff;
+}
+
+/* Крестовина */
+.snake-dpad {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+    margin: 10px auto;
+    width: fit-content;
+    user-select: none;
+}
+
+.snake-dpad[hidden] {
+    display: none !important;
+}
+
+.snake-dpad-middle {
+    display: flex;
+    gap: 50px; /* Было 70px — теперь компактнее */
+}
+
+.snake-dpad-btn {
+    width: 50px;      /* Было 60px */
+    height: 50px;
+    font-size: 1.2rem; /* Было 1.5rem */
+    font-weight: 900;
+    color: #fff;
+    background: #8053e8;
+    border: 3px solid #45238e;
+    border-radius: 10px;
+    box-shadow: 0 4px 0 #45238e;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    -webkit-tap-highlight-color: transparent;
+}
+
+.snake-dpad-btn:active {
+    transform: translateY(4px);
+    box-shadow: none;
+}
+
+/* Кнопки старта/рестарта */
+.snake-controls {
+    display: flex;
+    justify-content: center;
+}
+
+.snake-start-button, .snake-restart-button {
+    padding: 12px 24px;
+    background: #8053e8;
+    color: #fff;
+    border: 3px solid #45238e;
+    border-radius: 8px;
+    font-weight: 900;
+    font-size: 1rem;
+    box-shadow: 0 4px 0 #45238e;
+    cursor: pointer;
+}
+
+.snake-start-button:active, .snake-restart-button:active {
+    transform: translateY(4px);
+    box-shadow: none;
+}
+
+.snake-result {
+    text-align: center;
+    margin-top: 15px;
+    font-weight: 800;
+    color: #382273;
+}
+
+/* Мобильная адаптация */
+@media (max-width: 600px) {
+    .standalone-mini-game-content .snake-game {
+        padding: 0 5px;
+    }
+
+    .snake-canvas {
+        width: 100% !important;
+        height: auto !important;
+        aspect-ratio: 1 / 1;
+    }
+
+    .snake-header {
+        padding: 8px 12px;
+        margin-bottom: 10px;
+    }
+
+    .snake-score, .snake-best {
+        font-size: 1.1rem;
+    }
+
+    .snake-dpad-btn {
+        width: 55px;
+        height: 55px;
+        font-size: 1.3rem;
+    }
+    .snake-dpad-middle {
+        gap: 55px;
+    }
+}
+
+@media (min-width: 601px) and (max-width: 1024px) {
+    /* Делаем игровое поле чуть больше, но не на весь экран */
+    .snake-canvas {
+        max-width: 500px;
+        width: 100%;
+        margin: 0 auto;
+    }
+
+    /* Увеличиваем шрифты в шапке, чтобы было удобнее смотреть */
+    .snake-score,
+    .snake-best {
+        font-size: 1.4rem;
+    }
+
+    .snake-stat-label {
+        font-size: 0.8rem;
+    }
+
+    /* Делаем кнопку настроек чуть больше */
+    .snake-settings-button {
+        width: 44px;
+        height: 44px;
+        font-size: 1.3rem;
+    }
+
+    /* Увеличиваем кнопки крестовины для пальцев */
+    .snake-dpad-btn {
+        width: 70px;
+        height: 70px;
+        font-size: 1.8rem;
+    }
+
+    .snake-dpad-middle {
+        gap: 80px;
+    }
+
+    /* Меню настроек делаем чуть шире */
+    .snake-settings-modal {
+        max-width: 400px;
+        padding: 24px;
+    }
+
+    .snake-settings-option {
+        font-size: 1.05rem;
+        margin-bottom: 14px;
+    }
+
+    .snake-settings-title {
+        font-size: 1.25rem;
+    }
+
+    .snake-settings-close-btn {
+        padding: 14px;
+        font-size: 1.1rem;
+    }
+}
+
+/* Маленькие планшеты в портретной ориентации (до 768px) */
+@media (min-width: 601px) and (max-width: 768px) {
+    .snake-canvas {
+        max-width: 420px;
+    }
+}
+
+/* =========================================================
+   📌 СТРАНИЦА «ИЗБРАННОЕ» — ЖУРНАЛЬНЫЙ СТИЛЬ
+   ========================================================= */
+
+/* Фон для всей страницы (переопределяем стандартный body) */
+body.favorites-page {
+    background: #fdfaf6; /* Тёплый кремовый фон */
+    background-image: radial-gradient(#f0e6d2 1px, transparent 1px);
+    background-size: 30px 30px;
+    color: #2c2a38;
+}
+
+/* Шапка сайта на этой странице */
+body.favorites-page .site-header {
+    border-bottom: 3px solid #e8e2d9;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.03);
+}
+
+body.favorites-page .site-header-brand .hero-badge {
+    color: #8b7355;
+    border-color: #e8e2d9;
+}
+
+body.favorites-page .site-header-username,
+body.favorites-page .site-header-link {
+    color: #4a4a5a;
+}
+
+body.favorites-page .site-header-username:hover,
+body.favorites-page .site-header-link:hover {
+    color: #2c2a38;
+}
+
+/* Контейнер */
+.favorites-container {
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 40px 20px 80px;
+}
+
+/* Заголовок страницы */
+.favorites-hero {
+    text-align: center;
+    margin-bottom: 40px;
+}
+
+.favorites-hero-icon {
+    display: block;
+    font-size: 48px;
+    margin-bottom: 10px;
+    filter: drop-shadow(0 4px 6px rgba(240, 180, 41, 0.3));
+}
+
+.favorites-hero h1 {
+    margin: 0 0 8px;
+    color: #2c2a38;
+    font-size: clamp(28px, 5vw, 42px);
+    font-weight: 900;
+    letter-spacing: -1px;
+}
+
+.favorites-hero p {
+    margin: 0;
+    color: #8b8398;
+    font-size: 16px;
+}
+
+/* Пустой экран */
+.favorites-empty {
+    text-align: center;
+    padding: 60px 20px;
+    background: #fff;
+    border-radius: 24px;
+    border: 2px dashed #e8e2d9;
+    margin-top: 20px;
+}
+
+.favorites-empty-art {
+    font-size: 64px;
+    margin-bottom: 16px;
+    opacity: 0.8;
+}
+
+.favorites-empty h2 {
+    margin: 0 0 8px;
+    color: #2c2a38;
+    font-size: 24px;
+}
+
+.favorites-empty p {
+    margin: 0 0 24px;
+    color: #8b8398;
+}
+
+/* Сетка карточек */
+.favorites-grid {
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+}
+
+/* Карточка */
+.favorite-card {
+    display: flex;
+    background: #ffffff;
+    background-image: repeating-linear-gradient(
+            45deg,
+            #fdfaf6,
+            #fdfaf6 10px,
+            #f7f0e6 10px,
+            #f7f0e6 20px
+    );
+    border-radius: 24px;
+    overflow: hidden;
+    box-shadow: 0 10px 30px rgba(100, 80, 60, 0.08);
+    border: 1px solid #f0e6d2;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    cursor: pointer;
+    position: relative;
+}
+
+.favorite-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 16px 40px rgba(100, 80, 60, 0.12);
+}
+
+.favorite-card.is-expanded {
+    transform: translateY(0);
+    box-shadow: 0 8px 25px rgba(100, 80, 60, 0.15);
+}
+
+.favorite-card.has-image {
+    background-image: none;
+    background: #ffffff;
+}
+
+.favorite-card-image {
+    width: 280px;
+    flex-shrink: 0;
+    background: #f0e6d2;
+    position: relative;
+    display: flex;
+}
+
+.favorite-card-image img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+}
+
+.favorite-card-content {
+    padding: 28px;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    background: rgba(255, 255, 255, 0.85);
+    backdrop-filter: blur(4px);
+}
+
+.favorite-card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 16px;
+    margin-bottom: 16px;
+}
+
+.favorite-card-header h2 {
+    margin: 0;
+    color: #2c2a38;
+    font-size: 22px;
+    font-weight: 800;
+    line-height: 1.3;
+}
+
+/* Кнопка удаления */
+.favorite-delete-form {
+    margin: 0;
+    flex-shrink: 0;
+}
+
+.favorite-delete-btn {
+    background: #fdfaf6;
+    border: 1px solid #e8e2d9;
+    border-radius: 50%;
+    width: 32px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #8b8398;
+    font-size: 14px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.favorite-delete-btn:hover {
+    background: #ffe2e2;
+    color: #d9534f;
+    border-color: #ffc9c9;
+    transform: scale(1.1);
+}
+
+/* Теги (категория, время, место) */
+.favorite-meta-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-bottom: 16px;
+}
+
+.favorite-tag {
+    display: inline-flex;
+    align-items: center;
+    padding: 4px 10px;
+    background: #fdfaf6;
+    border: 1px solid #f0e6d2;
+    border-radius: 8px;
+    color: #7a6e5f;
+    font-size: 13px;
+    font-weight: 600;
+}
+
+.favorite-tag--category {
+    background: #f0e6d2;
+    color: #5d4a37;
+    border-color: #e0d0b8;
+}
+
+/* Описание */
+.favorite-card-desc {
+    margin: 0 0 20px;
+    color: #6b6478;
+    font-size: 15px;
+    line-height: 1.6;
+    flex: 1;
+}
+
+/* Детали (аккордеон) */
+.favorite-details {
+    margin-top: auto;
+    border-top: 1px solid #f0e6d2;
+    padding-top: 16px;
+}
+
+.favorite-details-toggle {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    cursor: pointer;
+    color: #7a6e5f;
+    font-size: 14px;
+    font-weight: 700;
+    list-style: none;
+    padding: 8px 0;
+}
+
+.favorite-details-toggle::-webkit-details-marker {
+    display: none;
+}
+
+.favorite-details-toggle:hover {
+    color: #5d4a37;
+}
+
+.favorite-details-arrow {
+    font-size: 10px;
+    transition: transform 0.3s ease;
+}
+
+.favorite-details[open] .favorite-details-arrow {
+    transform: rotate(180deg);
+}
+
+.favorite-details-content {
+    padding-top: 16px;
+    animation: slideDown 0.3s ease;
+}
+
+.favorite-details-trigger {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-top: 16px;
+    padding: 12px 16px;
+    background: #fdfaf6;
+    border: 1px solid #f0e6d2;
+    border-radius: 12px;
+    color: #7a6e5f;
+    font-size: 14px;
+    font-weight: 700;
+    transition: all 0.2s ease;
+    user-select: none;
+}
+
+.favorite-details-trigger:hover {
+    background: #f0e6d2;
+    color: #5d4a37;
+}
+
+.favorite-trigger-arrow {
+    font-size: 10px;
+    transition: transform 0.3s ease;
+}
+
+.favorite-details-trigger.is-open .favorite-trigger-arrow {
+    transform: rotate(180deg);
+}
+
+/* Контент (скрыт по умолчанию) */
+.favorite-details-content {
+    display: none;
+    margin-top: 16px;
+    animation: slideDown 0.3s ease;
+}
+
+.favorite-details-content.is-open {
+    display: block;
+}
+
+@keyframes slideDown {
+    from { opacity: 0; transform: translateY(-10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+/* Секции внутри деталей */
+.favorite-section {
+    margin-bottom: 16px;
+    padding: 16px;
+    background: #fdfaf6;
+    border-radius: 12px;
+    border-left: 3px solid #d4c5b0;
+}
+
+.favorite-section h3 {
+    margin: 0 0 8px;
+    color: #5d4a37;
+    font-size: 15px;
+    font-weight: 800;
+}
+
+.favorite-section p {
+    margin: 0;
+    color: #6b6478;
+    font-size: 14px;
+    line-height: 1.6;
+    white-space: pre-line;
+}
+
+.favorite-section--fact {
+    background: #fffdf5;
+    border-left-color: #f0b429;
+}
+
+/* Материалы */
+.favorite-materials {
+    margin-top: 16px;
+    padding-top: 16px;
+    border-top: 1px dashed #e8e2d9;
+}
+
+.favorite-materials h3 {
+    margin: 0 0 12px;
+    color: #5d4a37;
+    font-size: 15px;
+    font-weight: 800;
+}
+
+.favorite-materials-links {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+
+.favorite-material-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 8px 14px;
+    background: #ffffff;
+    border: 1px solid #e0d0b8;
+    border-radius: 10px;
+    color: #5d4a37;
+    text-decoration: none;
+    font-size: 13px;
+    font-weight: 700;
+    transition: all 0.2s ease;
+}
+
+.favorite-material-btn:hover {
+    background: #f0e6d2;
+    transform: translateY(-2px);
+}
+
+/* Подвал */
+.favorites-footer {
+    text-align: center;
+    margin-top: 48px;
+}
+
+.favorites-footer .button {
+    background: #5d4a37;
+    color: white;
+    border: none;
+    padding: 14px 32px;
+    border-radius: 999px;
+    font-weight: 700;
+    box-shadow: 0 6px 20px rgba(93, 74, 55, 0.2);
+}
+
+.favorites-footer .button:hover {
+    background: #4a3a2a;
+    box-shadow: 0 8px 25px rgba(93, 74, 55, 0.3);
+}
+
+/* =========================================================
+   АДАПТИВ ПОД МОБИЛЬНЫЕ
+   ========================================================= */
+@media (max-width: 768px) {
+    .favorite-card {
+        flex-direction: column;
+        background: #ffffff;
+        background-image: none;
+        cursor: pointer;
+    }
+
+    .favorite-card.has-image .favorite-card-image {
+        height: 180px;
+    }
+
+    .favorite-card-content {
+        padding: 20px;
+        background: transparent;
+        backdrop-filter: none;
+    }
+
+    .favorite-card-header {
+        margin-bottom: 12px;
+    }
+
+    .favorite-card-header h2 {
+        font-size: 19px;
+    }
+
+    /* Скрываем длинное описание в свернутом виде, чтобы карточка была компактной */
+    .favorite-card-desc {
+        display: -webkit-box;
+        -webkit-line-clamp: 2;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+        margin-bottom: 12px;
+        font-size: 14px;
+    }
+
+    .favorite-card.is-expanded .favorite-card-desc {
+        -webkit-line-clamp: unset;
+        display: block;
+    }
+
+    /* Кнопка "Подробнее" на мобилке выглядит как большая зона для тапа */
+    .favorite-details-trigger {
+        margin-top: 8px;
+        margin-bottom: 8px;
+        padding: 14px;
+        background: #fdfaf6;
+        border: 2px dashed #e8e2d9;
+        border-radius: 12px;
+        justify-content: center;
+        gap: 8px;
+    }
+
+    .favorite-details-trigger.is-open {
+        background: #f0e6d2;
+        border-style: solid;
+    }
+
+    /* Скрываем стрелочку, чтобы не загромождать */
+    .favorite-trigger-arrow {
+        display: none;
+    }
+
+    .favorite-trigger-text::after {
+        content: " 👆";
+    }
+
+    .favorite-details-trigger.is-open .favorite-trigger-text::after {
+        content: " 👇";
+    }
+
+    .favorite-details-content.is-open {
+        padding-top: 8px;
+    }
+}
+
+@media (max-width: 480px) {
+    .favorites-container {
+        padding: 20px 14px 60px;
+    }
+
+    .favorites-hero-icon {
+        font-size: 38px;
+    }
+
+    .favorite-card-image {
+        height: 160px;
+    }
 }

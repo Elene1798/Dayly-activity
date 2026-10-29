@@ -46,6 +46,8 @@ public interface ActivityCompletionRepository
             String source
     );
 
+    void deleteByActivityId(Long activityId);
+
     @Query("""
     SELECT COUNT(ac)
     FROM ActivityCompletion ac
