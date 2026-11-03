@@ -16,11 +16,12 @@
 <header class="site-header">
 
     <div class="site-header-brand-group">
+
         <a th:href="@{/}" class="site-header-brand">
             <span class="hero-badge">✨ Daily Activity</span>
         </a>
 
-        <!-- Иконка-консоль (мини-игры) -->
+        <!-- Иконка-консоль -->
         <a th:href="@{/mini-games}"
            class="mini-games-header-link"
            title="Мини-игры"
@@ -30,28 +31,28 @@
                  class="pixel-console">
         </a>
 
-        <!-- Иконка-календарик (ведёт на /advent) -->
+        <!-- Иконка-календарик -->
         <a th:href="@{/advent}"
            class="advent-header-link"
            title="Адвент-активность"
            aria-label="Адвент-активность">
 
-    <span class="advent-header-link__month"
-          th:if="${monthLabel != null and !monthLabel.isEmpty()}"
-          th:text="${monthLabel}">
-        Дек
-    </span>
+            <!-- Число -->
+            <span class="advent-header-link__day"
+                  th:text="${dayNumber}">3</span>
 
+            <!-- Линия -->
             <span class="advent-header-link__divider"
                   th:if="${monthLabel != null and !monthLabel.isEmpty()}">
-    </span>
+            </span>
 
-            <span class="advent-header-link__day"
-                  th:text="${dayNumber}">
-        15
-    </span>
+            <!-- Месяц -->
+            <span class="advent-header-link__month"
+                  th:if="${monthLabel != null and !monthLabel.isEmpty()}"
+                  th:text="${monthLabel}">НОЯ</span>
 
         </a>
+
     </div>
 
     <nav class="site-header-actions">
@@ -91,6 +92,7 @@
     </nav>
 
 </header>
+
 
 <!-- =========================================================
      ОСНОВНОЙ КОНТЕНТ

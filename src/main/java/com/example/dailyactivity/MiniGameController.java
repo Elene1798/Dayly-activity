@@ -2,10 +2,7 @@ package com.example.dailyactivity;
 
 import com.example.dailyactivity.model.*;
 import com.example.dailyactivity.repository.*;
-import com.example.dailyactivity.service.AchievementCheckerService;
-import com.example.dailyactivity.service.MiniGameService;
-import com.example.dailyactivity.service.MiniGameTaskService;
-import com.example.dailyactivity.service.PuzzleService;
+import com.example.dailyactivity.service.*;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.security.core.Authentication;
@@ -38,6 +35,7 @@ public class MiniGameController {
     private final PuzzleCompletionRepository puzzleCompletionRepository;
     private final SudokuRecordRepository sudokuRecordRepository;
     private final SnakeSettingsRepository snakeSettingsRepository;
+
 
     public MiniGameController(
             MiniGameService miniGameService,
@@ -155,6 +153,13 @@ public class MiniGameController {
             model.addAttribute("miniGame", miniGame);
             return "fragments/mini-game-sudoku";
         }
+
+        if ("SPY".equalsIgnoreCase(miniGame.getGameType())) {
+            model.addAttribute("miniGame", miniGame);
+            model.addAttribute("activityId", activityId);
+            return "fragments/mini-game-spy";
+        }
+
 
         List<MiniGameTask> tasks;
 

@@ -3,6 +3,7 @@ package com.example.dailyactivity;
 import com.example.dailyactivity.model.*;
 import com.example.dailyactivity.repository.ActivityRepository;
 import com.example.dailyactivity.repository.DailyRecommendationRepository;
+import com.example.dailyactivity.repository.SpyLocationRepository;
 import com.example.dailyactivity.service.*;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -10,7 +11,6 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.time.LocalDate;
-import java.time.YearMonth;
 import java.util.EnumMap;
 import java.util.Map;
 
@@ -25,6 +25,8 @@ public class AdminController {
     private final DailyRecommendationRepository dailyRecommendationRepository;
     private final PuzzleService puzzleService;
     private final ActivityService activityService;
+    private final SpyLocationRepository spyLocationRepository;
+
 
     public AdminController(
             ActivityRepository activityRepository,
@@ -33,7 +35,8 @@ public class AdminController {
             AdventService adventService,
             DailyRecommendationRepository dailyRecommendationRepository,
             PuzzleService puzzleService,
-            ActivityService activityService
+            ActivityService activityService,
+            SpyLocationRepository spyLocationRepository
     ) {
         this.activityRepository = activityRepository;
         this.miniGameService = miniGameService;
@@ -42,6 +45,8 @@ public class AdminController {
         this.dailyRecommendationRepository = dailyRecommendationRepository;
         this.puzzleService = puzzleService;
         this.activityService = activityService;
+        this.spyLocationRepository = spyLocationRepository;
+
     }
 
     // =========================================================
@@ -269,7 +274,6 @@ public class AdminController {
             miniGameTaskService.save(task);
 
         }
-
 
 
         return "redirect:/admin/mini-game/" + id + "/tasks";
@@ -533,4 +537,29 @@ public class AdminController {
 
         return "admin-mini-game-puzzles";
     }
+
+    @GetMapping("/spy/locations")
+    public String spyLocationsAdmin(Model model) {
+        model.addAttribute("locations", spyLocationRepository.findAll());
+        return "admin-spy-locations";
+    }
+
+    @PostMapping("/spy/locations/add")
+    public String addSpyLocation(
+            @RequestParam String name,
+            @RequestParam(required = false) String icon
+    ) {
+        SpyLocation loc = new SpyLocation();
+        loc.setName(name);
+        loc.setIcon(icon != null ? icon : "📍");
+        spyLocationRepository.save(loc);
+        return "redirect:/admin/spy/locations";
+    }
+
+    @PostMapping("/spy/locations/delete/{id}")
+    public String deleteSpyLocation(@PathVariable Long id) {
+        spyLocationRepository.deleteById(id);
+        return "redirect:/admin/spy/locations";
+    }
+
 }

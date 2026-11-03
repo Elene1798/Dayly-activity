@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="ru" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Локации для игры "Шпион"</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+</head>
+
+<body>
+
+<div class="container">
+
+    <a th:href="@{/admin}" class="site-header-link">
+        ← Вернуться в админку
+    </a>
+
+    <h1>🕵️ Локации для игры «Шпион»</h1>
+
+    <p class="subtitle">
+        Добавляйте места, где будут происходить действия. Игра будет случайно выбирать одно из них.
+    </p>
+
+    <!-- Форма добавления локации -->
+    <details class="admin-section-toggle" open>
+        <summary class="admin-section-toggle__header">
+            <span class="admin-section-toggle__icon">➕</span>
+            <span class="admin-section-toggle__title">Добавить локацию</span>
+            <span class="admin-section-toggle__arrow">▼</span>
+        </summary>
+
+        <div class="admin-section-toggle__body">
+            <form th:action="@{/admin/spy/locations/add}" method="post" class="mini-game-admin-form">
+                <input type="text" name="name" placeholder="Название локации (например, Пляж)" required>
+
+                <input type="text" name="icon" placeholder="Иконка (эмодзи, например 🏖️)" value="📍">
+
+                <button type="submit" class="button">
+                    ➕ Добавить локацию
+                </button>
+            </form>
+        </div>
+    </details>
+
+    <!-- Список локаций -->
+    <details class="admin-section-toggle" open>
+        <summary class="admin-section-toggle__header">
+            <span class="admin-section-toggle__icon">📋</span>
+            <span class="admin-section-toggle__title">Все локации</span>
+            <span class="admin-section-toggle__count" th:text="${#lists.size(locations)}">0</span>
+            <span class="admin-section-toggle__arrow">▼</span>
+        </summary>
+
+        <div class="admin-section-toggle__body">
+
+            <div class="mini-games-list">
+
+                <div class="mini-game-card" th:each="loc : ${locations}">
+                    <div class="mini-game-card-header">
+                        <div class="mini-game-title">
+                            <span th:text="${loc.icon}">📍</span>
+                            <strong th:text="${loc.name}">Пляж</strong>
+                        </div>
+                        <div class="mini-game-status">
+                            <span th:if="${loc.active}" class="mini-game-active">🟢 Активна</span>
+                            <span th:unless="${loc.active}" class="mini-game-inactive">⚪ Выключена</span>
+                        </div>
+                    </div>
+
+                    <div class="mini-game-actions">
+                        <form th:action="@{'/admin/spy/locations/delete/' + ${loc.id}}" method="post">
+                            <button type="submit" class="mini-game-delete-button"
+                                    onclick="return confirm('Удалить эту локацию?');">
+                                🗑️ Удалить
+                            </button>
+                        </form>
+                    </div>
+                </div>
+
+            </div>
+
+            <p th:if="${#lists.isEmpty(locations)}" class="empty-message">
+                Пока нет локаций. Добавьте первую!
+            </p>
+
+        </div>
+    </details>
+
+</div>
+
+</body>
+</html>

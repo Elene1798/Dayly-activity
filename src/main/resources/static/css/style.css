@@ -6885,7 +6885,7 @@ body.page-with-header:has(.mini-games-page) .site-header {
     box-shadow: 0 2px 0 #c9bdf5;
 }
 
-//* ===== Мобильные ===== */
+/* ===== Мобильные ===== */
 @media (max-width: 600px) {
     .cookie-banner {
         left: 6px;
@@ -7703,7 +7703,7 @@ body.page-with-header:has(.mini-games-page) .site-header {
 
 /* Месяц */
 .advent-header-link__month {
-    margin-top: 5px;
+    margin-top: 0;
     padding: 0 4px;
 
     font-size: 9px;
@@ -11694,3 +11694,464 @@ body.favorites-page .site-header-link:hover {
         height: 160px;
     }
 }
+
+/* =========================================================
+   🕵️ ШПИОН: ОБЩИЕ СТИЛИ
+   ========================================================= */
+
+/* Наследуем базовые стили от .draw-game, так как HTML использует те же классы */
+.spy-game {
+    width: 100%;
+    max-width: 900px;
+    margin: 24px auto;
+    color: #292343;
+    box-sizing: border-box;
+}
+
+/* Карточка с локацией/ролью */
+.spy-card-display {
+    background: linear-gradient(145deg, #ffffff, #f4efff);
+    border: 2px solid #c5a7ff;
+    border-radius: 20px;
+    padding: 30px 20px;
+    text-align: center;
+    box-shadow: 0 10px 30px rgba(80, 60, 150, 0.15);
+    margin-bottom: 20px;
+}
+
+.spy-card-role {
+    font-size: 2.5rem;
+    font-weight: 900;
+    color: #51318f;
+    margin-bottom: 15px;
+    text-shadow: 0 3px 0 rgba(111, 75, 202, 0.15);
+}
+
+.spy-card-location {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: #6b5a88;
+}
+
+/* Список игроков */
+.spy-players-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    justify-content: center;
+    margin-top: 10px;
+}
+
+.spy-player-tag {
+    background: #f0edff;
+    color: #51318f;
+    padding: 6px 12px;
+    border-radius: 20px;
+    font-size: 0.9rem;
+    font-weight: 700;
+}
+
+/* Кнопка выхода (дверь) */
+.draw-exit-button {
+    background: #ffe2e2;
+    color: #d9534f;
+    border: 2px solid #ffc9c9;
+    font-weight: 800;
+    padding: 8px 16px;
+    border-radius: 12px;
+    transition: all 0.2s ease;
+}
+
+.draw-exit-button:hover {
+    background: #ffc9c9;
+    transform: translateY(-2px);
+}
+
+/* Таймер */
+.draw-timer-badge {
+    background: #fff0a8;
+    border: 2px solid #c9a84b;
+    color: #8b6b00;
+    padding: 8px 16px;
+    border-radius: 20px;
+    font-weight: 900;
+    font-size: 1.2rem;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.mini-game-art-spy {
+    font-size: 5rem;
+    line-height: 1;
+    filter: drop-shadow(0 5px 0 rgba(111, 75, 202, 0.2));
+}
+/* =========================================================
+   📱 АДАПТАЦИЯ ПОД ТЕЛЕФОНЫ И ПЛАНШЕТЫ
+   ========================================================= */
+
+@media (max-width: 768px) {
+    .draw-game {
+        margin: 12px auto;
+    }
+
+    .draw-lobby {
+        padding: 20px 14px;
+        border-radius: 20px;
+    }
+
+    .draw-play {
+        padding: 16px 12px;
+        border-radius: 20px;
+    }
+
+    .draw-game-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 12px;
+    }
+
+    .draw-timer-controls {
+        align-self: flex-end;
+    }
+
+    .draw-info-grid {
+        grid-template-columns: 1fr;
+        gap: 10px;
+    }
+
+    .draw-info-card {
+        padding: 12px 14px;
+    }
+
+    .spy-card-role {
+        font-size: 2rem;
+    }
+
+    .spy-card-location {
+        font-size: 1.2rem;
+    }
+
+    .draw-controls-row {
+        flex-direction: column;
+        gap: 8px;
+    }
+
+    .draw-controls-row .button,
+    .draw-next-button {
+        width: 100%;
+    }
+}
+
+@media (max-width: 480px) {
+    .draw-game-heading h2 {
+        font-size: 20px;
+    }
+
+    .draw-room-code strong {
+        font-size: 16px;
+    }
+
+    .spy-card-display {
+        padding: 20px 12px;
+    }
+
+    .spy-card-role {
+        font-size: 1.8rem;
+    }
+
+    .spy-card-location {
+        font-size: 1rem;
+    }
+
+    .draw-join-form {
+        flex-direction: column;
+    }
+
+    .draw-join-form .button {
+        width: 100%;
+    }
+}
+
+.spy-copy-button.copied {
+    color: #26966d;
+    background: #e8f8f0;
+    border-color: #bcebd2;
+}
+
+.spy-copy-button {
+    width: 38px;
+    height: 38px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid #e5e6f2;
+    border-radius: 11px;
+    background: #f6f6ff;
+    color: var(--spy-primary);
+    cursor: pointer;
+    transition: background .2s, transform .2s;
+}
+
+.spy-copy-button:hover {
+    background: #e9eaff;
+    transform: translateY(-2px);
+}
+
+.spy-copy-button:active {
+    transform: scale(.94);
+}
+
+.spy-copy-feedback {
+    display: block;
+    min-height: 15px;
+    margin-top: 5px;
+    color: #26966d;
+    font-size: 11px;
+}
+
+/* ========================================
+   SECRET SPY CARD
+======================================== */
+
+.spy-secret-card {
+    position: relative;
+    width: 100%;
+    margin-top: 24px;
+    overflow: hidden;
+    border: 1px solid #e8e3fa;
+    border-radius: 24px;
+    background: #fff;
+    box-shadow: 0 12px 35px rgba(78, 55, 130, .09);
+}
+
+.spy-secret-header {
+    display: flex;
+    align-items: center;
+    gap: 13px;
+    padding: 20px 24px;
+    border-bottom: 1px solid #efedf7;
+}
+
+.spy-secret-header-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 43px;
+    height: 43px;
+    flex-shrink: 0;
+    border-radius: 13px;
+    background: #f0edff;
+    font-size: 22px;
+}
+
+.spy-secret-header h3 {
+    margin: 3px 0 0;
+    color: #29264b;
+    font-size: 17px;
+    font-weight: 800;
+}
+
+.spy-secret-eyebrow {
+    color: #8b78d6;
+    font-size: 9px;
+    font-weight: 800;
+    letter-spacing: 2px;
+}
+
+.spy-secret-lock {
+    margin-left: auto;
+    font-size: 20px;
+    opacity: .6;
+}
+
+.spy-secret-content {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 390px;
+    padding: 45px 24px 38px;
+    overflow: hidden;
+    text-align: center;
+    background:
+            radial-gradient(ellipse at 50% 15%, rgba(255,255,255,.95), transparent 60%),
+            linear-gradient(145deg, #f5f2ff 0%, #fdfbff 48%, #f0edff 100%);
+}
+
+.spy-secret-decoration {
+    position: absolute;
+    width: 190px;
+    height: 190px;
+    border: 1px solid rgba(128, 104, 202, .09);
+    border-radius: 50%;
+    pointer-events: none;
+}
+
+.spy-decoration-one {
+    top: -105px;
+    right: -65px;
+}
+
+.spy-decoration-two {
+    bottom: -135px;
+    left: -70px;
+    width: 250px;
+    height: 250px;
+}
+
+.spy-secret-symbol {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 112px;
+    height: 112px;
+    margin-bottom: 24px;
+    border: 1px solid rgba(255,255,255,.8);
+    border-radius: 32px;
+    background: linear-gradient(145deg, #fff, #eae4ff);
+    box-shadow:
+            0 12px 30px rgba(105, 80, 180, .13),
+            inset 0 1px 2px #fff;
+}
+
+.spy-secret-symbol span {
+    font-size: 57px;
+    line-height: 1;
+}
+
+.spy-secret-caption {
+    position: relative;
+    color: #8979bd;
+    font-size: 10px;
+    font-weight: 800;
+    letter-spacing: 3px;
+}
+
+.spy-secret-content h1 {
+    position: relative;
+    margin: 12px 0 17px;
+    color: #5841a3;
+    font-size: clamp(29px, 5vw, 42px);
+    line-height: 1.15;
+    font-weight: 900;
+    letter-spacing: 1px;
+}
+
+.spy-secret-divider {
+    width: 55px;
+    height: 3px;
+    margin: 0 auto 20px;
+    border-radius: 5px;
+    background: linear-gradient(90deg, #8c72ed, #c0a5f5);
+}
+
+.spy-secret-location {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    max-width: 100%;
+    padding: 13px 20px;
+    border: 1px solid #e7e0fa;
+    border-radius: 14px;
+    background: rgba(255,255,255,.78);
+    box-shadow: 0 5px 15px rgba(80, 60, 130, .04);
+}
+
+.spy-location-icon {
+    font-size: 20px;
+}
+
+.spy-secret-location p {
+    margin: 0;
+    color: #51456e;
+    font-size: 19px;
+    font-weight: 700;
+}
+
+.spy-secret-hint {
+    position: relative;
+    max-width: 360px;
+    margin: 22px 0 0;
+    color: #88829d;
+    font-size: 12px;
+    line-height: 1.6;
+}
+
+.spy-secret-footer {
+    display: flex;
+    justify-content: space-between;
+    gap: 10px;
+    padding: 15px 23px;
+    color: #aaa3c2;
+    font-size: 9px;
+    font-weight: 800;
+    letter-spacing: 1.5px;
+}
+
+/* Телефоны */
+
+@media (max-width: 600px) {
+    .spy-secret-header {
+        padding: 16px;
+    }
+
+    .spy-secret-content {
+        min-height: 340px;
+        padding: 35px 16px;
+    }
+
+    .spy-secret-symbol {
+        width: 95px;
+        height: 95px;
+        border-radius: 27px;
+    }
+
+    .spy-secret-symbol span {
+        font-size: 49px;
+    }
+
+    .spy-secret-location p {
+        font-size: 16px;
+    }
+
+    .spy-secret-footer {
+        padding: 13px 15px;
+        font-size: 8px;
+    }
+}
+
+.draw-join-form {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    width: 100%;
+}
+
+.draw-join-form input {
+    box-sizing: border-box;
+    width: 100%;
+    min-height: 46px;
+    padding: 12px 15px;
+    border: 1px solid #ded9ec;
+    border-radius: 12px;
+    background: #fff;
+    font-size: 15px;
+    outline: none;
+}
+
+.draw-join-form input:focus {
+    border-color: #8b78d6;
+    box-shadow: 0 0 0 3px rgba(139, 120, 214, .12);
+}
+
+.draw-join-form button {
+    width: 100%;
+    min-height: 46px;
+}
+
+

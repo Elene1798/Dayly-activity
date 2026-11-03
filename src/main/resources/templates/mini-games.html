@@ -8,6 +8,10 @@
     <title>Мини-игры — Daily Activity</title>
 
     <link rel="stylesheet" href="/css/style.css?v=3">
+
+    <meta name="_csrf" th:content="${_csrf.token}">
+    <meta name="_csrf_header" th:content="${_csrf.headerName}">
+
 </head>
 
 <body class="page-with-header">
@@ -33,20 +37,16 @@
            title="Адвент-активность"
            aria-label="Адвент-активность">
 
-    <span class="advent-header-link__month"
-          th:if="${monthLabel != null and !monthLabel.isEmpty()}"
-          th:text="${monthLabel}">
-        Дек
-    </span>
+    <span class="advent-header-link__day"
+          th:text="${dayNumber}">3</span>
 
             <span class="advent-header-link__divider"
                   th:if="${monthLabel != null and !monthLabel.isEmpty()}">
     </span>
 
-            <span class="advent-header-link__day"
-                  th:text="${dayNumber}">
-        15
-    </span>
+            <span class="advent-header-link__month"
+                  th:if="${monthLabel != null and !monthLabel.isEmpty()}"
+                  th:text="${monthLabel}">НОЯ</span>
 
         </a>
     </div>
@@ -167,6 +167,12 @@
 
         </span>
 
+                        <span th:case="'SPY'" class="mini-game-art-spy">
+            🕵️
+
+        </span>
+
+
                         <span th:case="*" class="mini-game-art-default">
             🎮
         </span>
@@ -182,6 +188,7 @@
                     Описание игры
                 </p>
 
+                <!-- Кнопка для всех игр -->
                 <button type="button"
                         class="button mini-game-toggle"
                         onclick="toggleMiniGame(this)">
@@ -344,6 +351,7 @@
             const puzzleGame = content.querySelector('[data-puzzle-game]');
             const sudokuGame = content.querySelector('[data-sudoku-game]');
             const drawGame = content.querySelector('[data-draw-game]');
+            const spyGame = content.querySelector('[data-spy-game]');
 
             if (memoryGame && typeof initializeMemoryGame === 'function') {
                 initializeMemoryGame(memoryGame);
@@ -359,6 +367,8 @@
                 initializeSudokuGame(sudokuGame);
             } else if (drawGame && typeof initializeDrawGame === 'function') {
                 initializeDrawGame(drawGame);
+            } else if (spyGame && typeof initializeSpyGame === 'function') {
+                initializeSpyGame(spyGame);
             } else if (card.dataset.gameType?.toUpperCase() === 'WORD') {
                 content.innerHTML =
                     '<p class="mini-games-completed">Все игры пройдены</p>';
@@ -455,6 +465,8 @@
 <script src="https://cdn.jsdelivr.net/npm/sockjs-client@1/dist/sockjs.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/stompjs@2.3.3/lib/stomp.min.js"></script>
 <script th:src="@{/js/games/mini-game-draw.js}"></script>
+<script th:src="@{/js/games/mini-game-spy.js}"></script>
+
 
 
 <div th:replace="~{fragments/achievement-notification :: notification}"></div>

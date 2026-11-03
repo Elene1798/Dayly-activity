@@ -32,13 +32,18 @@
            class="advent-header-link"
            title="Адвент-активность"
            aria-label="Адвент-активность">
+
+    <span class="advent-header-link__day"
+          th:text="${dayNumber}">3</span>
+
+            <span class="advent-header-link__divider"
+                  th:if="${monthLabel != null and !monthLabel.isEmpty()}">
+    </span>
+
             <span class="advent-header-link__month"
                   th:if="${monthLabel != null and !monthLabel.isEmpty()}"
-                  th:text="${monthLabel}">Дек</span>
-            <span class="advent-header-link__divider"
-                  th:if="${monthLabel != null and !monthLabel.isEmpty()}"></span>
-            <span class="advent-header-link__day"
-                  th:text="${dayNumber}">15</span>
+                  th:text="${monthLabel}">НОЯ</span>
+
         </a>
     </div>
 

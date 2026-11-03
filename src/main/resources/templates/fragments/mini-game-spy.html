@@ -1,0 +1,196 @@
+<div class="mini-game-inline draw-game"
+     data-spy-game
+     th:attr="data-game-id=${miniGame.id}">
+
+    <input type="hidden" class="draw-csrf-token"
+           th:name="${_csrf.parameterName}"
+           th:value="${_csrf.token}">
+
+    <!-- Лобби: создание и подключение -->
+    <section class="draw-lobby" data-spy-lobby>
+        <p class="draw-subtitle">
+            Один игрок — шпион, он не знает, где находится. Остальные знают локацию.
+            Вычислите шпиона, задавая вопросы!
+        </p>
+
+        <div class="draw-lobby-card">
+            <div class="draw-card-icon">🕵️</div>
+            <h3>Создать новую игру</h3>
+            <p>Введи своё имя и создай комнату, чтобы отправить код друзьям.</p>
+
+            <!-- ВОТ ЭТО ПОЛЕ НУЖНО ДОБАВИТЬ -->
+            <input type="text"
+                   data-spy-name
+                   placeholder="Твоё имя"
+                   style="width: 100%; padding: 10px; margin-bottom: 15px; border: 1px solid #ddd; border-radius: 10px; font-size: 16px;"
+                   required>
+
+            <button type="button" class="button draw-primary-button"
+                    data-spy-create>
+                🎮 Создать комнату
+            </button>
+        </div>
+
+        <div class="draw-or"><span>или</span></div>
+
+        <div class="draw-lobby-card draw-join-card">
+            <div class="draw-card-icon">🔗</div>
+            <h3>Присоединиться</h3>
+            <p>Введи своё имя и код комнаты, который прислал друг.</p>
+
+            <div class="draw-join-form">
+
+                <input type="text"
+                       data-spy-join-name
+                       placeholder="Твоё имя"
+                       maxlength="30"
+                       autocomplete="name"
+                       aria-label="Твоё имя"
+                       required>
+
+                <input type="text"
+                       class="draw-code-input"
+                       data-spy-code-input
+                       placeholder="КОД КОМНАТЫ"
+                       maxlength="6"
+                       autocomplete="off"
+                       aria-label="Код комнаты"
+                       required>
+
+                <button type="button"
+                        class="button draw-primary-button"
+                        data-spy-join>
+                    🔗 Войти в комнату
+                </button>
+
+            </div>
+        </div>
+
+        <p class="draw-lobby-status" data-spy-status aria-live="polite"></p>
+    </section>
+
+
+    <!-- Игровая комната -->
+    <section class="draw-play" data-spy-play hidden>
+        <header class="draw-game-header">
+            <div class="draw-game-heading">
+                <span class="draw-eyebrow">DAILY ACTIVITY · SPY GAME</span>
+                <button type="button"
+                        class="button draw-exit-button"
+                        data-spy-exit>
+                    🚪 Выйти
+                </button>
+            </div>
+
+            <div class="draw-timer-controls">
+                <div class="draw-timer-badge">
+                    <span>⏱</span>
+                    <span class="draw-timer" data-spy-timer>180</span>
+                    <small>сек.</small>
+                </div>
+            </div>
+        </header>
+
+        <div class="draw-info-grid">
+            <div class="draw-info-card">
+                <span class="draw-info-label">ТВОЯ РОЛЬ</span>
+                <strong class="draw-role" data-spy-role>Ожидание...</strong>
+            </div>
+
+            <div class="draw-info-card draw-room-info spy-info-card">
+                <span class="draw-info-label">КОД КОМНАТЫ</span>
+
+                <div class="draw-room-code spy-room-code">
+                    <strong data-spy-room-code>—</strong>
+
+                    <button type="button"
+                            class="spy-copy-button"
+                            data-spy-copy-code
+                            title="Скопировать код комнаты"
+                            aria-label="Скопировать код комнаты">
+                        <svg viewBox="0 0 24 24"
+                             width="19"
+                             height="19"
+                             fill="none"
+                             stroke="currentColor"
+                             stroke-width="2"
+                             stroke-linecap="round"
+                             stroke-linejoin="round"
+                             aria-hidden="true">
+                            <rect x="8" y="8" width="13" height="13" rx="2"></rect>
+                            <path d="M16 8V5a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h3"></path>
+                        </svg>
+                    </button>
+                </div>
+                <span class="spy-copy-feedback" data-spy-copy-feedback aria-live="polite"></span>
+            </div>
+        </div>
+
+        <!-- Список игроков -->
+        <div class="draw-word-banner" data-spy-players-banner>
+            <span class="draw-word-icon">👥</span>
+            <div>
+                <span class="draw-info-label">ИГРОКИ В КОМНАТЕ</span>
+                <strong data-spy-players-list>Никого нет</strong>
+            </div>
+        </div>
+
+        <!-- Карточка локации (показывается после старта) -->
+        <div class="draw-board-card spy-board-card spy-secret-card" data-spy-card hidden>
+
+            <div class="spy-secret-header">
+                <div class="spy-secret-header-icon">🃏</div>
+                <div>
+                    <span class="spy-secret-eyebrow">SECRET MISSION</span>
+                    <h3>Твоя карточка</h3>
+                </div>
+                <span class="spy-secret-lock">🔒</span>
+            </div>
+
+            <div class="spy-secret-content">
+                <div class="spy-secret-decoration spy-decoration-one"></div>
+                <div class="spy-secret-decoration spy-decoration-two"></div>
+
+                <div class="spy-secret-symbol">
+                    <span data-spy-card-symbol>🕵️</span>
+                </div>
+
+                <span class="spy-secret-caption">ТВОЯ РОЛЬ</span>
+
+                <h1 data-spy-card-role>ШПИОН</h1>
+
+                <div class="spy-secret-divider"></div>
+
+                <div class="spy-secret-location">
+                    <span class="spy-location-icon">📍</span>
+                    <p data-spy-card-location>Попробуйте понять, где вы</p>
+                </div>
+
+                <p class="spy-secret-hint" data-spy-card-hint>
+                    Внимательно слушай других игроков и не выдавай себя!
+                </p>
+            </div>
+
+            <div class="spy-secret-footer">
+                <span>DAILY ACTIVITY</span>
+                <span>✦ SPY GAME ✦</span>
+            </div>
+
+        </div>
+
+        <!-- Кнопка старта (видна только создателю) -->
+        <div class="draw-controls" data-spy-start-controls>
+            <div class="draw-controls-row">
+                <button type="button"
+                        class="button draw-primary-button"
+                        data-spy-start>
+                    🎲 Раздать карточки
+                </button>
+            </div>
+        </div>
+
+        <p class="draw-status" data-spy-play-status aria-live="polite">
+            Ожидаем игроков...
+        </p>
+    </section>
+</div>
